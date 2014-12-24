@@ -1,0 +1,8 @@
+INTSTYLE=ise
+INFILE=F:\Projects\flightsim_controller_new\Xilinx\top_flightsim_controller_n\top_flightsim_controller_n.ncd
+OUTFILE=F:\Projects\flightsim_controller_new\Xilinx\top_flightsim_controller_n\top_flightsim_controller_n.bit
+FAMILY=Spartan3E
+PART=xc3s500e-4fg320
+WORKINGDIR=F:\Projects\flightsim_controller_new\Xilinx\top_flightsim_controller_n
+LICENSE=WebPack
+USER_INFO=210635019_0_0_055

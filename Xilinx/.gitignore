@@ -1,0 +1,56 @@
+# generated folders
+iseconfig/
+ipcore_dir/
+xlnx_auto_0_xdb/
+xst/
+_ngo/
+_xmsgs/
+
+# intermediate build files  except files after clean-up project files
+*.bgn
+*.bit
+*.bld
+*.cmd_log
+*.drc
+# *.gise  
+*.lso
+*.ncd
+*.ngc
+*.ngd
+*.ngr
+*.pad
+*.par
+*.pcf
+*.prj
+*.ptwx
+*.stx
+*.syr
+*.twr
+*.twx
+*.unroutes
+*.ut
+# *.xise
+*.xpi
+*.xst
+# *_bitgen.xwbt
+*_envsettings.html
+# *_guide.ncd
+*_map.map
+*_map.mrp
+*_map.ncd
+*_map.ngm
+*_map.xrpt
+*_ngdbuild.xrpt
+*_pad.csv
+*_pad.txt
+*_par.xrpt
+# *_summary.html
+*_summary.xml
+*_usage.xml
+*_vhdl.prj
+*_xst.xrpt
+
+# project-wide generated files
+usage_statistics_webtalk.html
+webtalk.log
+webtalk_pn.xml

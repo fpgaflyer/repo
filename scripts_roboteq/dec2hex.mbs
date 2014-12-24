@@ -1,0 +1,40 @@
+top:
+dim rem[8] as integer
+for i=0 andwhile i<8
+rem[i] = 0
+next
+
+i = 0
+print("\n")
+print("x")
+
+pos = GetValue(_ABCNTR)/10
+
+while pos > 0 
+rem[i] = pos mod 16
+pos = pos/16
+i++
+end while
+
+for i=7 andwhile i>=0 evaluate i--
+
+if 		rem[i]=10 then 
+print("A")
+elseif  rem[i]=11 then 
+print("B")
+elseif  rem[i]=12 then 
+print("C")
+elseif  rem[i]=13 then 
+print("D")
+elseif  rem[i]=14 then 
+print("E")
+elseif  rem[i]=15 then 
+print("F")
+else	
+print(rem[i])
+end if
+
+next
+
+wait(1)
+goto top
