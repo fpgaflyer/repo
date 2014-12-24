@@ -3,15 +3,15 @@ Project: Flightsimulator controller VHDL code to control Brushless DC motors for
 Project status: under development
 
 Project description (current status >>>):
-XXX Code running on Xilinx FPGA Starter Kit Board to drive one Roboteq SBL1360 Brushless 
-DC motor controller connected via serial in/out.
->>> Code will not run due to TEST settings in clk_divider_n 
+>>> Code running on Xilinx FPGA Starter Kit Board to drive one Roboteq SBL1360 Brushless 
+Roboteq motor controller connected via serial in/out.
+XXX Code will not run due to ...
 
 Speed control loop implemented on SBL1360 controller:
 configuration settings = profile_roboteq/Profile.xml 
 microBasic script = scripts_roboteq/dec2hex.mbs MicroBasic script sents every ms the absolute encoder value in hexadecimal format (only positive values !!)
 
-Position control loop implemented in FPGA
+Position control loop implemented in FPGA:
 
 Serial out: !G runtime commands to SBL1360
 Serial in: actual position motor axis from SBL1360
@@ -51,4 +51,9 @@ ENCODER AVAGO HEDS-9040#B00 1000CPR, mounted on motor axis, connected to SBL1360
 see: http://www.avagotech.com/docs/AV02-1132EN
 
 
+Tools:
+VHDL design creation: Sigasi 		http://www.sigasi.com/
+Simulation: Modelsim PE SE 10.3d	http://www.mentor.com/products/fv/modelsim/
+Xilinx: ISE Design Suite 14.1 		http://www.xilinx.com/products/design-tools/ise-design-suite.html
+Roboteq: Roborun+ PC Utility 1.4	http://www.roboteq.com/
  

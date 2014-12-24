@@ -6,7 +6,7 @@
         <Nodes>
           <Node Text="Scripting">
             <Nodes>
-              <Node Text="Script Auto-Start" Value="0">
+              <Node Text="Script Auto-Start" Value="1">
                 <Nodes />
               </Node>
             </Nodes>
@@ -84,31 +84,23 @@
           <Node Text="CAN Mode" Value="0">
             <Nodes />
           </Node>
+          <Node Text="Bit Rate" Value="3">
+            <Nodes />
+          </Node>
           <Node Text="Node ID" Value="1">
             <Nodes />
           </Node>
-          <Node Text="Bit Rate" Value="3">
+          <Node Text="Listen Node ID" Value="4">
             <Nodes />
           </Node>
           <Node Text="Heartbeat (ms)" Value="0">
             <Nodes />
           </Node>
-          <Node Text="CANOpen">
-            <Nodes>
-              <Node Text="Autostart" Value="0">
-                <Nodes />
-              </Node>
-            </Nodes>
+          <Node Text="MiniCAN Send Rate (ms)" Value="100">
+            <Nodes />
           </Node>
-          <Node Text="MiniCAN">
-            <Nodes>
-              <Node Text="Listen Node ID" Value="4">
-                <Nodes />
-              </Node>
-              <Node Text="Send Rate (ms)" Value="100">
-                <Nodes />
-              </Node>
-            </Nodes>
+          <Node Text="CANOpen Autostart" Value="0">
+            <Nodes />
           </Node>
         </Nodes>
       </Node>
@@ -344,41 +336,6 @@
             </Nodes>
           </Node>
           <Node Text="AIn5" Value="">
-            <Nodes>
-              <Node Text="Conversion Type" Value="0">
-                <Nodes />
-              </Node>
-              <Node Text="Input Use" Value="16">
-                <Nodes />
-              </Node>
-              <Node Text="Range" Value="">
-                <Nodes>
-                  <Node Text="Input Min (mV)" Value="250">
-                    <Nodes />
-                  </Node>
-                  <Node Text="Input Center (mV)" Value="2500">
-                    <Nodes />
-                  </Node>
-                  <Node Text="Input Max (mV)" Value="4750">
-                    <Nodes />
-                  </Node>
-                </Nodes>
-              </Node>
-              <Node Text="Conversion Polarity" Value="0">
-                <Nodes />
-              </Node>
-              <Node Text="Input Deadband (%)" Value="5">
-                <Nodes />
-              </Node>
-              <Node Text="Action on Min" Value="16">
-                <Nodes />
-              </Node>
-              <Node Text="Action on Max" Value="16">
-                <Nodes />
-              </Node>
-            </Nodes>
-          </Node>
-          <Node Text="AIn6" Value="">
             <Nodes>
               <Node Text="Conversion Type" Value="0">
                 <Nodes />
@@ -685,7 +642,7 @@
           <Node Text="Number of Pole Pairs" Value="2">
             <Nodes />
           </Node>
-          <Node Text="Feedback Sensor" Value="0">
+          <Node Text="Operating Mode" Value="0">
             <Nodes />
           </Node>
           <Node Text="Stall Detection" Value="2">
@@ -709,6 +666,9 @@
                 <Nodes />
               </Node>
             </Nodes>
+          </Node>
+          <Node Text="Closed Loop Feedback Sensor" Value="0">
+            <Nodes />
           </Node>
         </Nodes>
       </Node>

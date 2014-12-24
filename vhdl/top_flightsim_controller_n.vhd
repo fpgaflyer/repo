@@ -1,4 +1,4 @@
-library IEEE;                --
+library IEEE;                           --
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -20,7 +20,7 @@ entity top_flightsim_controller_n is
 		 rotary_press   : in  std_logic;
 		 btn_west       : in  std_logic;
 		 btn_east       : in  std_logic;
---		 sw0            : in  std_logic;
+		 --		 sw0            : in  std_logic;
 		 serial_out     : out std_logic;
 		 serial_in      : in  std_logic
 	);
@@ -125,17 +125,13 @@ architecture structure of top_flightsim_controller_n is
 	end component readpos;
 
 	component control
-		port(clk       : in  std_logic;
-			 press     : in  std_logic;
-			 btn_west  : in  std_logic;
-			 btn_east  : in  std_logic;
-	--		 sw0       : in  std_logic;
-			 kp        : out std_logic_vector(3 downto 0);
-			 val_in    : in  std_logic_vector(7 downto 0);
-			 val_out   : out std_logic_vector(7 downto 0);
-			 sync_20ms : in  std_logic);
---			 rom_addr  : out std_logic_vector(10 downto 0);
---			 rom_data  : in  std_logic_vector(7 downto 0));
+		port(clk      : in  std_logic;
+			 press    : in  std_logic;
+			 btn_west : in  std_logic;
+			 btn_east : in  std_logic;
+			 kp       : out std_logic_vector(3 downto 0);
+			 val_in   : in  std_logic_vector(7 downto 0);
+			 val_out  : out std_logic_vector(7 downto 0));
 	end component control;
 
 	component digital_filter
@@ -153,14 +149,6 @@ architecture structure of top_flightsim_controller_n is
 			 pos    : in  std_logic_vector(13 downto 0);
 			 drive  : out std_logic_vector(10 downto 0));
 	end component p_controller_n;
-
---	component rom_2048x8
---		port(
---			clka  : in  std_logic;
---			addra : in  std_logic_vector(10 downto 0);
---			douta : out std_logic_vector(7 downto 0)
---		);
---	end component rom_2048x8;
 
 	-- declaration of signals used to interconnect 
 
@@ -188,10 +176,6 @@ architecture structure of top_flightsim_controller_n is
 	signal setpositie          : std_logic_vector(7 downto 0);
 	signal drive               : std_logic_vector(10 downto 0);
 	signal positie             : std_logic_vector(31 downto 0);
-	signal sync_20ms           : std_logic;
---	signal sw0_f               : std_logic;
-	signal rom_addr            : std_logic_vector(10 downto 0);
-	signal rom_data            : std_logic_vector(7 downto 0);
 
 begin
 
@@ -207,7 +191,7 @@ begin
 		port map(
 			clk        => clk,
 			sync_2ms   => sync_2ms,
-			sync_20ms  => sync_20ms,
+			sync_20ms  => open,
 			en_16xbaud => en_16xbaud
 		);
 
@@ -316,28 +300,17 @@ begin
 			     o     => btn_east_f
 		);
 
---	A13 : component digital_filter
---		port map(clk   => sync_2ms,
---			     reset => reset,
---			     i     => sw0,
---			     o     => sw0_f
---		);
-
-	A14 : component control
-		port map(clk       => clk,
-			     press     => press,
-			     btn_west  => btn_west_f,
-			     btn_east  => btn_east_f,
-	--		     sw0       => sw0_f,
-			     kp        => kp,
-			     val_in    => setpos,
-			     val_out   => setpositie,
-			     sync_20ms => sync_20ms
---			     rom_addr  => rom_addr,
---			     rom_data  => rom_data
+	A13 : component control
+		port map(clk      => clk,
+			     press    => press,
+			     btn_west => btn_west_f,
+			     btn_east => btn_east_f,
+			     kp       => kp,
+			     val_in   => setpos,
+			     val_out  => setpositie
 		);
 
-	A15 : component p_controller_n
+	A14 : component p_controller_n
 		port map(clk    => clk,
 			     reset  => reset,
 			     kp     => kp,
@@ -346,16 +319,10 @@ begin
 			     drive  => drive
 		);
 
---	A16 : component rom_2048x8
---		port map(clka  => clk,
---			     addra => rom_addr,
---			     douta => rom_data
---		);
-
 	-- additional statements  
 
-	value   <= kp & "00000" & drive & "0000" & setpos;
-	positie <= "000000000000000000000000" & pos(13 downto 6);
+	value   <= kp & "00000" & drive & "0000" & setpos; 			--LCD line 1
+	positie <= "000000000000000000000000" & pos(13 downto 6); 	--LCD line 2
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';
