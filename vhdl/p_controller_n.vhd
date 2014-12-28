@@ -8,8 +8,8 @@ entity p_controller_n is
 		clk    : in  std_logic;
 		reset  : in  std_logic;
 		kp     : in  std_logic_vector(3 downto 0);
-		setpos : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0 - 409.6 mm
-		pos    : in  std_logic_vector(13 downto 0); --25um unit,  range 0 - 409.6 mm
+		setpos : in  std_logic_vector(13 downto 0); --25um unit, range 0 - 409.6 mm
+		pos    : in  std_logic_vector(13 downto 0); --25um unit, range 0 - 409.6 mm
 		drive  : out std_logic_vector(10 downto 0)
 	);
 
@@ -44,7 +44,7 @@ begin
 			drive   <= (others => '0'); -- stop
 
 		else
-			e <= ('0' & setpos & "000000") - ('0' & pos); --(setpos x 64) - pos
+			e <= ('0' & setpos) - ('0' & pos); -- setpos - pos
 
 			if e(14) = '1' then         --neg
 				e_abs <= (not e(13 downto 0)) + 1;

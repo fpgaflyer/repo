@@ -13,7 +13,7 @@ entity readpos is
 		din                 : in  std_logic_vector(7 downto 0);
 		read_buffer         : out std_logic;
 		buffer_data_present : in  std_logic;
-		pos                 : out std_logic_vector(31 downto 0)
+		pos                 : out std_logic_vector(31 downto 0) --25um 
 	);
 end;
 

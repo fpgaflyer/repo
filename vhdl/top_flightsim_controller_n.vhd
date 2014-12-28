@@ -1,4 +1,4 @@
-library IEEE;                           --
+library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -20,7 +20,7 @@ entity top_flightsim_controller_n is
 		 rotary_press   : in  std_logic;
 		 btn_west       : in  std_logic;
 		 btn_east       : in  std_logic;
-		 --		 sw0            : in  std_logic;
+		 sw0            : in  std_logic;
 		 serial_out     : out std_logic;
 		 serial_in      : in  std_logic
 	);
@@ -80,7 +80,7 @@ architecture structure of top_flightsim_controller_n is
 			 reset : in  std_logic;
 			 step  : in  std_logic;
 			 dir   : in  std_logic;
-			 val   : out std_logic_vector(7 downto 0));
+			 val   : out std_logic_vector(13 downto 0));
 	end component counter;
 
 	component conv
@@ -130,8 +130,10 @@ architecture structure of top_flightsim_controller_n is
 			 btn_west : in  std_logic;
 			 btn_east : in  std_logic;
 			 kp       : out std_logic_vector(3 downto 0);
-			 val_in   : in  std_logic_vector(7 downto 0);
-			 val_out  : out std_logic_vector(7 downto 0));
+			 sw0      : in  std_logic;
+			 val_in0  : in  std_logic_vector(13 downto 0);
+			 val_in1  : in  std_logic_vector(13 downto 0);
+			 val_out  : out std_logic_vector(13 downto 0));
 	end component control;
 
 	component digital_filter
@@ -145,10 +147,26 @@ architecture structure of top_flightsim_controller_n is
 		port(clk    : in  std_logic;
 			 reset  : in  std_logic;
 			 kp     : in  std_logic_vector(3 downto 0);
-			 setpos : in  std_logic_vector(7 downto 0);
+			 setpos : in  std_logic_vector(13 downto 0);
 			 pos    : in  std_logic_vector(13 downto 0);
 			 drive  : out std_logic_vector(10 downto 0));
 	end component p_controller_n;
+
+	component ramp_gen
+		port(clk       : in  std_logic;
+			 start     : in  std_logic;
+			 sync_20ms : in  std_logic;
+			 dout      : out std_logic_vector(7 downto 0));
+	end component ramp_gen;
+
+	component interpol
+		port(clk      : in  std_logic;
+			 reset    : in  std_logic;
+			 sync_2ms : in  std_logic;
+			 din      : in  std_logic_vector(7 downto 0);
+			 dvalid   : in  std_logic;
+			 dout     : out std_logic_vector(13 downto 0));
+	end component interpol;
 
 	-- declaration of signals used to interconnect 
 
@@ -162,20 +180,24 @@ architecture structure of top_flightsim_controller_n is
 	signal en_16xbaud          : std_logic;
 	signal do                  : int(7 downto 0);
 	signal dvalid              : bool;
-	signal value               : std_logic_vector(31 downto 0);
+	signal val_0               : std_logic_vector(31 downto 0);
+	signal val_1               : std_logic_vector(31 downto 0);
 	signal data_out            : std_logic_vector(7 downto 0);
 	signal read_buffer         : std_logic;
 	signal buffer_data_present : std_logic;
 	signal pos                 : std_logic_vector(31 downto 0);
 	signal sync_2ms            : std_logic;
+	signal sync_20ms           : std_logic;
 	signal btn_west_f          : std_logic;
 	signal btn_east_f          : std_logic;
 	signal press               : std_logic;
 	signal kp                  : std_logic_vector(3 downto 0);
-	signal setpos              : std_logic_vector(7 downto 0);
-	signal setpositie          : std_logic_vector(7 downto 0);
+	signal setpos              : std_logic_vector(13 downto 0);
+	signal setpositie          : std_logic_vector(13 downto 0);
 	signal drive               : std_logic_vector(10 downto 0);
-	signal positie             : std_logic_vector(31 downto 0);
+	signal ramp_out            : std_logic_vector(7 downto 0);
+	signal interpol_out        : std_logic_vector(13 downto 0);
+	signal sw0_f               : std_logic;
 
 begin
 
@@ -191,7 +213,7 @@ begin
 		port map(
 			clk        => clk,
 			sync_2ms   => sync_2ms,
-			sync_20ms  => open,
+			sync_20ms  => sync_20ms,
 			en_16xbaud => en_16xbaud
 		);
 
@@ -213,8 +235,8 @@ begin
 		port map(
 			clk     => clk,
 			reset   => reset,
-			val_0   => value,
-			val_1   => positie,
+			val_0   => val_0,
+			val_1   => val_1,
 			data    => data,
 			addr    => addr,
 			data_en => data_en,
@@ -306,7 +328,9 @@ begin
 			     btn_west => btn_west_f,
 			     btn_east => btn_east_f,
 			     kp       => kp,
-			     val_in   => setpos,
+			     sw0      => sw0_f,
+			     val_in0  => setpos,
+			     val_in1  => interpol_out,
 			     val_out  => setpositie
 		);
 
@@ -319,10 +343,33 @@ begin
 			     drive  => drive
 		);
 
+	A15 : component ramp_gen
+		port map(clk       => clk,
+			     start     => press,
+			     sync_20ms => sync_20ms,
+			     dout      => ramp_out
+		);
+
+	A16 : component interpol
+		port map(clk      => clk,
+			     reset    => reset,
+			     sync_2ms => sync_2ms,
+			     din      => ramp_out,
+			     dvalid   => sync_20ms,
+			     dout     => interpol_out
+		);
+
+	A17 : component digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => sw0,
+			     o     => sw0_f
+		);
+
 	-- additional statements  
 
-	value   <= kp & "00000" & drive & "0000" & setpos; 			--LCD line 1
-	positie <= "000000000000000000000000" & pos(13 downto 6); 	--LCD line 2
+	val_0 <= kp & "00000000000000" & setpositie; --LCD line 1
+	val_1 <= pos;                       --LCD line 2
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';

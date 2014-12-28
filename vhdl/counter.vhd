@@ -9,12 +9,12 @@ entity counter is
 		reset  : in  std_logic;
 		step   : in  std_logic;
 		dir    : in  std_logic;
-		val    : out std_logic_vector(7 downto 0)
+		val    : out std_logic_vector(13 downto 0)
 	);
 end;
 
 architecture behav of counter is
-	signal cnt : std_logic_vector(7 downto 0);
+	signal cnt : std_logic_vector(13 downto 0);
 
 begin
 	process

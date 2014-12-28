@@ -1,4 +1,4 @@
-library IEEE;
+library IEEE; --
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_ARITH.ALL;
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
@@ -24,7 +24,7 @@ begin
 		if rising_edge(clk) then        -- use work edge for good synthese, wait until does not work !!!!!
 
 			if cnt_2ms = "11000011010011111" then --99999
-				-- if cnt_2ms = "00000000001100011" then --99 TEST
+				-- if cnt_2ms = "00000000001100011" then --99 TEST 2us
 				sync_2ms <= '1';
 				cnt_2ms  <= (others => '0');
 			else
@@ -32,8 +32,11 @@ begin
 				cnt_2ms  <= cnt_2ms + 1;
 			end if;
 
-			if cnt_20ms = "11110100001000111111" then --999999
-				-- if cnt_20ms = "00000000001111100111" then --999 TEST
+			-- if cnt_20ms = "11110100001000111111" then --999999
+			-- if cnt_20ms = "00000000001111100111" then --999 TEST 20us
+			if cnt_20ms = "11000011010011111111" then --799999 for 16ms
+				-- if cnt_20ms = "00000000001100011111" then --799 TEST 16us
+
 				sync_20ms <= '1';
 				cnt_20ms  <= (others => '0');
 			else

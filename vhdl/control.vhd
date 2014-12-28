@@ -10,8 +10,10 @@ entity control is
 		btn_west : in  std_logic;
 		btn_east : in  std_logic;
 		kp       : out std_logic_vector(3 downto 0);
-		val_in   : in  std_logic_vector(7 downto 0);
-		val_out  : out std_logic_vector(7 downto 0)
+		sw0      : in  std_logic;
+		val_in0  : in  std_logic_vector(13 downto 0);
+		val_in1  : in  std_logic_vector(13 downto 0);
+		val_out  : out std_logic_vector(13 downto 0)
 	);
 
 end;
@@ -32,7 +34,11 @@ begin
 		btn_e_d <= btn_east;
 
 		if (press = '1') and (press_d = '0') then
-			val_out <= val_in;
+			val_out <= val_in0;
+		end if;
+
+		if sw0 = '1' then
+			val_out <= val_in1;
 		end if;
 
 		if (btn_west = '1') and (btn_w_d = '0') then
