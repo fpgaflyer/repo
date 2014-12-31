@@ -1,4 +1,4 @@
--- runtime =  6ms with sync_2ms / sync_20ms set to us in clk_divider_n.vhd (TEST)
+-- runtime =  20ms with sync_2/20ms set to 2/20us in clk_divider_n.vhd (TEST)
 --			  and ramp_gen.vhd stepsize set to 8 (TEST)	
 
 entity tb_interpol is

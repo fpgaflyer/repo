@@ -16,26 +16,26 @@ end entity interpol;
 
 architecture RTL of interpol is
 	signal n     : integer range 0 to 15;
-	signal delta : std_logic_vector(13 downto 0);
+	signal delta : std_logic_vector(21 downto 0);
 	signal do    : std_logic_vector(15 downto 0);
 	type t_lut is array (0 to 15) of std_logic_vector(7 downto 0);
 	constant lut : t_lut := (
-		0  => "00000000",               --0
-		1  => "11111111",               --255
-		2  => "10000000",               --128
-		3  => "01010101",               --85
-		4  => "01000000",               --64	
-		5  => "00110011",               --51
-		6  => "00101011",               --43
-		7  => "00100101",               --37
-		8  => "00100000",               --32
-		9  => "00011100",               --28
-		10 => "00011010",               --26
-		11 => "00010111",               --23
-		12 => "00010101",               --21
-		13 => "00010100",               --20
-		14 => "00010010",               --18
-		15 => "00010001");              --17
+		0  => X"FF",                    --255
+		1  => X"FF",                    --255
+		2  => X"80",                    --128
+		3  => X"55",                    --85
+		4  => X"40",                    --64	
+		5  => X"33",                    --51
+		6  => X"2B",                    --43
+		7  => X"25",                    --37
+		8  => X"20",                    --32
+		9  => X"1C",                    --28
+		10 => X"1A",                    --26
+		11 => X"17",                    --23
+		12 => X"15",                    --21
+		13 => X"14",                    --20
+		14 => X"12",                    --18
+		15 => X"11");                   --17
 
 begin
 	process
@@ -47,12 +47,12 @@ begin
 
 		di := din & "000000";           -- din x 64  (1.6mm -> 25um)
 
-		if dvalid = '1' then            ------ denk aan beveiliging n = 0
+		if dvalid = '1' then
 			up := (di >= do);
 			if up = true then
-				delta <= ((di - do) * lut(n));
+				delta <= ((di - do(13 downto 0)) * lut(n));
 			else
-				delta <= ((do - di) * lut(n));
+				delta <= ((do(13 downto 0) - di) * lut(n));
 			end if;
 
 		end if;
@@ -60,21 +60,23 @@ begin
 		if sync_2ms = '1' then
 			n <= n + 1;
 			if up = true then
-				if (do < di) then
-					do <= do + delta;
+				if (do(13 downto 0) < di) then
+					do <= ("00" & do(13 downto 0)) + ("00" & delta(21 downto 8));
 				end if;
 			else
-				if (do >= di) then
-					do <= do - delta;
+				if (do(13 downto 0) >= di) then
+					do <= ("00" & do(13 downto 0)) - ("00" & delta(21 downto 8));
 				end if;
 			end if;
 
 		end if;
 
-		if do(14) = '1' then            -- do > 16383   letop delta berekening
-			dout <= "11111111111111";
-		elsif do(15) = '1' then         -- do < 0
-			dout <= "00000000000000";
+		if do(15 downto 14) = "01" then -- do > 16383   
+			do   <= "0011111111111111";
+			dout <= (others => '1');
+		elsif do(15 downto 14) = "11" then -- do < 0
+			do   <= (others => '0');
+			dout <= (others => '0');
 		else
 			dout <= do(13 downto 0);
 		end if;
