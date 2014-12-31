@@ -1,6 +1,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.NUMERIC_STD.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 entity interpol is
 	port(
@@ -14,63 +15,81 @@ entity interpol is
 end entity interpol;
 
 architecture RTL of interpol is
-	--	signal n     : unsigned(3 downto 0);
-	signal delta : unsigned(13 downto 0);
-	signal do    : unsigned(13 downto 0);
+	signal n     : integer range 0 to 15;
+	signal delta : std_logic_vector(13 downto 0);
+	signal do    : std_logic_vector(15 downto 0);
+	type t_lut is array (0 to 15) of std_logic_vector(7 downto 0);
+	constant lut : t_lut := (
+		0  => "00000000",               --0
+		1  => "11111111",               --255
+		2  => "10000000",               --128
+		3  => "01010101",               --85
+		4  => "01000000",               --64	
+		5  => "00110011",               --51
+		6  => "00101011",               --43
+		7  => "00100101",               --37
+		8  => "00100000",               --32
+		9  => "00011100",               --28
+		10 => "00011010",               --26
+		11 => "00010111",               --23
+		12 => "00010101",               --21
+		13 => "00010100",               --20
+		14 => "00010010",               --18
+		15 => "00010001");              --17
 
 begin
 	process
-		variable di  : unsigned(13 downto 0);
-		variable up  : boolean;
-		variable dpd : unsigned(14 downto 0);
+		variable di : std_logic_vector(13 downto 0);
+		variable up : boolean;
+
 	begin
 		wait until clk = '1';
 
-		di  := unsigned(din & "000000"); -- din x 64  (1.6mm -> 25um)
-		dpd := ('0' & do) + ('0' & delta);
+		di := din & "000000";           -- din x 64  (1.6mm -> 25um)
 
-		if reset = '1' then
-			--		n     <= (others => '0');
-			delta <= (others => '0');
-			do    <= (others => '0');
-			up    := false;
-
-		else
-			--		if dvalid = '1' and n /= 15 then
-			if dvalid = '1' then
-				up := (di >= do);
-				if up = true then
-					--				delta <= ((di - do) / (n + 1)); XST div must have power of 2
-					delta <= ((di - do) / 8);
-				else
-					--				delta <= ((do - di) / (n + 1)); XST div must have power of 2
-					delta <= ((do - di) / 8);
-				end if;
-
-			end if;
-
-			if sync_2ms = '1' then
-				--			n <= n + 1;
-				if up = true then
-					if (do < di) and (dpd(14) = '0') then
-						do <= dpd(13 downto 0);
-					end if;
-				else
-					if (do > di) and (do > delta) then
-						do <= do - delta;
-					end if;
-				end if;
-
+		if dvalid = '1' then            ------ denk aan beveiliging n = 0
+			up := (di >= do);
+			if up = true then
+				delta <= ((di - do) * lut(n));
+			else
+				delta <= ((do - di) * lut(n));
 			end if;
 
 		end if;
 
-	--	if dvalid = '1' then
-	--		n <= (others => '0');
-	--	end if;
+		if sync_2ms = '1' then
+			n <= n + 1;
+			if up = true then
+				if (do < di) then
+					do <= do + delta;
+				end if;
+			else
+				if (do >= di) then
+					do <= do - delta;
+				end if;
+			end if;
+
+		end if;
+
+		if do(14) = '1' then            -- do > 16383   letop delta berekening
+			dout <= "11111111111111";
+		elsif do(15) = '1' then         -- do < 0
+			dout <= "00000000000000";
+		else
+			dout <= do(13 downto 0);
+		end if;
+
+		if dvalid = '1' then
+			n <= 0;
+		end if;
+
+		if reset = '1' then
+			n     <= 0;
+			delta <= (others => '0');
+			do    <= (others => '0');
+			up    := false;
+		end if;
 
 	end process;
-
-	dout <= std_logic_vector(do);
 
 end architecture RTL;

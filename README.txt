@@ -3,9 +3,9 @@ Project: Flightsimulator controller VHDL code to control Brushless DC motors for
 Project status: under development
 
 Project description (current status >>>):
->>> Code running on Xilinx FPGA Starter Kit Board to drive one Roboteq SBL1360 Brushless 
+XXX Code running on Xilinx FPGA Starter Kit Board to drive one Roboteq SBL1360 Brushless 
 Roboteq motor controller connected via serial in/out.
-XXX Code will not run due to ...
+>>> Code will not run ok due to problems with interpol.vhd
 
 Speed control loop implemented on SBL1360 controller:
 configuration settings = profile_roboteq/Profile.xml 
