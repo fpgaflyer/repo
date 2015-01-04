@@ -12,6 +12,7 @@ entity conv is
 		rst    : in  bool;
 		di     : in  int(10 downto 0);
 		start  : in  bool;
+		rtc    : in  int(1 downto 0);   -- 00=!G 01=!EX 10=!H 1 11=!MG  
 
 		do     : out int(7 downto 0);
 		dvalid : out bool
@@ -95,17 +96,31 @@ begin
 				else
 					pc <= pc;
 				end if;
+				case rtc is
+					when "00"   => null;
+					when "10"   => bin <= "00000000001";
+					when others => bin <= (others => '0');
+				end case;
 			when 1 =>
 				ascii_out('!');
 				bcd_shift;
 			when 2 =>
-				ascii_out('G');
+				case rtc is
+					when "01"   => ascii_out('E');
+					when "10"   => ascii_out('H');
+					when "11"   => ascii_out('M');
+					when others => ascii_out('G');
+				end case;
 				bcd_shift;
 			when 3 =>
-				ascii_out(' ');
+				case rtc is
+					when "01"   => ascii_out('X');
+					when "11"   => ascii_out('G');
+					when others => ascii_out(' ');
+				end case;
 				bcd_shift;
 			when 4 =>
-				if sign = '1' then
+				if sign = '1' and rtc = "00" then
 					ascii_out('-');
 				end if;
 				bcd_shift;
@@ -117,7 +132,10 @@ begin
 				digit_out(digits(2), nozero);
 			when 14 =>
 				digit_out(digits(1), nozero);
-				nozero <= '0';
+				case rtc is
+					when "00"   => nozero <= '0';
+					when others => null;
+				end case;
 			when 15 =>
 				digit_out(digits(0), nozero);
 			when 16 =>

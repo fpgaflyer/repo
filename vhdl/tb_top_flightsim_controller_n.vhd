@@ -21,9 +21,10 @@ architecture structure of tb_top_flightsim_controller_n is
 			 rotary_press   : in  std_logic;
 			 btn_west       : in  std_logic;
 			 btn_east       : in  std_logic;
+			 btn_south      : in  std_logic;
+			 sw0            : in  std_logic;
 			 serial_out     : out std_logic;
-			 serial_in      : in  std_logic
-		);
+			 serial_in      : in  std_logic);
 	end component top_flightsim_controller_n;
 
 	signal CLK50          : std_logic := '1';
@@ -41,7 +42,9 @@ architecture structure of tb_top_flightsim_controller_n is
 	signal BTN_EAST       : std_logic;
 	signal serial_out     : std_logic;
 	signal SERIAL_IN      : std_logic;
-
+	signal BTN_SOUTH      : std_logic;
+	signal SW0            : std_logic;
+	
 begin
 	CLK50 <= NOT CLK50 after 10 ns;
 
@@ -56,6 +59,10 @@ begin
 	BTN_WEST <= '0';
 
 	BTN_EAST <= '0';
+
+	BTN_SOUTH <= '0';
+
+	SW0 <= '1';
 
 	SERIAL_IN <= '0';
 
@@ -73,9 +80,12 @@ begin
 			     rotary_press   => ROT_P,
 			     btn_west       => btn_west,
 			     btn_east       => btn_east,
+			     btn_south      => BTN_SOUTH,
+			     sw0            => SW0,
 			     serial_out     => serial_out,
 			     serial_in      => serial_in
-		);
-
+			     
+			     );
+	
 end;
 

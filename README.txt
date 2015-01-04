@@ -5,7 +5,7 @@ Project status: under development
 Project description (current status >>>):
 >>> Code running on Xilinx FPGA Starter Kit Board to drive one Roboteq SBL1360 Brushless 
 Roboteq motor controller connected via serial in/out.
->>> Code will not run ok due ......
+XXX Code will not run ok due ......
 
 Speed control loop implemented on SBL1360 controller:
 configuration settings = profile_roboteq/Profile.xml 
@@ -20,7 +20,8 @@ Rotary Push-Button switch to set motor_axis position (SW0 = '0')
 OR
 Ramp generator (ramp_gen.vhd) generates motor_axis position (SW0 = '1')
 
-Button west/east  set Kp value position controller
+Button west/east:	set Kp value position controller
+Button south;		load home counter position in Roboteq controller <<< does not work yet
 LCD screen shows Kp(0-F) and set position (0-3FFF) on line 1, motor axis position (0-FFFFFFFF) on line2  
 
 

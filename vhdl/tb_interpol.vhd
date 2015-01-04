@@ -15,6 +15,11 @@ architecture rtl of tb_interpol is
 			 en_16xbaud : out std_logic);
 	end component clk_divider_n;
 
+	component reset_gen_n
+		port(clk   : in  std_logic;
+			 reset : out std_logic);
+	end component reset_gen_n;
+
 	component interpol
 		port(clk      : in  std_logic;
 			 reset    : in  std_logic;
@@ -32,15 +37,14 @@ architecture rtl of tb_interpol is
 	end component ramp_gen;
 
 	signal CLK       : std_logic := '1';
-	signal RESET     : std_logic;
+	signal reset     : std_logic;
 	signal sync_2ms  : std_logic;
 	signal sync_20ms : std_logic;
 	signal din       : std_logic_vector(7 downto 0);
 	signal dout      : std_logic_vector(13 downto 0);
 
 begin
-	CLK   <= NOT CLK after 10 ns;
-	RESET <= '1', '0' after 100 ns;
+	CLK <= NOT CLK after 10 ns;
 
 	A1 : component clk_divider_n
 		port map(clk        => clk,
@@ -49,18 +53,25 @@ begin
 			     en_16xbaud => open
 		);
 
+	A4 : entity work.reset_gen_n
+		port map(clk   => clk,
+			     reset => reset
+		);
+
 	A2 : component interpol
 		port map(clk      => clk,
 			     reset    => reset,
 			     sync_2ms => sync_2ms,
 			     din      => din,
 			     dvalid   => sync_20ms,
-			     dout     => dout);
+			     dout     => dout
+		);
 
 	A3 : component ramp_gen
 		port map(clk       => clk,
 			     start     => '0',
 			     sync_20ms => sync_20ms,
-			     dout      => din);
+			     dout      => din
+		);
 
 end;
