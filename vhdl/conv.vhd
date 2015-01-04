@@ -12,7 +12,7 @@ entity conv is
 		rst    : in  bool;
 		di     : in  int(10 downto 0);
 		start  : in  bool;
-		rtc    : in  int(1 downto 0);   -- 00=!G 01=!EX 10=!H 1 11=!MG  
+		rtc    : in  int(1 downto 0);   -- 00=!G 01=^MMOD 1 0 10=!H 1 11=^MMOD 1 1  
 
 		do     : out int(7 downto 0);
 		dvalid : out bool
@@ -35,7 +35,7 @@ architecture RTL of conv is
 	signal digits       : digit_v(0 to 3);
 	signal bin          : int(10 downto 0);
 	signal sign, nozero : bool;
-	signal pc           : integer range 0 to 16;
+	signal pc           : integer range 0 to 17;
 
 begin
 	process
@@ -77,7 +77,7 @@ begin
 	begin
 		wait until clk = '1';
 		dvalid <= '0';
-		if pc < 16 then
+		if pc < 17 then
 			pc <= pc + 1;
 		else
 			pc <= 0;
@@ -96,17 +96,18 @@ begin
 				else
 					pc <= pc;
 				end if;
-				case rtc is
-					when "00"   => null;
-					when "10"   => bin <= "00000000001";
-					when others => bin <= (others => '0');
-				end case;
+
 			when 1 =>
-				ascii_out('!');
+				case rtc is
+					when "01"   => ascii_out('^');
+					when "10"   => ascii_out('!');
+					when "11"   => ascii_out('^');
+					when others => ascii_out('!');
+				end case;
 				bcd_shift;
 			when 2 =>
 				case rtc is
-					when "01"   => ascii_out('E');
+					when "01"   => ascii_out('M');
 					when "10"   => ascii_out('H');
 					when "11"   => ascii_out('M');
 					when others => ascii_out('G');
@@ -114,33 +115,63 @@ begin
 				bcd_shift;
 			when 3 =>
 				case rtc is
-					when "01"   => ascii_out('X');
-					when "11"   => ascii_out('G');
+					when "01"   => ascii_out('M');
+					when "11"   => ascii_out('M');
 					when others => ascii_out(' ');
 				end case;
 				bcd_shift;
 			when 4 =>
-				if sign = '1' and rtc = "00" then
-					ascii_out('-');
-				end if;
+				case rtc is
+					when "01"   => ascii_out('O');
+					when "10"   => ascii_out('1');
+					when "11"   => ascii_out('O');
+					when others =>
+						if sign = '1' then
+							ascii_out('-');
+						end if;
+				end case;
 				bcd_shift;
 			when 5 | 6 | 7 | 8 | 9 | 10 | 11 =>
 				bcd_shift;
 			when 12 =>
-				digit_out(digits(3), nozero);
-			when 13 =>
-				digit_out(digits(2), nozero);
-			when 14 =>
-				digit_out(digits(1), nozero);
 				case rtc is
-					when "00"   => nozero <= '0';
-					when others => null;
+					when "01"   => ascii_out('D');
+					when "10"   => null;
+					when "11"   => ascii_out('D');
+					when others => digit_out(digits(3), nozero);
+				end case;
+			when 13 =>
+				case rtc is
+					when "01"   => ascii_out(' ');
+					when "10"   => null;
+					when "11"   => ascii_out(' ');
+					when others => digit_out(digits(2), nozero);
+				end case;
+			when 14 =>
+				case rtc is
+					when "01"   => ascii_out('1');
+					when "10"   => null;
+					when "11"   => ascii_out('1');
+					when others =>
+						digit_out(digits(1), nozero);
+						nozero <= '0';
 				end case;
 			when 15 =>
-				digit_out(digits(0), nozero);
+				case rtc is
+					when "01"   => ascii_out(' ');
+					when "10"   => null;
+					when "11"   => ascii_out(' ');
+					when others => digit_out(digits(0), nozero);
+				end case;
 			when 16 =>
+				case rtc is
+					when "01"   => ascii_out('0');
+					when "10"   => null;
+					when "11"   => ascii_out('1');
+					when others => null;
+				end case;
+			when 17 =>
 				ascii_out(cr);
-
 			when others => pc <= 0;
 		end case;
 		if rst = '1' then

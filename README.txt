@@ -21,7 +21,7 @@ OR
 Ramp generator (ramp_gen.vhd) generates motor_axis position (SW0 = '1')
 
 Button west/east:	set Kp value position controller
-Button south;		load home counter position in Roboteq controller <<< does not work yet
+Button south;		load home counter position in Roboteq controller 
 LCD screen shows Kp(0-F) and set position (0-3FFF) on line 1, motor axis position (0-FFFFFFFF) on line2  
 
 

@@ -31,7 +31,7 @@ begin
 	CLK   <= NOT CLK after 10 ns;
 	RESET <= '1', '0' after 100 ns;
 	START <= '0', '1' after 100000 ns, '0' after 100020 ns;
-	DI    <= "10000000000";
+	DI    <= "00010000000";
 	RTC   <= "11";
 
 	A1 : conv port map(

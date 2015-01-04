@@ -139,7 +139,8 @@ architecture structure of top_flightsim_controller_n is
 			 val_in1   : in  std_logic_vector(13 downto 0);
 			 val_out   : out std_logic_vector(13 downto 0);
 			 val_dis   : out std_logic_vector(13 downto 0);
-			 rtc       : out std_logic_vector(1 downto 0));
+			 rtc       : out std_logic_vector(1 downto 0);
+			 start     : out std_logic);
 	end component control;
 
 	component digital_filter
@@ -206,8 +207,9 @@ architecture structure of top_flightsim_controller_n is
 	signal interpol_out        : std_logic_vector(13 downto 0);
 	signal sw0_f               : std_logic;
 	signal rtc                 : int(1 downto 0);
+	signal start               : std_logic;
 	signal val_dis             : std_logic_vector(13 downto 0);
-	
+
 begin
 
 	-- component instantiations statements
@@ -273,7 +275,7 @@ begin
 		port map(clk    => clk,
 			     rst    => reset,
 			     di     => drive,
-			     start  => sync_2ms,
+			     start  => start,
 			     rtc    => rtc,
 			     do     => do,
 			     dvalid => dvalid
@@ -352,7 +354,8 @@ begin
 			     val_in1   => interpol_out,
 			     val_out   => setpositie,
 			     val_dis   => val_dis,
-			     rtc       => rtc
+			     rtc       => rtc,
+			     start     => start
 		);
 
 	A15 : component p_controller_n
@@ -387,7 +390,6 @@ begin
 			     o     => sw0_f
 		);
 
-	
 	-- additional statements  
 
 	val_0 <= kp & "00000000000000" & val_dis; --LCD line 1

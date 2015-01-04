@@ -17,7 +17,8 @@ entity control is
 		val_in1   : in  std_logic_vector(13 downto 0);
 		val_out   : out std_logic_vector(13 downto 0);
 		val_dis   : out std_logic_vector(13 downto 0);
-		rtc       : out std_logic_vector(1 downto 0)
+		rtc       : out std_logic_vector(1 downto 0);
+		start     : out std_logic
 	);
 
 end;
@@ -26,9 +27,12 @@ architecture behav of control is
 	signal press_d : std_logic;
 	signal btn_w_d : std_logic;
 	signal btn_e_d : std_logic;
+	signal btn_s_d : std_logic;
 	signal cnt     : std_logic_vector(3 downto 0);
-	type t_sm is (drive_cmd, ex_cmd, h1_cmd, mg_cmd);
+	signal cnt_2ms : std_logic_vector(7 downto 0);
+	type t_sm is (drive_cmd, mmod10_cmd, h1_cmd, mmod11_cmd);
 	signal sm : t_sm;
+
 begin
 	process
 	begin
@@ -37,8 +41,10 @@ begin
 		press_d <= press;
 		btn_w_d <= btn_west;
 		btn_e_d <= btn_east;
+		btn_s_d <= btn_south;
 
 		val_dis <= val_in0;
+		start   <= '0';
 
 		if (press = '1') and (press_d = '0') then
 			val_out <= val_in0;
@@ -58,27 +64,44 @@ begin
 		end if;
 
 		if sync_2ms = '1' then
+			cnt_2ms <= cnt_2ms + 1;
 			case sm is
 				when drive_cmd =>
-					rtc <= "00";
-					if btn_south = '1' then
-						sm <= ex_cmd;
+					rtc   <= "00";
+					start <= '1';
+					if (btn_south = '1') and (btn_s_d = '0') then
+						sm      <= mmod10_cmd;
+						cnt_2ms <= (others => '0');
 					end if;
-				when ex_cmd =>
+
+				when mmod10_cmd =>      --open loop
 					rtc <= "01";
-					sm  <= h1_cmd;
-				when h1_cmd =>
-					rtc <= "10";
-					sm  <= mg_cmd;
-				when mg_cmd =>
-					rtc <= "11";
-					if btn_south = '0' then
-						sm <= ex_cmd;
+					if cnt_2ms(7) = '1' then --delay 128x2ms
+						start   <= '1';
+						sm      <= h1_cmd;
+						cnt_2ms <= (others => '0');
 					end if;
-					sm <= drive_cmd;
+
+				when h1_cmd =>          -- load home counter
+					rtc <= "10";
+					if cnt_2ms(7) = '1' then --delay 128x2ms
+						start   <= '1';
+						sm      <= mmod11_cmd;
+						cnt_2ms <= (others => '0');
+					end if;
+
+				when mmod11_cmd =>      -- closed loop
+					rtc <= "11";
+					if cnt_2ms(7) = '1' then --delay 128x2ms
+						start   <= '1';
+						sm      <= drive_cmd;
+						cnt_2ms <= (others => '0');
+					end if;
+
 				when others =>
 					sm <= drive_cmd;
 			end case;
+
 		end if;
 
 	end process;
