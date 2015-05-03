@@ -27,12 +27,26 @@ NET "rotary_b"     LOC = "G18" | IOSTANDARD = LVTTL | PULLUP;
 NET "rotary_press" LOC = "V16" | IOSTANDARD = LVTTL | PULLDOWN;
 
 # Pushbuttons 
+NET "btn_north"  LOC = "V4" | IOSTANDARD = LVTTL | PULLDOWN ;
 NET "btn_west"  LOC = "D18" | IOSTANDARD = LVTTL | PULLDOWN ;
 NET "btn_east"  LOC = "H13" | IOSTANDARD = LVTTL | PULLDOWN ;
 NET "btn_south" LOC = "K17" | IOSTANDARD = LVTTL | PULLDOWN ;
 
 # Slide Switches 
 NET "sw0" LOC = "L13" | IOSTANDARD = LVTTL | PULLUP;
+
+# Header J2 
+NET "home_sensor" LOC = "A6" | IOSTANDARD = LVTTL ;
+
+# LEDs 
+NET "led<0>" LOC = "F12" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<1>" LOC = "E12" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<2>" LOC = "E11" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<3>" LOC = "F11" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<4>" LOC = "C11" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<5>" LOC = "D11" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<6>" LOC = "E9" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
+NET "led<7>" LOC = "F9" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
 
 # RS-232 Serial Ports DTE male 
 NET "serial_out" LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;

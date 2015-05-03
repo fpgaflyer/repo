@@ -18,10 +18,13 @@ entity top_flightsim_controller_n is
 		 rotary_a       : in  std_logic;
 		 rotary_b       : in  std_logic;
 		 rotary_press   : in  std_logic;
+		 btn_north      : in  std_logic;
 		 btn_west       : in  std_logic;
 		 btn_east       : in  std_logic;
 		 btn_south      : in  std_logic;
 		 sw0            : in  std_logic;
+		 home_sensor    : in  std_logic;
+		 led            : out std_logic_vector(7 downto 0);
 		 serial_out     : out std_logic;
 		 serial_in      : in  std_logic
 	);
@@ -81,7 +84,7 @@ architecture structure of top_flightsim_controller_n is
 			 reset : in  std_logic;
 			 step  : in  std_logic;
 			 dir   : in  std_logic;
-			 val   : out std_logic_vector(13 downto 0));
+			 val   : out std_logic_vector(7 downto 0));
 	end component counter;
 
 	component conv
@@ -127,20 +130,24 @@ architecture structure of top_flightsim_controller_n is
 	end component readpos;
 
 	component control
-		port(clk       : in  std_logic;
-			 sync_2ms  : in  std_logic;
-			 press     : in  std_logic;
-			 btn_west  : in  std_logic;
-			 btn_east  : in  std_logic;
-			 btn_south : in  std_logic;
-			 kp        : out std_logic_vector(3 downto 0);
-			 sw0       : in  std_logic;
-			 val_in0   : in  std_logic_vector(13 downto 0);
-			 val_in1   : in  std_logic_vector(13 downto 0);
-			 val_out   : out std_logic_vector(13 downto 0);
-			 val_dis   : out std_logic_vector(13 downto 0);
-			 rtc       : out std_logic_vector(1 downto 0);
-			 start     : out std_logic);
+		port(clk           : in  std_logic;
+			 reset         : in  std_logic;
+			 sync_2ms      : in  std_logic;
+			 press         : in  std_logic;
+			 btn_north     : in  std_logic;
+			 btn_west      : in  std_logic;
+			 btn_east      : in  std_logic;
+			 btn_south     : in  std_logic;
+			 kp            : out std_logic_vector(3 downto 0);
+			 sw0           : in  std_logic;
+			 setpos_in     : in  std_logic_vector(7 downto 0);
+			 setpos_out    : out std_logic_vector(13 downto 0);
+			 drive_in      : in  std_logic_vector(10 downto 0);
+			 drive_out     : out std_logic_vector(10 downto 0);
+			 rtc           : out std_logic_vector(1 downto 0);
+			 start         : out std_logic;
+			 home_enable   : out std_logic;
+			 position_mode : out std_logic);
 	end component control;
 
 	component digital_filter
@@ -159,21 +166,14 @@ architecture structure of top_flightsim_controller_n is
 			 drive  : out std_logic_vector(10 downto 0));
 	end component p_controller_n;
 
-	component ramp_gen
-		port(clk       : in  std_logic;
-			 start     : in  std_logic;
-			 sync_20ms : in  std_logic;
-			 dout      : out std_logic_vector(7 downto 0));
-	end component ramp_gen;
-
-	component interpol
-		port(clk      : in  std_logic;
-			 reset    : in  std_logic;
-			 sync_2ms : in  std_logic;
-			 din      : in  std_logic_vector(7 downto 0);
-			 dvalid   : in  std_logic;
-			 dout     : out std_logic_vector(13 downto 0));
-	end component interpol;
+	component home_position
+		port(clk         : in  std_logic;
+			 reset       : in  std_logic;
+			 home_enable : in  std_logic;
+			 home_sensor : in  std_logic;
+			 pos_in      : in  std_logic_vector(31 downto 0);
+			 pos_out     : out std_logic_vector(31 downto 0));
+	end component home_position;
 
 	-- declaration of signals used to interconnect 
 
@@ -194,21 +194,22 @@ architecture structure of top_flightsim_controller_n is
 	signal buffer_data_present : std_logic;
 	signal pos                 : std_logic_vector(31 downto 0);
 	signal sync_2ms            : std_logic;
-	signal sync_20ms           : std_logic;
+	signal btn_north_f         : std_logic;
 	signal btn_west_f          : std_logic;
 	signal btn_east_f          : std_logic;
 	signal btn_south_f         : std_logic;
 	signal press               : std_logic;
 	signal kp                  : std_logic_vector(3 downto 0);
-	signal setpos              : std_logic_vector(13 downto 0);
+	signal setpos              : std_logic_vector(7 downto 0);
 	signal setpositie          : std_logic_vector(13 downto 0);
 	signal drive               : std_logic_vector(10 downto 0);
-	signal ramp_out            : std_logic_vector(7 downto 0);
-	signal interpol_out        : std_logic_vector(13 downto 0);
 	signal sw0_f               : std_logic;
 	signal rtc                 : int(1 downto 0);
 	signal start               : std_logic;
-	signal val_dis             : std_logic_vector(13 downto 0);
+	signal home_enable         : std_logic;
+	signal drive_out           : int(10 downto 0);
+	signal pos_out             : std_logic_vector(31 downto 0);
+	signal position_mode       : std_logic;
 
 begin
 
@@ -224,7 +225,7 @@ begin
 		port map(
 			clk        => clk,
 			sync_2ms   => sync_2ms,
-			sync_20ms  => sync_20ms,
+			sync_20ms  => open,
 			en_16xbaud => en_16xbaud
 		);
 
@@ -274,7 +275,7 @@ begin
 	A6 : component conv
 		port map(clk    => clk,
 			     rst    => reset,
-			     di     => drive,
+			     di     => drive_out,
 			     start  => start,
 			     rtc    => rtc,
 			     do     => do,
@@ -341,59 +342,74 @@ begin
 			     o     => btn_south_f
 		);
 
-	A14 : component control
-		port map(clk       => clk,
-			     sync_2ms  => sync_2ms,
-			     press     => press,
-			     btn_west  => btn_west_f,
-			     btn_east  => btn_east_f,
-			     btn_south => btn_south_f,
-			     kp        => kp,
-			     sw0       => sw0_f,
-			     val_in0   => setpos,
-			     val_in1   => interpol_out,
-			     val_out   => setpositie,
-			     val_dis   => val_dis,
-			     rtc       => rtc,
-			     start     => start
+	A14 : component digital_filter
+		port map(clk   => sync_2ms,
+			     reset => reset,
+			     i     => btn_north,
+			     o     => btn_north_f
 		);
 
-	A15 : component p_controller_n
-		port map(clk    => clk,
-			     reset  => reset,
-			     kp     => kp,
-			     setpos => setpositie,
-			     pos    => pos(13 downto 0),
-			     drive  => drive
-		);
-
-	A16 : component ramp_gen
-		port map(clk       => clk,
-			     start     => press,
-			     sync_20ms => sync_20ms,
-			     dout      => ramp_out
-		);
-
-	A17 : component interpol
-		port map(clk      => clk,
-			     reset    => reset,
-			     sync_2ms => sync_2ms,
-			     din      => ramp_out,
-			     dvalid   => sync_20ms,
-			     dout     => interpol_out
-		);
-
-	A18 : component digital_filter
+	A15 : component digital_filter
 		port map(clk   => clk,
 			     reset => reset,
 			     i     => sw0,
 			     o     => sw0_f
 		);
 
+	A16 : component control
+		port map(
+			clk           => clk,
+			reset         => reset,
+			sync_2ms      => sync_2ms,
+			press         => press,
+			btn_north     => btn_north_f,
+			btn_west      => btn_west_f,
+			btn_east      => btn_east_f,
+			btn_south     => btn_south_f,
+			kp            => kp,
+			sw0           => sw0_f,
+			setpos_in     => setpos,
+			setpos_out    => setpositie,
+			drive_in      => drive,
+			drive_out     => drive_out,
+			rtc           => rtc,
+			start         => start,
+			home_enable   => home_enable,
+			position_mode => position_mode
+		);
+
+	A17 : component p_controller_n
+		port map(clk    => clk,
+			     reset  => reset,
+			     kp     => kp,
+			     setpos => setpositie,
+			     pos    => pos_out(13 downto 0),
+			     drive  => drive
+		);
+
+	A18 : component home_position
+		port map(
+			clk         => clk,
+			reset       => reset,
+			home_enable => home_enable,
+			home_sensor => home_sensor,
+			pos_in      => pos,
+			pos_out     => pos_out
+		);
+
 	-- additional statements  
 
-	val_0 <= kp & "00000000000000" & val_dis; --LCD line 1
-	val_1 <= pos;                       --LCD line 2
+	val_0 <= kp & "00000000000000000000" & setpos; --LCD line 1  	1.6mm
+	val_1 <= "000000" & pos_out(31 downto 6); --LCD line 2    		1.6mm
+
+	led(0) <= home_sensor;
+	led(1) <= '0';
+	led(2) <= '0';
+	led(3) <= '0';
+	led(4) <= position_mode;
+	led(5) <= position_mode;
+	led(6) <= position_mode;
+	led(7) <= position_mode;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';

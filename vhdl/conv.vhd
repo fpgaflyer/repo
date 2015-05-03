@@ -6,14 +6,20 @@ use ieee.std_logic_unsigned.all;
 library gen;
 use gen.std.all;
 
+--	rtc  runtime cmd
+--	00 = stop  
+--	01 = go
+-- 	10 = emergency stop
+-- 	11 = emergency stop release
+
+
 entity conv is
 	port(
 		clk    : in  bool;
 		rst    : in  bool;
 		di     : in  int(10 downto 0);
 		start  : in  bool;
-		rtc    : in  int(1 downto 0);   -- 00=!G 01=^MMOD 1 0 10=!H 1 11=^MMOD 1 1  
-
+		rtc    : in  int(1 downto 0);
 		do     : out int(7 downto 0);
 		dvalid : out bool
 	);
@@ -77,7 +83,7 @@ begin
 	begin
 		wait until clk = '1';
 		dvalid <= '0';
-		if pc < 17 then
+		if pc < 16 then
 			pc <= pc + 1;
 		else
 			pc <= 0;
@@ -99,78 +105,70 @@ begin
 
 			when 1 =>
 				case rtc is
-					when "01"   => ascii_out('^');
+					when "01"   => ascii_out('!');
 					when "10"   => ascii_out('!');
-					when "11"   => ascii_out('^');
+					when "11"   => ascii_out('!');
 					when others => ascii_out('!');
 				end case;
 				bcd_shift;
 			when 2 =>
 				case rtc is
-					when "01"   => ascii_out('M');
-					when "10"   => ascii_out('H');
+					when "01"   => ascii_out('G');
+					when "10"   => ascii_out('E');
 					when "11"   => ascii_out('M');
 					when others => ascii_out('G');
 				end case;
 				bcd_shift;
 			when 3 =>
 				case rtc is
-					when "01"   => ascii_out('M');
-					when "11"   => ascii_out('M');
+					when "01"   => ascii_out(' ');
+					when "10"   => ascii_out('X');
+					when "11"   => ascii_out('G');
 					when others => ascii_out(' ');
 				end case;
 				bcd_shift;
 			when 4 =>
 				case rtc is
-					when "01"   => ascii_out('O');
-					when "10"   => ascii_out('1');
-					when "11"   => ascii_out('O');
-					when others =>
-						if sign = '1' then
+					when "01" => if sign = '1' then
 							ascii_out('-');
 						end if;
+					when "10"   => null;
+					when "11"   => null;
+					when others => ascii_out('0');
 				end case;
 				bcd_shift;
 			when 5 | 6 | 7 | 8 | 9 | 10 | 11 =>
 				bcd_shift;
 			when 12 =>
 				case rtc is
-					when "01"   => ascii_out('D');
+					when "01"   => digit_out(digits(3), nozero);
 					when "10"   => null;
-					when "11"   => ascii_out('D');
-					when others => digit_out(digits(3), nozero);
+					when "11"   => null;
+					when others => null;
 				end case;
 			when 13 =>
 				case rtc is
-					when "01"   => ascii_out(' ');
+					when "01"   => digit_out(digits(2), nozero);
 					when "10"   => null;
-					when "11"   => ascii_out(' ');
-					when others => digit_out(digits(2), nozero);
+					when "11"   => null;
+					when others => null;
 				end case;
 			when 14 =>
 				case rtc is
-					when "01"   => ascii_out('1');
-					when "10"   => null;
-					when "11"   => ascii_out('1');
-					when others =>
-						digit_out(digits(1), nozero);
+					when "01" => digit_out(digits(1), nozero);
 						nozero <= '0';
+					when "10"   => null;
+					when "11"   => null;
+					when others => null;
 				end case;
 			when 15 =>
 				case rtc is
-					when "01"   => ascii_out(' ');
+					when "01"   => digit_out(digits(0), nozero);
 					when "10"   => null;
-					when "11"   => ascii_out(' ');
-					when others => digit_out(digits(0), nozero);
-				end case;
-			when 16 =>
-				case rtc is
-					when "01"   => ascii_out('0');
-					when "10"   => null;
-					when "11"   => ascii_out('1');
+					when "11"   => null;
 					when others => null;
 				end case;
-			when 17 =>
+			when 16 =>
 				ascii_out(cr);
 			when others => pc <= 0;
 		end case;
