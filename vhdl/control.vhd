@@ -22,7 +22,7 @@ entity control is
 		drive_in      : in  std_logic_vector(10 downto 0);
 		drive_out     : out std_logic_vector(10 downto 0);
 
-		rtc           : out std_logic_vector(1 downto 0);
+		rtc           : out std_logic;
 		start         : out std_logic;
 		home_enable   : out std_logic;
 		position_mode : out std_logic
@@ -48,7 +48,7 @@ begin
 		btn_e_d <= btn_east;
 
 		start       <= '0';
-		rtc         <= "01";            --go
+		rtc         <= '1';             --go
 		home_enable <= '0';
 
 		if (press = '1') and (press_d = '0') then

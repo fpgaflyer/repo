@@ -91,14 +91,14 @@ package body std is
 	end;
 
 	function ascii2hex(input : std_logic_vector) return std_logic_vector is
-		variable res : std_logic_vector(3 downto 0);
+		variable res : std_logic_vector(4 downto 0);
 	begin
 		if input(7 downto 4) = 3 and input(3 downto 0) < 10 then
-			res := input(3 downto 0);
+			res := '0' & input(3 downto 0);
 		elsif input(7 downto 4) = 4 and input(3 downto 0) > 0 and input(3 downto 0) < 7 then
-			res := input(3 downto 0) + 9;
+			res := '0' & input(3 downto 0) + 9;
 		else
-			res := "XXXX";
+			res(4) := '1';             -- error
 		end if;
 		return res;
 	end;

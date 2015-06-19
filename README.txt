@@ -41,6 +41,7 @@ readpos.vhd: read serial input position data
 uart_rx.vhd, uart_tx.vhd, bbfifo_16x8.vhd, kcuart_rx.vhd, kcuart_tx.vhd: Ken Chapman UART with buffer
 p_controller_n.vhd: proportial position controller 
 interpol.vhd: interpolator on set position improves position stability (more intermediate position steps) NOT USED
+home_position.vhd: gives offset to position counter when home position detected
 
 tb_ ... are the testbenches
 

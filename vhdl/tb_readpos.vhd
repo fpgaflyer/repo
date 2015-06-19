@@ -1,4 +1,4 @@
--- runtime = 200us
+-- runtime = 200us   
 
 entity tb_readpos is
 end;
@@ -56,9 +56,9 @@ begin
 	RESET        <= '1', '0' after 100 ns;
 	DATA_IN      <= X"78",
 					X"30" after 5000 ns,
-					X"31" after 15000 ns,					
+					X"78" after 15000 ns,					
 					X"32" after 25000 ns,
-					X"33" after 35000 ns,					
+					X"2b" after 35000 ns,					
 					X"34" after 45000 ns,
 					X"35" after 55000 ns,					
 					X"36" after 65000 ns,
@@ -72,7 +72,7 @@ begin
 					X"45" after 135000 ns,
 					X"46" after 145000 ns,					
 					X"38" after 155000 ns,
-					X"3A" after 165000 ns;
+					X"39" after 165000 ns;
 												
 	WRITE_BUFFER <= '0', '1' after 2000 ns, '0' after 2020 ns,
 						 '1' after 10000 ns, '0' after 10020 ns,

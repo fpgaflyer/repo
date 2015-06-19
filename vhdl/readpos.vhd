@@ -1,6 +1,6 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
+use IEEE.STD_LOGIC_ARITH.ALL; 
 use IEEE.STD_LOGIC_UNSIGNED.ALL;
 
 library gen;
@@ -26,6 +26,7 @@ architecture behav of readpos is
 
 begin
 	process
+		variable di : std_logic_vector(4 downto 0);
 	begin
 		wait until clk = '1';
 
@@ -47,8 +48,9 @@ begin
 
 				when wait4start =>
 					if din = X"78" then -- char "x"
-						n  <= 0;
-						sm <= wait4bytes;
+						n     <= 0;
+						di(4) := '0';   --reset error flag  
+						sm    <= wait4bytes;
 					else
 						sm <= wait4data;
 					end if;
@@ -66,8 +68,9 @@ begin
 					else
 						n <= n + 1;
 					end if;
-					d(n) <= ascii2hex(din);
-					if ascii2hex(din) = "XXXX" then
+					di   := ascii2hex(din);
+					d(n) <= di(3 downto 0);
+					if di(4) = '1' then
 						sm <= wait4data; -- data error 
 					end if;
 

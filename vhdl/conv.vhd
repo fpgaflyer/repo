@@ -7,11 +7,8 @@ library gen;
 use gen.std.all;
 
 --	rtc  runtime cmd
---	00 = stop  
---	01 = go
--- 	10 = emergency stop
--- 	11 = emergency stop release
-
+--	0 = stop  
+--	1 = go
 
 entity conv is
 	port(
@@ -19,7 +16,7 @@ entity conv is
 		rst    : in  bool;
 		di     : in  int(10 downto 0);
 		start  : in  bool;
-		rtc    : in  int(1 downto 0);
+		rtc    : in  bool;
 		do     : out int(7 downto 0);
 		dvalid : out bool
 	);
@@ -105,35 +102,27 @@ begin
 
 			when 1 =>
 				case rtc is
-					when "01"   => ascii_out('!');
-					when "10"   => ascii_out('!');
-					when "11"   => ascii_out('!');
+					when '1'    => ascii_out('!');
 					when others => ascii_out('!');
 				end case;
 				bcd_shift;
 			when 2 =>
 				case rtc is
-					when "01"   => ascii_out('G');
-					when "10"   => ascii_out('E');
-					when "11"   => ascii_out('M');
+					when '1'    => ascii_out('G');
 					when others => ascii_out('G');
 				end case;
 				bcd_shift;
 			when 3 =>
 				case rtc is
-					when "01"   => ascii_out(' ');
-					when "10"   => ascii_out('X');
-					when "11"   => ascii_out('G');
+					when '1'    => ascii_out(' ');
 					when others => ascii_out(' ');
 				end case;
 				bcd_shift;
 			when 4 =>
 				case rtc is
-					when "01" => if sign = '1' then
+					when '1' => if sign = '1' then
 							ascii_out('-');
 						end if;
-					when "10"   => null;
-					when "11"   => null;
 					when others => ascii_out('0');
 				end case;
 				bcd_shift;
@@ -141,31 +130,23 @@ begin
 				bcd_shift;
 			when 12 =>
 				case rtc is
-					when "01"   => digit_out(digits(3), nozero);
-					when "10"   => null;
-					when "11"   => null;
+					when '1'    => digit_out(digits(3), nozero);
 					when others => null;
 				end case;
 			when 13 =>
 				case rtc is
-					when "01"   => digit_out(digits(2), nozero);
-					when "10"   => null;
-					when "11"   => null;
+					when '1'    => digit_out(digits(2), nozero);
 					when others => null;
 				end case;
 			when 14 =>
 				case rtc is
-					when "01" => digit_out(digits(1), nozero);
+					when '1' => digit_out(digits(1), nozero);
 						nozero <= '0';
-					when "10"   => null;
-					when "11"   => null;
 					when others => null;
 				end case;
 			when 15 =>
 				case rtc is
-					when "01"   => digit_out(digits(0), nozero);
-					when "10"   => null;
-					when "11"   => null;
+					when '1'    => digit_out(digits(0), nozero);
 					when others => null;
 				end case;
 			when 16 =>

@@ -92,7 +92,7 @@ architecture structure of top_flightsim_controller_n is
 			 rst    : in  bool;
 			 di     : in  int(10 downto 0);
 			 start  : in  bool;
-			 rtc    : in  int(1 downto 0);
+			 rtc    : in  bool;
 			 do     : out int(7 downto 0);
 			 dvalid : out bool);
 	end component conv;
@@ -144,7 +144,7 @@ architecture structure of top_flightsim_controller_n is
 			 setpos_out    : out std_logic_vector(13 downto 0);
 			 drive_in      : in  std_logic_vector(10 downto 0);
 			 drive_out     : out std_logic_vector(10 downto 0);
-			 rtc           : out std_logic_vector(1 downto 0);
+			 rtc           : out std_logic;
 			 start         : out std_logic;
 			 home_enable   : out std_logic;
 			 position_mode : out std_logic);
@@ -204,7 +204,7 @@ architecture structure of top_flightsim_controller_n is
 	signal setpositie          : std_logic_vector(13 downto 0);
 	signal drive               : std_logic_vector(10 downto 0);
 	signal sw0_f               : std_logic;
-	signal rtc                 : int(1 downto 0);
+	signal rtc                 : std_logic;
 	signal start               : std_logic;
 	signal home_enable         : std_logic;
 	signal drive_out           : int(10 downto 0);
