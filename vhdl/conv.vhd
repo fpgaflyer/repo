@@ -6,17 +6,12 @@ use ieee.std_logic_unsigned.all;
 library gen;
 use gen.std.all;
 
---	rtc  runtime cmd
---	0 = stop  
---	1 = go
-
 entity conv is
 	port(
 		clk    : in  bool;
 		rst    : in  bool;
 		di     : in  int(10 downto 0);
 		start  : in  bool;
-		rtc    : in  bool;
 		do     : out int(7 downto 0);
 		dvalid : out bool
 	);
@@ -56,7 +51,7 @@ begin
 			variable nz : bool;
 		begin
 			nz := xnozero;
-			if nz = '0' OR d /= 0 then
+			if nz = '0' or d /= 0 then
 				nz := '0';
 				ascii_out(X"3" & d);
 			end if;
@@ -100,57 +95,29 @@ begin
 					pc <= pc;
 				end if;
 
-			when 1 =>
-				case rtc is
-					when '1'    => ascii_out('!');
-					when others => ascii_out('!');
-				end case;
+			when 1 => ascii_out('!');
 				bcd_shift;
-			when 2 =>
-				case rtc is
-					when '1'    => ascii_out('G');
-					when others => ascii_out('G');
-				end case;
+			when 2 => ascii_out('G');
 				bcd_shift;
-			when 3 =>
-				case rtc is
-					when '1'    => ascii_out(' ');
-					when others => ascii_out(' ');
-				end case;
+			when 3 => ascii_out(' ');
 				bcd_shift;
 			when 4 =>
-				case rtc is
-					when '1' => if sign = '1' then
-							ascii_out('-');
-						end if;
-					when others => ascii_out('0');
-				end case;
+				if sign = '1' then
+					ascii_out('-');
+				end if;
 				bcd_shift;
 			when 5 | 6 | 7 | 8 | 9 | 10 | 11 =>
 				bcd_shift;
-			when 12 =>
-				case rtc is
-					when '1'    => digit_out(digits(3), nozero);
-					when others => null;
-				end case;
-			when 13 =>
-				case rtc is
-					when '1'    => digit_out(digits(2), nozero);
-					when others => null;
-				end case;
-			when 14 =>
-				case rtc is
-					when '1' => digit_out(digits(1), nozero);
-						nozero <= '0';
-					when others => null;
-				end case;
-			when 15 =>
-				case rtc is
-					when '1'    => digit_out(digits(0), nozero);
-					when others => null;
-				end case;
-			when 16 =>
-				ascii_out(cr);
+			when 12 => digit_out(digits(3), nozero);
+
+			when 13 => digit_out(digits(2), nozero);
+
+			when 14 => digit_out(digits(1), nozero);
+				nozero <= '0';
+			when 15 => digit_out(digits(0), nozero);
+
+			when 16 => ascii_out(cr);
+
 			when others => pc <= 0;
 		end case;
 		if rst = '1' then

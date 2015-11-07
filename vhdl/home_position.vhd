@@ -9,15 +9,15 @@ entity home_position is
 		reset       : in  std_logic;
 		home_enable : in  std_logic;
 		home_sensor : in  std_logic;
-		pos_in      : in  std_logic_vector(31 downto 0); --25um 
-		pos_out     : out std_logic_vector(31 downto 0) --25um 
+		pos_in      : in  std_logic_vector(14 downto 0); --25um 0-82cm
+		pos_out     : out std_logic_vector(14 downto 0) --25um 0-82cm
 
 	);
 end entity home_position;
 
 architecture RTL of home_position is
 	signal home_sensor_d : std_logic;
-	signal diff          : std_logic_vector(31 downto 0);
+	signal diff          : std_logic_vector(14 downto 0);
 
 begin
 	process

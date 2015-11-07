@@ -1,7 +1,7 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL; 
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 library gen;
 use gen.std.all;
@@ -13,7 +13,7 @@ entity readpos is
 		din                 : in  std_logic_vector(7 downto 0);
 		read_buffer         : out std_logic;
 		buffer_data_present : in  std_logic;
-		pos                 : out std_logic_vector(31 downto 0) --25um 
+		pos                 : out std_logic_vector(14 downto 0) --25um 0-82cm
 	);
 end;
 
@@ -75,7 +75,7 @@ begin
 					end if;
 
 				when writepos =>
-					pos <= d(0) & d(1) & d(2) & d(3) & d(4) & d(5) & d(6) & d(7);
+					pos <= d(4)(2 downto 0) & d(5) & d(6) & d(7);
 					sm  <= wait4data;
 
 				when others => null;

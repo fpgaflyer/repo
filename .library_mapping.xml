@@ -6,7 +6,38 @@
   <Mappings Location="Common Libraries" Library="not mapped"/>
   <Mappings Location="Common Libraries/unisim/primitive" Library="not mapped"/>
   <Mappings Location="Common Libraries/unisim/secureip" Library="not mapped"/>
+  <Mappings Location="vhdl" Library="not mapped"/>
   <Mappings Location="Common Libraries/STD" Library="std"/>
   <Mappings Location="Common Libraries/unisim" Library="unisim"/>
   <Mappings Location="" Library="work"/>
+  <Mappings Location="vhdl/bbfifo_16x8.vhd" Library="work"/>
+  <Mappings Location="vhdl/clk_divider_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/control.vhd" Library="work"/>
+  <Mappings Location="vhdl/control_nnn.vhd" Library="work"/>
+  <Mappings Location="vhdl/controller.vhd" Library="work"/>
+  <Mappings Location="vhdl/conv.vhd" Library="work"/>
+  <Mappings Location="vhdl/counter.vhd" Library="work"/>
+  <Mappings Location="vhdl/digital_filter.vhd" Library="work"/>
+  <Mappings Location="vhdl/display_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/drv_mux.vhd" Library="work"/>
+  <Mappings Location="vhdl/home_position.vhd" Library="work"/>
+  <Mappings Location="vhdl/interpol.vhd" Library="work"/>
+  <Mappings Location="vhdl/kcuart_rx.vhd" Library="work"/>
+  <Mappings Location="vhdl/kcuart_tx.vhd" Library="work"/>
+  <Mappings Location="vhdl/lcd_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/p_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/ramp_gen.vhd" Library="work"/>
+  <Mappings Location="vhdl/readpos.vhd" Library="work"/>
+  <Mappings Location="vhdl/reset_gen_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/rotary_decoder_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_clk_divider.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_conv.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_interpol.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_ramp_gen.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_readpos.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_top_flightsim_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_uart.vhd" Library="work"/>
+  <Mappings Location="vhdl/top_flightsim_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/uart_rx.vhd" Library="work"/>
+  <Mappings Location="vhdl/uart_tx.vhd" Library="work"/>
 </com.sigasi.hdt.shared.librarymapping.model:LibraryMappings>

@@ -1,7 +1,7 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 library gen;
 use gen.std.all;
@@ -23,10 +23,34 @@ entity top_flightsim_controller_n is
 		 btn_east       : in  std_logic;
 		 btn_south      : in  std_logic;
 		 sw0            : in  std_logic;
-		 home_sensor    : in  std_logic;
+		 sw1            : in  std_logic;
+		 sw2            : in  std_logic;
+		 sw3            : in  std_logic;
 		 led            : out std_logic_vector(7 downto 0);
-		 serial_out     : out std_logic;
-		 serial_in      : in  std_logic
+		 run_switch     : in  std_logic;
+--		 reset_button   : in  std_logic;
+		 motor_stop     : out std_logic;
+
+		 home_sensor_1  : in  std_logic;
+		 home_sensor_2  : in  std_logic;
+		 home_sensor_3  : in  std_logic;
+		 home_sensor_4  : in  std_logic;
+		 home_sensor_5  : in  std_logic;
+		 home_sensor_6  : in  std_logic;
+
+		 serial_in_1    : in  std_logic;
+		 serial_in_2    : in  std_logic;
+		 serial_in_3    : in  std_logic;
+		 serial_in_4    : in  std_logic;
+		 serial_in_5    : in  std_logic;
+		 serial_in_6    : in  std_logic;
+
+		 serial_out_1   : out std_logic;
+		 serial_out_2   : out std_logic;
+		 serial_out_3   : out std_logic;
+		 serial_out_4   : out std_logic;
+		 serial_out_5   : out std_logic;
+		 serial_out_6   : out std_logic
 	);
 end;
 
@@ -63,8 +87,8 @@ architecture structure of top_flightsim_controller_n is
 	component display_controller_n
 		port(clk     : in  std_logic;
 			 reset   : in  std_logic;
-			 val_0   : in  std_logic_vector(31 downto 0);
-			 val_1   : in  std_logic_vector(31 downto 0);
+			 val_0   : in  std_logic_vector(63 downto 0);
+			 val_1   : in  std_logic_vector(63 downto 0);
 			 data    : out std_logic_vector(7 downto 0);
 			 addr    : out std_logic_vector(6 downto 0);
 			 data_en : out std_logic;
@@ -79,75 +103,60 @@ architecture structure of top_flightsim_controller_n is
 			 rotary_left  : out std_logic);
 	end component rotary_decoder_n;
 
-	component counter
-		port(clk   : in  std_logic;
-			 reset : in  std_logic;
-			 step  : in  std_logic;
-			 dir   : in  std_logic;
-			 val   : out std_logic_vector(7 downto 0));
-	end component counter;
-
-	component conv
-		port(clk    : in  bool;
-			 rst    : in  bool;
-			 di     : in  int(10 downto 0);
-			 start  : in  bool;
-			 rtc    : in  bool;
-			 do     : out int(7 downto 0);
-			 dvalid : out bool);
-	end component conv;
-
-	component uart_tx
-		port(data_in          : in  std_logic_vector(7 downto 0);
-			 write_buffer     : in  std_logic;
-			 reset_buffer     : in  std_logic;
-			 en_16_x_baud     : in  std_logic;
-			 serial_out       : out std_logic;
-			 buffer_full      : out std_logic;
-			 buffer_half_full : out std_logic;
-			 clk              : in  std_logic);
-	end component uart_tx;
-
-	component uart_rx
-		port(serial_in           : in  std_logic;
-			 data_out            : out std_logic_vector(7 downto 0);
-			 read_buffer         : in  std_logic;
-			 reset_buffer        : in  std_logic;
-			 en_16_x_baud        : in  std_logic;
-			 buffer_data_present : out std_logic;
-			 buffer_full         : out std_logic;
-			 buffer_half_full    : out std_logic;
-			 clk                 : in  std_logic);
-	end component uart_rx;
-
-	component readpos
-		port(clk                 : in  std_logic;
-			 reset               : in  std_logic;
-			 din                 : in  std_logic_vector(7 downto 0);
-			 read_buffer         : out std_logic;
-			 buffer_data_present : in  std_logic;
-			 pos                 : out std_logic_vector(31 downto 0));
-	end component readpos;
+	component controller
+		port(clk         : in  std_logic;
+			 reset       : in  std_logic;
+			 start       : in  std_logic;
+			 en_16xbaud  : in  std_logic;
+			 serial_in   : in  std_logic;
+			 home_en     : in  std_logic;
+			 kp          : in  std_logic_vector(3 downto 0);
+			 home_sensor : in  std_logic;
+			 set_pos     : in  std_logic_vector(7 downto 0);
+			 drv_mode    : in  std_logic_vector(1 downto 0);
+			 drv_man     : in  std_logic_vector(10 downto 0);
+			 position    : out std_logic_vector(7 downto 0);
+			 serial_out  : out std_logic);
+	end component controller;
 
 	component control
-		port(clk           : in  std_logic;
-			 reset         : in  std_logic;
-			 sync_2ms      : in  std_logic;
-			 press         : in  std_logic;
-			 btn_north     : in  std_logic;
-			 btn_west      : in  std_logic;
-			 btn_east      : in  std_logic;
-			 btn_south     : in  std_logic;
-			 kp            : out std_logic_vector(3 downto 0);
-			 sw0           : in  std_logic;
-			 setpos_in     : in  std_logic_vector(7 downto 0);
-			 setpos_out    : out std_logic_vector(13 downto 0);
-			 drive_in      : in  std_logic_vector(10 downto 0);
-			 drive_out     : out std_logic_vector(10 downto 0);
-			 rtc           : out std_logic;
-			 start         : out std_logic;
-			 home_enable   : out std_logic;
-			 position_mode : out std_logic);
+		port(clk          : in  std_logic;
+			 reset        : in  std_logic;
+			 sync_2ms     : in  std_logic;
+			 rotary_event : in  std_logic;
+			 rotary_left  : in  std_logic;
+			 press        : in  std_logic;
+			 btn_north    : in  std_logic;
+			 btn_west     : in  std_logic;
+			 btn_east     : in  std_logic;
+			 btn_south    : in  std_logic;
+			 sw0          : in  std_logic;
+			 sw1          : in  std_logic;
+			 sw2          : in  std_logic;
+			 sw3          : in  std_logic;
+			 start        : out std_logic;
+			 home_enable  : out std_logic;
+			 kp           : out std_logic_vector(3 downto 0);
+			 set_pos_1    : out std_logic_vector(7 downto 0);
+			 set_pos_2    : out std_logic_vector(7 downto 0);
+			 set_pos_3    : out std_logic_vector(7 downto 0);
+			 set_pos_4    : out std_logic_vector(7 downto 0);
+			 set_pos_5    : out std_logic_vector(7 downto 0);
+			 set_pos_6    : out std_logic_vector(7 downto 0);
+			 drv_mode_1   : out std_logic_vector(1 downto 0);
+			 drv_mode_2   : out std_logic_vector(1 downto 0);
+			 drv_mode_3   : out std_logic_vector(1 downto 0);
+			 drv_mode_4   : out std_logic_vector(1 downto 0);
+			 drv_mode_5   : out std_logic_vector(1 downto 0);
+			 drv_mode_6   : out std_logic_vector(1 downto 0);
+			 drv_man_1    : out std_logic_vector(10 downto 0);
+			 drv_man_2    : out std_logic_vector(10 downto 0);
+			 drv_man_3    : out std_logic_vector(10 downto 0);
+			 drv_man_4    : out std_logic_vector(10 downto 0);
+			 drv_man_5    : out std_logic_vector(10 downto 0);
+			 drv_man_6    : out std_logic_vector(10 downto 0);
+			 led          : out std_logic_vector(7 downto 0);
+			 val_1        : out std_logic_vector(63 downto 0));
 	end component control;
 
 	component digital_filter
@@ -157,62 +166,63 @@ architecture structure of top_flightsim_controller_n is
 			 o     : out std_logic);
 	end component digital_filter;
 
-	component p_controller_n
-		port(clk    : in  std_logic;
-			 reset  : in  std_logic;
-			 kp     : in  std_logic_vector(3 downto 0);
-			 setpos : in  std_logic_vector(13 downto 0);
-			 pos    : in  std_logic_vector(13 downto 0);
-			 drive  : out std_logic_vector(10 downto 0));
-	end component p_controller_n;
-
-	component home_position
-		port(clk         : in  std_logic;
-			 reset       : in  std_logic;
-			 home_enable : in  std_logic;
-			 home_sensor : in  std_logic;
-			 pos_in      : in  std_logic_vector(31 downto 0);
-			 pos_out     : out std_logic_vector(31 downto 0));
-	end component home_position;
-
 	-- declaration of signals used to interconnect 
 
-	signal reset               : std_logic;
-	signal data                : std_logic_vector(7 downto 0);
-	signal addr                : std_logic_vector(6 downto 0);
-	signal data_en             : std_logic;
-	signal rdy                 : std_logic;
-	signal rotary_event        : std_logic;
-	signal rotary_left         : std_logic;
-	signal en_16xbaud          : std_logic;
-	signal do                  : int(7 downto 0);
-	signal dvalid              : bool;
-	signal val_0               : std_logic_vector(31 downto 0);
-	signal val_1               : std_logic_vector(31 downto 0);
-	signal data_out            : std_logic_vector(7 downto 0);
-	signal read_buffer         : std_logic;
-	signal buffer_data_present : std_logic;
-	signal pos                 : std_logic_vector(31 downto 0);
-	signal sync_2ms            : std_logic;
-	signal btn_north_f         : std_logic;
-	signal btn_west_f          : std_logic;
-	signal btn_east_f          : std_logic;
-	signal btn_south_f         : std_logic;
-	signal press               : std_logic;
-	signal kp                  : std_logic_vector(3 downto 0);
-	signal setpos              : std_logic_vector(7 downto 0);
-	signal setpositie          : std_logic_vector(13 downto 0);
-	signal drive               : std_logic_vector(10 downto 0);
-	signal sw0_f               : std_logic;
-	signal rtc                 : std_logic;
-	signal start               : std_logic;
-	signal home_enable         : std_logic;
-	signal drive_out           : int(10 downto 0);
-	signal pos_out             : std_logic_vector(31 downto 0);
-	signal position_mode       : std_logic;
+	signal reset           : std_logic;
+	signal sync_2ms        : std_logic;
+	signal data            : std_logic_vector(7 downto 0);
+	signal addr            : std_logic_vector(6 downto 0);
+	signal data_en         : std_logic;
+	signal rdy             : std_logic;
+	signal rotary_event    : std_logic;
+	signal rotary_left     : std_logic;
+	signal en_16xbaud      : std_logic;
+	signal val_0           : std_logic_vector(63 downto 0);
+	signal val_1           : std_logic_vector(63 downto 0);
+	signal btn_north_f     : std_logic;
+	signal btn_west_f      : std_logic;
+	signal btn_east_f      : std_logic;
+	signal btn_south_f     : std_logic;
+	signal sw0_f           : std_logic;
+	signal sw1_f           : std_logic;
+	signal sw2_f           : std_logic;
+	signal sw3_f           : std_logic;
+	signal press           : std_logic;
+	signal kp              : std_logic_vector(3 downto 0);
+	signal start           : std_logic;
+	signal home_enable     : std_logic;
+	signal set_pos_1       : std_logic_vector(7 downto 0);
+	signal set_pos_2       : std_logic_vector(7 downto 0);
+	signal set_pos_3       : std_logic_vector(7 downto 0);
+	signal set_pos_4       : std_logic_vector(7 downto 0);
+	signal set_pos_5       : std_logic_vector(7 downto 0);
+	signal set_pos_6       : std_logic_vector(7 downto 0);
+	signal drv_mode_1      : std_logic_vector(1 downto 0);
+	signal drv_mode_2      : std_logic_vector(1 downto 0);
+	signal drv_mode_3      : std_logic_vector(1 downto 0);
+	signal drv_mode_4      : std_logic_vector(1 downto 0);
+	signal drv_mode_5      : std_logic_vector(1 downto 0);
+	signal drv_mode_6      : std_logic_vector(1 downto 0);
+	signal drv_man_1       : std_logic_vector(10 downto 0);
+	signal drv_man_2       : std_logic_vector(10 downto 0);
+	signal drv_man_3       : std_logic_vector(10 downto 0);
+	signal drv_man_4       : std_logic_vector(10 downto 0);
+	signal drv_man_5       : std_logic_vector(10 downto 0);
+	signal drv_man_6       : std_logic_vector(10 downto 0);
+	signal position_1      : std_logic_vector(7 downto 0);
+	signal position_2      : std_logic_vector(7 downto 0);
+	signal position_3      : std_logic_vector(7 downto 0);
+	signal position_4      : std_logic_vector(7 downto 0);
+	signal position_5      : std_logic_vector(7 downto 0);
+	signal position_6      : std_logic_vector(7 downto 0);
+	signal home_sensor_1_f : std_logic;
+	signal home_sensor_2_f : std_logic;
+	signal home_sensor_3_f : std_logic;
+	signal home_sensor_4_f : std_logic;
+	signal home_sensor_5_f : std_logic;
+	signal home_sensor_6_f : std_logic;
 
 begin
-
 	-- component instantiations statements
 
 	A0 : reset_gen_n
@@ -221,7 +231,7 @@ begin
 			reset => reset
 		);
 
-	A1 : component clk_divider_n
+	A1 : clk_divider_n
 		port map(
 			clk        => clk,
 			sync_2ms   => sync_2ms,
@@ -264,152 +274,264 @@ begin
 			rotary_left  => rotary_left
 		);
 
-	A5 : counter
-		port map(clk   => clk,
-			     reset => reset,
-			     step  => rotary_event,
-			     dir   => rotary_left,
-			     val   => setpos
+	A5 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_1,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_1_f,
+			set_pos     => set_pos_1,
+			drv_mode    => drv_mode_1,
+			drv_man     => drv_man_1,
+			position    => position_1,
+			serial_out  => serial_out_1
 		);
 
-	A6 : component conv
-		port map(clk    => clk,
-			     rst    => reset,
-			     di     => drive_out,
-			     start  => start,
-			     rtc    => rtc,
-			     do     => do,
-			     dvalid => dvalid
+	A6 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_2,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_2_f,
+			set_pos     => set_pos_2,
+			drv_mode    => drv_mode_2,
+			drv_man     => drv_man_2,
+			position    => position_2,
+			serial_out  => serial_out_2
 		);
 
-	A7 : component uart_tx
-		port map(data_in          => do,
-			     write_buffer     => dvalid,
-			     reset_buffer     => reset,
-			     en_16_x_baud     => en_16xbaud,
-			     serial_out       => serial_out,
-			     buffer_full      => open,
-			     buffer_half_full => open,
-			     clk              => clk
+	A7 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_3,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_3_f,
+			set_pos     => set_pos_3,
+			drv_mode    => drv_mode_3,
+			drv_man     => drv_man_3,
+			position    => position_3,
+			serial_out  => serial_out_3
 		);
 
-	A8 : component uart_rx
-		port map(serial_in           => serial_in,
-			     data_out            => data_out,
-			     read_buffer         => read_buffer,
-			     reset_buffer        => reset,
-			     en_16_x_baud        => en_16xbaud,
-			     buffer_data_present => buffer_data_present,
-			     buffer_full         => open,
-			     buffer_half_full    => open,
-			     clk                 => clk
+	A8 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_4,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_4_f,
+			set_pos     => set_pos_4,
+			drv_mode    => drv_mode_4,
+			drv_man     => drv_man_4,
+			position    => position_4,
+			serial_out  => serial_out_4
 		);
 
-	A9 : component readpos
-		port map(clk                 => clk,
-			     reset               => reset,
-			     din                 => data_out,
-			     read_buffer         => read_buffer,
-			     buffer_data_present => buffer_data_present,
-			     pos                 => pos
+	A9 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_5,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_5_f,
+			set_pos     => set_pos_5,
+			drv_mode    => drv_mode_5,
+			drv_man     => drv_man_5,
+			position    => position_5,
+			serial_out  => serial_out_5
 		);
 
-	A10 : component digital_filter
+	A10 : controller
+		port map(
+			clk         => clk,
+			reset       => reset,
+			start       => start,
+			en_16xbaud  => en_16xbaud,
+			serial_in   => serial_in_6,
+			home_en     => home_enable,
+			kp          => kp,
+			home_sensor => home_sensor_6_f,
+			set_pos     => set_pos_6,
+			drv_mode    => drv_mode_6,
+			drv_man     => drv_man_6,
+			position    => position_6,
+			serial_out  => serial_out_6
+		);
+
+	A11 : component control
+		port map(
+			clk          => clk,
+			reset        => reset,
+			sync_2ms     => sync_2ms,
+			rotary_event => rotary_event,
+			rotary_left  => rotary_left,
+			press        => press,
+			btn_north    => btn_north_f,
+			btn_west     => btn_west_f,
+			btn_east     => btn_east_f,
+			btn_south    => btn_south_f,
+			sw0          => sw0_f,
+			sw1          => sw1_f,
+			sw2          => sw2_f,
+			sw3          => sw3_f,
+			start        => start,
+			home_enable  => home_enable,
+			kp           => kp,
+			set_pos_1    => set_pos_1,
+			set_pos_2    => set_pos_2,
+			set_pos_3    => set_pos_3,
+			set_pos_4    => set_pos_4,
+			set_pos_5    => set_pos_5,
+			set_pos_6    => set_pos_6,
+			drv_mode_1   => drv_mode_1,
+			drv_mode_2   => drv_mode_2,
+			drv_mode_3   => drv_mode_3,
+			drv_mode_4   => drv_mode_4,
+			drv_mode_5   => drv_mode_5,
+			drv_mode_6   => drv_mode_6,
+			drv_man_1    => drv_man_1,
+			drv_man_2    => drv_man_2,
+			drv_man_3    => drv_man_3,
+			drv_man_4    => drv_man_4,
+			drv_man_5    => drv_man_5,
+			drv_man_6    => drv_man_6,
+			led          => led,
+			val_1        => val_1
+		);
+	A12 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
 			     i     => rotary_press,
 			     o     => press
 		);
 
-	A11 : component digital_filter
+	A13 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
 			     i     => btn_west,
 			     o     => btn_west_f
 		);
 
-	A12 : component digital_filter
+	A14 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
 			     i     => btn_east,
 			     o     => btn_east_f
 		);
 
-	A13 : component digital_filter
+	A15 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
 			     i     => btn_south,
 			     o     => btn_south_f
 		);
 
-	A14 : component digital_filter
+	A16 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
 			     i     => btn_north,
 			     o     => btn_north_f
 		);
 
-	A15 : component digital_filter
+	A17 : digital_filter
 		port map(clk   => clk,
 			     reset => reset,
 			     i     => sw0,
 			     o     => sw0_f
 		);
 
-	A16 : component control
-		port map(
-			clk           => clk,
-			reset         => reset,
-			sync_2ms      => sync_2ms,
-			press         => press,
-			btn_north     => btn_north_f,
-			btn_west      => btn_west_f,
-			btn_east      => btn_east_f,
-			btn_south     => btn_south_f,
-			kp            => kp,
-			sw0           => sw0_f,
-			setpos_in     => setpos,
-			setpos_out    => setpositie,
-			drive_in      => drive,
-			drive_out     => drive_out,
-			rtc           => rtc,
-			start         => start,
-			home_enable   => home_enable,
-			position_mode => position_mode
+	A18 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => sw1,
+			     o     => sw1_f
 		);
 
-	A17 : component p_controller_n
-		port map(clk    => clk,
-			     reset  => reset,
-			     kp     => kp,
-			     setpos => setpositie,
-			     pos    => pos_out(13 downto 0),
-			     drive  => drive
+	A19 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => sw2,
+			     o     => sw2_f
 		);
 
-	A18 : component home_position
+	A20 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => sw3,
+			     o     => sw3_f
+		);
+
+	A21 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_1,
+			     o     => home_sensor_1_f
+		);
+
+	A22 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_2,
+			     o     => home_sensor_2_f
+		);
+
+	A23 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_3,
+			     o     => home_sensor_3_f
+		);
+
+	A24 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_4,
+			     o     => home_sensor_4_f
+		);
+
+	A25 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_5,
+			     o     => home_sensor_5_f
+		);
+
+	A26 : digital_filter
+		port map(clk   => clk,
+			     reset => reset,
+			     i     => home_sensor_6,
+			     o     => home_sensor_6_f
+		);
+
+	A27 : component digital_filter
 		port map(
-			clk         => clk,
-			reset       => reset,
-			home_enable => home_enable,
-			home_sensor => home_sensor,
-			pos_in      => pos,
-			pos_out     => pos_out
+			clk   => clk,
+			reset => reset,
+			i     => not run_switch,
+			o     => motor_stop
 		);
 
 	-- additional statements  
+	val_0 <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
 
-	val_0 <= kp & "00000000000000000000" & setpos; --LCD line 1  	1.6mm
-	val_1 <= "000000" & pos_out(31 downto 6); --LCD line 2    		1.6mm
-
-	led(0) <= home_sensor;
-	led(1) <= '0';
-	led(2) <= '0';
-	led(3) <= '0';
-	led(4) <= position_mode;
-	led(5) <= position_mode;
-	led(6) <= position_mode;
-	led(7) <= position_mode;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';

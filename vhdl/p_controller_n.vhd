@@ -1,15 +1,16 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity p_controller_n is
 	port(
 		clk    : in  std_logic;
 		reset  : in  std_logic;
 		kp     : in  std_logic_vector(3 downto 0);
-		setpos : in  std_logic_vector(13 downto 0); --25um unit, range 0 - 409.6 mm
-		pos    : in  std_logic_vector(13 downto 0); --25um unit, range 0 - 409.6 mm
+		setpos : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
+		pos    : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
+		limit  : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
 		drive  : out std_logic_vector(10 downto 0)
 	);
 
@@ -44,7 +45,7 @@ begin
 			drive   <= (others => '0'); -- stop
 
 		else
-			e <= ('0' & setpos) - ('0' & pos); -- setpos - pos
+			e <= ('0' & setpos & "000000") - ('0' & pos); -- setpos - pos
 
 			if e(14) = '1' then         --neg
 				e_abs <= (not e(13 downto 0)) + 1;
@@ -59,8 +60,8 @@ begin
 			drv_div <= drv(17 downto 2); --/4
 			sign_3d <= sign_2d;
 
-			if drv_div > "0000001111101000" then --  >1000
-				drv_lim <= "0000001111101000";
+			if drv_div > "000000" & limit then
+				drv_lim <= "000000" & limit;
 			else
 				drv_lim <= drv_div;
 			end if;
