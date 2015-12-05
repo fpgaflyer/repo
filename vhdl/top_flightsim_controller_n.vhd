@@ -28,7 +28,7 @@ entity top_flightsim_controller_n is
 		 sw3            : in  std_logic;
 		 led            : out std_logic_vector(7 downto 0);
 		 run_switch     : in  std_logic;
---		 reset_button   : in  std_logic;
+		 --		 reset_button   : in  std_logic;
 		 motor_stop     : out std_logic;
 
 		 home_sensor_1  : in  std_logic;
@@ -50,7 +50,10 @@ entity top_flightsim_controller_n is
 		 serial_out_3   : out std_logic;
 		 serial_out_4   : out std_logic;
 		 serial_out_5   : out std_logic;
-		 serial_out_6   : out std_logic
+		 serial_out_6   : out std_logic;
+
+		 rxd            : in  std_logic;
+		 txd            : out std_logic
 	);
 end;
 
@@ -156,7 +159,13 @@ architecture structure of top_flightsim_controller_n is
 			 drv_man_5    : out std_logic_vector(10 downto 0);
 			 drv_man_6    : out std_logic_vector(10 downto 0);
 			 led          : out std_logic_vector(7 downto 0);
-			 val_1        : out std_logic_vector(63 downto 0));
+			 val_1        : out std_logic_vector(63 downto 0);
+			 ext_setpos_1 : in  std_logic_vector(7 downto 0);
+			 ext_setpos_2 : in  std_logic_vector(7 downto 0);
+			 ext_setpos_3 : in  std_logic_vector(7 downto 0);
+			 ext_setpos_4 : in  std_logic_vector(7 downto 0);
+			 ext_setpos_5 : in  std_logic_vector(7 downto 0);
+			 ext_setpos_6 : in  std_logic_vector(7 downto 0));
 	end component control;
 
 	component digital_filter
@@ -165,6 +174,36 @@ architecture structure of top_flightsim_controller_n is
 			 i     : in  std_logic;
 			 o     : out std_logic);
 	end component digital_filter;
+
+	component serial_rx
+		port(clk           : in  std_logic;
+			 reset         : in  std_logic;
+			 rx            : in  std_logic;
+			 rx_data       : out std_logic_vector(7 downto 0);
+			 rx_data_valid : out std_logic);
+	end component serial_rx;
+
+	component serial_rx_dec_n
+		port(clk           : in  std_logic;
+			 reset         : in  std_logic;
+			 rx_data       : in  std_logic_vector(7 downto 0);
+			 rx_data_valid : in  std_logic;
+			 byte_1        : out std_logic_vector(7 downto 0);
+			 byte_2        : out std_logic_vector(7 downto 0);
+			 byte_3        : out std_logic_vector(7 downto 0);
+			 byte_4        : out std_logic_vector(7 downto 0);
+			 byte_5        : out std_logic_vector(7 downto 0);
+			 byte_6        : out std_logic_vector(7 downto 0);
+			 byte_7        : out std_logic_vector(7 downto 0);
+			 com_error     : out std_logic);
+	end component serial_rx_dec_n;
+
+	component filter
+		port(clk   : in  std_logic;
+			 reset : in  std_logic;
+			 i     : in  std_logic;
+			 o     : out std_logic);
+	end component filter;
 
 	-- declaration of signals used to interconnect 
 
@@ -221,6 +260,15 @@ architecture structure of top_flightsim_controller_n is
 	signal home_sensor_4_f : std_logic;
 	signal home_sensor_5_f : std_logic;
 	signal home_sensor_6_f : std_logic;
+	signal rx_data         : std_logic_vector(7 downto 0);
+	signal rx_data_valid   : std_logic;
+	signal byte_2          : std_logic_vector(7 downto 0);
+	signal byte_3          : std_logic_vector(7 downto 0);
+	signal byte_4          : std_logic_vector(7 downto 0);
+	signal byte_5          : std_logic_vector(7 downto 0);
+	signal byte_6          : std_logic_vector(7 downto 0);
+	signal byte_7          : std_logic_vector(7 downto 0);
+	signal rxd_fil         : std_logic;
 
 begin
 	-- component instantiations statements
@@ -414,8 +462,15 @@ begin
 			drv_man_5    => drv_man_5,
 			drv_man_6    => drv_man_6,
 			led          => led,
-			val_1        => val_1
+			val_1        => val_1,
+			ext_setpos_1 => byte_2,
+			ext_setpos_2 => byte_3,
+			ext_setpos_3 => byte_4,
+			ext_setpos_4 => byte_5,
+			ext_setpos_5 => byte_6,
+			ext_setpos_6 => byte_7
 		);
+
 	A12 : digital_filter
 		port map(clk   => sync_2ms,
 			     reset => reset,
@@ -529,9 +584,42 @@ begin
 			o     => motor_stop
 		);
 
+	A28 : component serial_rx
+		port map(
+			clk           => clk,
+			reset         => reset,
+			rx            => rxd_fil,
+			rx_data       => rx_data,
+			rx_data_valid => rx_data_valid
+		);
+
+	A29 : component serial_rx_dec_n
+		port map(
+			clk           => clk,
+			reset         => reset,
+			rx_data       => rx_data,
+			rx_data_valid => rx_data_valid,
+			byte_1        => open,
+			byte_2        => byte_2,
+			byte_3        => byte_3,
+			byte_4        => byte_4,
+			byte_5        => byte_5,
+			byte_6        => byte_6,
+			byte_7        => byte_7,
+			com_error     => open
+		);
+
+	A30 : component filter
+		port map(
+			clk   => clk,
+			reset => reset,
+			i     => rxd,
+			o     => rxd_fil
+		);
+
 	-- additional statements  
 	val_0 <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
-
+	txd   <= '1';
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';

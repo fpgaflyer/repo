@@ -47,7 +47,14 @@ entity control is
 		drv_man_6    : out std_logic_vector(10 downto 0);
 
 		led          : out std_logic_vector(7 downto 0);
-		val_1        : out std_logic_vector(63 downto 0)
+		val_1        : out std_logic_vector(63 downto 0);
+
+		ext_setpos_1 : in  std_logic_vector(7 downto 0);
+		ext_setpos_2 : in  std_logic_vector(7 downto 0);
+		ext_setpos_3 : in  std_logic_vector(7 downto 0);
+		ext_setpos_4 : in  std_logic_vector(7 downto 0);
+		ext_setpos_5 : in  std_logic_vector(7 downto 0);
+		ext_setpos_6 : in  std_logic_vector(7 downto 0)
 	);
 
 end;
@@ -138,12 +145,21 @@ begin
 			end case;
 		end if;
 
-		set_pos_1 <= setpos(1);
-		set_pos_2 <= setpos(2);
-		set_pos_3 <= setpos(3);
-		set_pos_4 <= setpos(4);
-		set_pos_5 <= setpos(5);
-		set_pos_6 <= setpos(6);
+		if sw3 = '0' then
+			set_pos_1 <= setpos(1);
+			set_pos_2 <= setpos(2);
+			set_pos_3 <= setpos(3);
+			set_pos_4 <= setpos(4);
+			set_pos_5 <= setpos(5);
+			set_pos_6 <= setpos(6);
+		else
+			set_pos_1 <= ext_setpos_1;
+			set_pos_2 <= ext_setpos_2;
+			set_pos_3 <= ext_setpos_3;
+			set_pos_4 <= ext_setpos_4;
+			set_pos_5 <= ext_setpos_5;
+			set_pos_6 <= ext_setpos_6;
+		end if;
 
 		drv_mode_1 <= drvmode(1);
 		drv_mode_2 <= drvmode(2);
@@ -159,9 +175,13 @@ begin
 		drv_man_5 <= drvman(5);
 		drv_man_6 <= drvman(6);
 
-		kp <= '0' & sw3 & sw2 & sw1;
+		kp <= '0' & '0' & sw2 & sw1;
 
-		val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
+		if sw3 = '0' then
+			val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
+		else
+			val_1 <= conv_std_logic_vector(i, 4) & "0000" & ext_setpos_1 & ext_setpos_2 & "0000" & ext_setpos_3 & ext_setpos_4 & "0000" & ext_setpos_5 & ext_setpos_6; --LCD line 2  1.6mm
+		end if;
 
 		led(0) <= leds(6);
 		led(1) <= leds(5);

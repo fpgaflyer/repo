@@ -20,6 +20,7 @@
   <Mappings Location="vhdl/digital_filter.vhd" Library="work"/>
   <Mappings Location="vhdl/display_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/drv_mux.vhd" Library="work"/>
+  <Mappings Location="vhdl/filter.vhd" Library="work"/>
   <Mappings Location="vhdl/home_position.vhd" Library="work"/>
   <Mappings Location="vhdl/interpol.vhd" Library="work"/>
   <Mappings Location="vhdl/kcuart_rx.vhd" Library="work"/>
@@ -30,11 +31,15 @@
   <Mappings Location="vhdl/readpos.vhd" Library="work"/>
   <Mappings Location="vhdl/reset_gen_n.vhd" Library="work"/>
   <Mappings Location="vhdl/rotary_decoder_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/serial_rx.vhd" Library="work"/>
+  <Mappings Location="vhdl/serial_rx_dec_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/sinus_rom.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_clk_divider.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_conv.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_interpol.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_ramp_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_readpos.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_sinus_rom.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_top_flightsim_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_uart.vhd" Library="work"/>
   <Mappings Location="vhdl/top_flightsim_controller_n.vhd" Library="work"/>

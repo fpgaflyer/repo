@@ -26,7 +26,10 @@ Button north/south enables speed mode, north = speed +50 (up), south = speed -50
 Button west/east:	select controller 1 to 6, index is displayed on LCD lower left corner digit
 
 SW0 = '1' enables home_position (set position counter to zero) when home_position sensor goes high
-SW1,Sw2,SW3 sets kp value 0..7, kp value is displayed on LCD upper left corner digit
+SW1,SW2 sets kp value 0..2, kp value is displayed on LCD upper left corner digit
+
+SW3 = '1' enables setposition via serial input: interface see 6-DOF BFF Motion Driver User Guide,
+data input is BIN format, 38400 Baud
 
 led on = position mode
 led off = speed mode
@@ -76,4 +79,5 @@ VHDL design creation: Sigasi 		http://www.sigasi.com/
 Simulation: Modelsim PE SE 10.3d	http://www.mentor.com/products/fv/modelsim/
 Xilinx: ISE Design Suite 14.1 		http://www.xilinx.com/products/design-tools/ise-design-suite.html
 Roboteq: Roborun+ PC Utility 1.4	http://www.roboteq.com/
+BFF simulation 6-DOF motion driver	http://bffsimulation.com/
  
