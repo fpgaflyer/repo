@@ -54,9 +54,17 @@ entity control is
 		ext_setpos_3 : in  std_logic_vector(7 downto 0);
 		ext_setpos_4 : in  std_logic_vector(7 downto 0);
 		ext_setpos_5 : in  std_logic_vector(7 downto 0);
-		ext_setpos_6 : in  std_logic_vector(7 downto 0)
-	);
+		ext_setpos_6 : in  std_logic_vector(7 downto 0);
 
+		sin_setpos_1 : in  std_logic_vector(7 downto 0);
+		sin_setpos_2 : in  std_logic_vector(7 downto 0);
+		sin_setpos_3 : in  std_logic_vector(7 downto 0);
+		sin_setpos_4 : in  std_logic_vector(7 downto 0);
+		sin_setpos_5 : in  std_logic_vector(7 downto 0);
+		sin_setpos_6 : in  std_logic_vector(7 downto 0);
+
+		mode         : out std_logic_vector(3 downto 0)
+	);
 end;
 
 architecture behav of control is
@@ -68,6 +76,7 @@ architecture behav of control is
 	type t_cnt is array (1 to 6) of std_logic_vector(7 downto 0);
 	signal cnt : t_cnt;
 	signal i   : integer range 1 to 6;
+	signal mde : integer range 10 to 15;
 
 begin
 	process
@@ -145,21 +154,34 @@ begin
 			end case;
 		end if;
 
-		if sw3 = '0' then
-			set_pos_1 <= setpos(1);
-			set_pos_2 <= setpos(2);
-			set_pos_3 <= setpos(3);
-			set_pos_4 <= setpos(4);
-			set_pos_5 <= setpos(5);
-			set_pos_6 <= setpos(6);
-		else
-			set_pos_1 <= ext_setpos_1;
-			set_pos_2 <= ext_setpos_2;
-			set_pos_3 <= ext_setpos_3;
-			set_pos_4 <= ext_setpos_4;
-			set_pos_5 <= ext_setpos_5;
-			set_pos_6 <= ext_setpos_6;
+		if sw3 = '1' then               --set mode 10..15 / A..F  
+			mde <= i + 9;
 		end if;
+		mode <= conv_std_logic_vector(mde, 4);
+
+		case mde is
+			when 11 =>                  --B
+				set_pos_1 <= ext_setpos_1;
+				set_pos_2 <= ext_setpos_2;
+				set_pos_3 <= ext_setpos_3;
+				set_pos_4 <= ext_setpos_4;
+				set_pos_5 <= ext_setpos_5;
+				set_pos_6 <= ext_setpos_6;
+			when 12 | 13 | 14 | 15 =>   --C | D | E | F
+				set_pos_1 <= sin_setpos_1;
+				set_pos_2 <= sin_setpos_2;
+				set_pos_3 <= sin_setpos_3;
+				set_pos_4 <= sin_setpos_4;
+				set_pos_5 <= sin_setpos_5;
+				set_pos_6 <= sin_setpos_6;
+			when others =>              --A 
+				set_pos_1 <= setpos(1);
+				set_pos_2 <= setpos(2);
+				set_pos_3 <= setpos(3);
+				set_pos_4 <= setpos(4);
+				set_pos_5 <= setpos(5);
+				set_pos_6 <= setpos(6);
+		end case;
 
 		drv_mode_1 <= drvmode(1);
 		drv_mode_2 <= drvmode(2);
@@ -177,10 +199,14 @@ begin
 
 		kp <= '0' & '0' & sw2 & sw1;
 
-		if sw3 = '0' then
-			val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
+		if sw3 = '1' then
+			val_1 <= conv_std_logic_vector(mde, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
 		else
-			val_1 <= conv_std_logic_vector(i, 4) & "0000" & ext_setpos_1 & ext_setpos_2 & "0000" & ext_setpos_3 & ext_setpos_4 & "0000" & ext_setpos_5 & ext_setpos_6; --LCD line 2  1.6mm
+			case mde is
+				when 11                => val_1 <= conv_std_logic_vector(i, 4) & "0000" & ext_setpos_1 & ext_setpos_2 & "0000" & ext_setpos_3 & ext_setpos_4 & "0000" & ext_setpos_5 & ext_setpos_6; --LCD line 2  1.6mm
+				when 12 | 13 | 14 | 15 => val_1 <= conv_std_logic_vector(i, 4) & "0000" & sin_setpos_1 & sin_setpos_2 & "0000" & sin_setpos_3 & sin_setpos_4 & "0000" & sin_setpos_5 & sin_setpos_6; --LCD line 2  1.6mm
+				when others            => val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
+			end case;
 		end if;
 
 		led(0) <= leds(6);
@@ -193,8 +219,9 @@ begin
 		led(7) <= '0';
 
 		if reset = '1' then
-			sm <= init;
-			i  <= 1;
+			sm  <= init;
+			i   <= 1;
+			mde <= 10;
 			for j in 1 to 6 loop
 				setpos(j)  := (others => '0');
 				drvmode(j) := (others => '0');

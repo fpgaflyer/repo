@@ -28,8 +28,16 @@ Button west/east:	select controller 1 to 6, index is displayed on LCD lower left
 SW0 = '1' enables home_position (set position counter to zero) when home_position sensor goes high
 SW1,SW2 sets kp value 0..2, kp value is displayed on LCD upper left corner digit
 
-SW3 = '1' enables setposition via serial input: interface see 6-DOF BFF Motion Driver User Guide,
-data input is BIN format, 38400 Baud
+SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
+mode
+A: set position by rotary switch
+B: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
+C: set position by sinus generator : YAW
+D: set position by sinus generator : SURGE
+E: set position = 0x10
+F: set position = 0x80 
+
+** serial data input is BIN format, 38400 Baud
 
 led on = position mode
 led off = speed mode

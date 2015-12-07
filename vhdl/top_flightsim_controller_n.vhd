@@ -165,7 +165,14 @@ architecture structure of top_flightsim_controller_n is
 			 ext_setpos_3 : in  std_logic_vector(7 downto 0);
 			 ext_setpos_4 : in  std_logic_vector(7 downto 0);
 			 ext_setpos_5 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_6 : in  std_logic_vector(7 downto 0));
+			 ext_setpos_6 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_1 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_2 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_3 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_4 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_5 : in  std_logic_vector(7 downto 0);
+			 sin_setpos_6 : in  std_logic_vector(7 downto 0);
+			 mode         : out std_logic_vector(3 downto 0));
 	end component control;
 
 	component digital_filter
@@ -205,10 +212,22 @@ architecture structure of top_flightsim_controller_n is
 			 o     : out std_logic);
 	end component filter;
 
+	component sinus_rom
+		port(clk_in       : in  std_logic;
+			 mode         : in  std_logic_vector(3 downto 0);
+			 sin_setpos_1 : out std_logic_vector(7 downto 0);
+			 sin_setpos_2 : out std_logic_vector(7 downto 0);
+			 sin_setpos_3 : out std_logic_vector(7 downto 0);
+			 sin_setpos_4 : out std_logic_vector(7 downto 0);
+			 sin_setpos_5 : out std_logic_vector(7 downto 0);
+			 sin_setpos_6 : out std_logic_vector(7 downto 0));
+	end component sinus_rom;
+
 	-- declaration of signals used to interconnect 
 
 	signal reset           : std_logic;
 	signal sync_2ms        : std_logic;
+	signal sync_20ms       : std_logic;
 	signal data            : std_logic_vector(7 downto 0);
 	signal addr            : std_logic_vector(6 downto 0);
 	signal data_en         : std_logic;
@@ -269,6 +288,13 @@ architecture structure of top_flightsim_controller_n is
 	signal byte_6          : std_logic_vector(7 downto 0);
 	signal byte_7          : std_logic_vector(7 downto 0);
 	signal rxd_fil         : std_logic;
+	signal sin_setpos_1    : std_logic_vector(7 downto 0);
+	signal sin_setpos_2    : std_logic_vector(7 downto 0);
+	signal sin_setpos_3    : std_logic_vector(7 downto 0);
+	signal sin_setpos_4    : std_logic_vector(7 downto 0);
+	signal sin_setpos_5    : std_logic_vector(7 downto 0);
+	signal sin_setpos_6    : std_logic_vector(7 downto 0);
+	signal mode            : std_logic_vector(3 downto 0);
 
 begin
 	-- component instantiations statements
@@ -283,7 +309,7 @@ begin
 		port map(
 			clk        => clk,
 			sync_2ms   => sync_2ms,
-			sync_20ms  => open,
+			sync_20ms  => sync_20ms,
 			en_16xbaud => en_16xbaud
 		);
 
@@ -468,7 +494,14 @@ begin
 			ext_setpos_3 => byte_4,
 			ext_setpos_4 => byte_5,
 			ext_setpos_5 => byte_6,
-			ext_setpos_6 => byte_7
+			ext_setpos_6 => byte_7,
+			sin_setpos_1 => sin_setpos_1,
+			sin_setpos_2 => sin_setpos_2,
+			sin_setpos_3 => sin_setpos_3,
+			sin_setpos_4 => sin_setpos_4,
+			sin_setpos_5 => sin_setpos_5,
+			sin_setpos_6 => sin_setpos_6,
+			mode         => mode
 		);
 
 	A12 : digital_filter
@@ -615,6 +648,18 @@ begin
 			reset => reset,
 			i     => rxd,
 			o     => rxd_fil
+		);
+
+	A31 : entity work.sinus_rom
+		port map(
+			clk_in       => sync_20ms,
+			mode         => mode,
+			sin_setpos_1 => sin_setpos_1,
+			sin_setpos_2 => sin_setpos_2,
+			sin_setpos_3 => sin_setpos_3,
+			sin_setpos_4 => sin_setpos_4,
+			sin_setpos_5 => sin_setpos_5,
+			sin_setpos_6 => sin_setpos_6
 		);
 
 	-- additional statements  
