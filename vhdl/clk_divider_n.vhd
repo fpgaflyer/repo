@@ -1,7 +1,7 @@
 library IEEE;                           --
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity clk_divider_n is
 	port(
@@ -24,7 +24,8 @@ begin
 		if rising_edge(clk) then        -- use work edge for good synthese, wait until does not work !!!!!
 
 			if cnt_2ms = "11000011010011111" then --99999
-				-- if cnt_2ms = "00000000001100011" then --99 TEST 2us
+				--if cnt_2ms = "00000000001100011" then --99 TEST 2us
+				--if cnt_2ms = "00000000011111001" then --249 TEST 5us	
 				sync_2ms <= '1';
 				cnt_2ms  <= (others => '0');
 			else

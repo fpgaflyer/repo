@@ -10,10 +10,12 @@ entity readpos is
 	port(
 		clk                 : in  std_logic;
 		reset               : in  std_logic;
+		sync_2ms            : in  std_logic;
 		din                 : in  std_logic_vector(7 downto 0);
 		read_buffer         : out std_logic;
 		buffer_data_present : in  std_logic;
-		pos                 : out std_logic_vector(14 downto 0) --25um 0-82cm
+		pos                 : out std_logic_vector(14 downto 0); --25um 0-82cm
+		pos_update_error    : out std_logic -- error if no position update in 64ms
 	);
 end;
 
@@ -26,7 +28,8 @@ architecture behav of readpos is
 
 begin
 	process
-		variable di : std_logic_vector(4 downto 0);
+		variable di      : std_logic_vector(4 downto 0);
+		variable cnt_2ms : std_logic_vector(5 downto 0);
 	begin
 		wait until clk = '1';
 
@@ -39,6 +42,11 @@ begin
 		else
 			read_buffer <= '0';
 
+			if sync_2ms = '1' and cnt_2ms(5) /= '1' then
+				cnt_2ms := cnt_2ms + 1;
+			end if;
+			pos_update_error <= cnt_2ms(5);
+
 			case sm is
 				when wait4data =>
 					if buffer_data_present = '1' then
@@ -48,9 +56,10 @@ begin
 
 				when wait4start =>
 					if din = X"78" then -- char "x"
-						n     <= 0;
-						di(4) := '0';   --reset error flag  
-						sm    <= wait4bytes;
+						n       <= 0;
+						di(4)   := '0'; --reset error flag  
+						cnt_2ms := (others => '0'); --reset watchdog
+						sm      <= wait4bytes;
 					else
 						sm <= wait4data;
 					end if;

@@ -13,7 +13,6 @@
   <Mappings Location="vhdl/bbfifo_16x8.vhd" Library="work"/>
   <Mappings Location="vhdl/clk_divider_n.vhd" Library="work"/>
   <Mappings Location="vhdl/control.vhd" Library="work"/>
-  <Mappings Location="vhdl/control_nnn.vhd" Library="work"/>
   <Mappings Location="vhdl/controller.vhd" Library="work"/>
   <Mappings Location="vhdl/conv.vhd" Library="work"/>
   <Mappings Location="vhdl/counter.vhd" Library="work"/>

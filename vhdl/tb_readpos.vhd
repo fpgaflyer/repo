@@ -1,4 +1,4 @@
--- runtime = 200us   
+-- runtime = 500us   set sync_2ms in clk_divider_n to TEST 5us
 
 entity tb_readpos is
 end;
@@ -33,11 +33,20 @@ architecture rtl of tb_readpos is
 	component readpos
 		port(clk                 : in  std_logic;
 			 reset               : in  std_logic;
+			 sync_2ms            : in  std_logic;
 			 din                 : in  std_logic_vector(7 downto 0);
 			 read_buffer         : out std_logic;
 			 buffer_data_present : in  std_logic;
-			 pos                 : out std_logic_vector(31 downto 0));
+			 pos                 : out std_logic_vector(14 downto 0);
+			 pos_update_error    : out std_logic);
 	end component readpos;
+
+	component clk_divider_n
+		port(clk        : in  std_logic;
+			 sync_2ms   : out std_logic;
+			 sync_20ms  : out std_logic;
+			 en_16xbaud : out std_logic);
+	end component clk_divider_n;
 
 	signal CLK                 : std_logic := '1';
 	signal RESET               : std_logic;
@@ -49,53 +58,25 @@ architecture rtl of tb_readpos is
 	signal buffer_data_present : std_logic;
 	signal buffer_full         : std_logic;
 	signal buffer_half_full    : std_logic;
-	signal pos                 : std_logic_vector(31 downto 0);
+	signal pos                 : std_logic_vector(14 downto 0);
+	signal sync_2ms            : std_logic;
+	signal pos_update_error    : std_logic;
+	signal en_16xbaud          : std_logic;
 
 begin
-	CLK          <= NOT CLK after 10 ns;
-	RESET        <= '1', '0' after 100 ns;
-	DATA_IN      <= X"78",
-					X"30" after 5000 ns,
-					X"78" after 15000 ns,					
-					X"32" after 25000 ns,
-					X"2b" after 35000 ns,					
-					X"34" after 45000 ns,
-					X"35" after 55000 ns,					
-					X"36" after 65000 ns,
-					X"37" after 75000 ns,
-											
-					X"78" after 85000 ns,
-					X"41" after 95000 ns,
-					X"42" after 105000 ns,					
-					X"43" after 115000 ns,
-					X"44" after 125000 ns,					
-					X"45" after 135000 ns,
-					X"46" after 145000 ns,					
-					X"38" after 155000 ns,
-					X"39" after 165000 ns;
-												
-	WRITE_BUFFER <= '0', '1' after 2000 ns, '0' after 2020 ns,
-						 '1' after 10000 ns, '0' after 10020 ns,
-						 '1' after 20000 ns, '0' after 20020 ns,
-						 '1' after 30000 ns, '0' after 30020 ns,
-						 '1' after 40000 ns, '0' after 40020 ns,
-					 	 '1' after 50000 ns, '0' after 50020 ns,
-						 '1' after 60000 ns, '0' after 60020 ns,
-						 '1' after 70000 ns, '0' after 70020 ns,
-						 '1' after 80000 ns, '0' after 80020 ns,						 
-					 	 '1' after 90000 ns, '0' after 90020 ns,
-						 '1' after 100000 ns, '0' after 100020 ns,
-						 '1' after 110000 ns, '0' after 110020 ns,
-						 '1' after 120000 ns, '0' after 120020 ns,
-					 	 '1' after 130000 ns, '0' after 130020 ns,
-						 '1' after 140000 ns, '0' after 140020 ns,
-						 '1' after 150000 ns, '0' after 150020 ns,
-						 '1' after 160000 ns, '0' after 160020 ns,	
-						 '1' after 170000 ns, '0' after 170020 ns;						 			 						 
+	CLK     <= not CLK after 10 ns;
+	RESET   <= '1', '0' after 100 ns;
+	DATA_IN <= X"78", X"30" after 5000 ns, X"78" after 15000 ns, X"32" after 25000 ns, X"2b" after 35000 ns, X"34" after 45000 ns, X"35" after 55000 ns, X"36" after 65000 ns, X"37" after 75000 ns, X"78" after 85000 ns, X"41" after 95000 ns, X"42" after 105000 ns, X"43" after 115000 ns, X"44" after
+		125000 ns, X"45" after 135000 ns, X"46" after 145000 ns, X"38" after 155000 ns, X"39" after 165000 ns;
+
+	WRITE_BUFFER <= '0', '1' after 2000 ns, '0' after 2020 ns, '1' after 10000 ns, '0' after 10020 ns, '1' after 20000 ns, '0' after 20020 ns, '1' after 30000 ns, '0' after 30020 ns, '1' after 40000 ns, '0' after 40020 ns, '1' after 50000 ns, '0' after 50020 ns, '1' after 60000 ns, '0' after 60020
+		ns, '1' after 70000 ns, '0' after 70020 ns, '1' after 80000 ns, '0' after 80020 ns, '1' after 90000 ns, '0' after 90020 ns, '1' after 100000 ns, '0' after 100020 ns, '1' after 110000 ns, '0' after 110020 ns, '1' after 120000 ns, '0' after 120020 ns, '1' after 130000 ns, '0' after 130020 ns, '1'
+		after 140000 ns, '0' after 140020 ns, '1' after 150000 ns, '0' after 150020 ns, '1' after 160000 ns, '0' after 160020 ns, '1' after 170000 ns, '0' after 170020 ns;
+
 	A1 : uart_tx port map(
 			data_in          => DATA_IN,
 			write_buffer     => WRITE_BUFFER,
-			reset_buffer     => reset,
+			reset_buffer     => RESET,
 			en_16_x_baud     => '1',
 			serial_out       => serial,
 			buffer_full      => open,
@@ -107,21 +88,32 @@ begin
 			serial_in           => serial,
 			data_out            => data,
 			read_buffer         => read_buffer,
-			reset_buffer        => reset,
+			reset_buffer        => RESET,
 			en_16_x_baud        => '1',
 			buffer_data_present => buffer_data_present,
 			buffer_full         => buffer_full,
 			buffer_half_full    => buffer_half_full,
-			clk                 => clk
+			clk                 => CLK
 		);
-	
-	A3 : readpos port map(
+
+	A3 : readpos
+		port map(
 			clk                 => CLK,
-			reset               => reset,
+			reset               => RESET,
+			sync_2ms            => sync_2ms,
 			din                 => data,
 			read_buffer         => read_buffer,
 			buffer_data_present => buffer_data_present,
-			pos                 => pos
+			pos                 => pos,
+			pos_update_error    => pos_update_error
+		);
+
+	A4 : clk_divider_n
+		port map(
+			clk        => CLK,
+			sync_2ms   => sync_2ms,
+			sync_20ms  => open,
+			en_16xbaud => open
 		);
 
 end;

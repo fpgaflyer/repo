@@ -1,6 +1,6 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
-Project status: under development, only manual control with FPGA Starter Kit
+Project status: under development, XXXXXXXXXXXXX  THIS COMMIT DOES NOT WORK  XXXXXXXXXXX
 
 Project description 
 Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brushless 

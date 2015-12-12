@@ -28,8 +28,8 @@ entity top_flightsim_controller_n is
 		 sw3            : in  std_logic;
 		 led            : out std_logic_vector(7 downto 0);
 		 run_switch     : in  std_logic;
-		 --		 reset_button   : in  std_logic;
-		 motor_stop     : out std_logic;
+		 reset_button   : in  std_logic;
+		 motor_enable   : out std_logic;
 
 		 home_sensor_1  : in  std_logic;
 		 home_sensor_2  : in  std_logic;
@@ -109,6 +109,8 @@ architecture structure of top_flightsim_controller_n is
 	component controller
 		port(clk         : in  std_logic;
 			 reset       : in  std_logic;
+			 sync_2ms    : in  std_logic;
+			 sync_20ms   : in  std_logic;
 			 start       : in  std_logic;
 			 en_16xbaud  : in  std_logic;
 			 serial_in   : in  std_logic;
@@ -118,61 +120,81 @@ architecture structure of top_flightsim_controller_n is
 			 set_pos     : in  std_logic_vector(7 downto 0);
 			 drv_mode    : in  std_logic_vector(1 downto 0);
 			 drv_man     : in  std_logic_vector(10 downto 0);
+			 speedlimit  : in  std_logic_vector(9 downto 0);
 			 position    : out std_logic_vector(7 downto 0);
-			 serial_out  : out std_logic);
+			 serial_out  : out std_logic;
+			 errors      : out std_logic_vector(3 downto 0));
 	end component controller;
 
 	component control
-		port(clk          : in  std_logic;
-			 reset        : in  std_logic;
-			 sync_2ms     : in  std_logic;
-			 rotary_event : in  std_logic;
-			 rotary_left  : in  std_logic;
-			 press        : in  std_logic;
-			 btn_north    : in  std_logic;
-			 btn_west     : in  std_logic;
-			 btn_east     : in  std_logic;
-			 btn_south    : in  std_logic;
-			 sw0          : in  std_logic;
-			 sw1          : in  std_logic;
-			 sw2          : in  std_logic;
-			 sw3          : in  std_logic;
-			 start        : out std_logic;
-			 home_enable  : out std_logic;
-			 kp           : out std_logic_vector(3 downto 0);
-			 set_pos_1    : out std_logic_vector(7 downto 0);
-			 set_pos_2    : out std_logic_vector(7 downto 0);
-			 set_pos_3    : out std_logic_vector(7 downto 0);
-			 set_pos_4    : out std_logic_vector(7 downto 0);
-			 set_pos_5    : out std_logic_vector(7 downto 0);
-			 set_pos_6    : out std_logic_vector(7 downto 0);
-			 drv_mode_1   : out std_logic_vector(1 downto 0);
-			 drv_mode_2   : out std_logic_vector(1 downto 0);
-			 drv_mode_3   : out std_logic_vector(1 downto 0);
-			 drv_mode_4   : out std_logic_vector(1 downto 0);
-			 drv_mode_5   : out std_logic_vector(1 downto 0);
-			 drv_mode_6   : out std_logic_vector(1 downto 0);
-			 drv_man_1    : out std_logic_vector(10 downto 0);
-			 drv_man_2    : out std_logic_vector(10 downto 0);
-			 drv_man_3    : out std_logic_vector(10 downto 0);
-			 drv_man_4    : out std_logic_vector(10 downto 0);
-			 drv_man_5    : out std_logic_vector(10 downto 0);
-			 drv_man_6    : out std_logic_vector(10 downto 0);
-			 led          : out std_logic_vector(7 downto 0);
-			 val_1        : out std_logic_vector(63 downto 0);
-			 ext_setpos_1 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_2 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_3 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_4 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_5 : in  std_logic_vector(7 downto 0);
-			 ext_setpos_6 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_1 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_2 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_3 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_4 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_5 : in  std_logic_vector(7 downto 0);
-			 sin_setpos_6 : in  std_logic_vector(7 downto 0);
-			 mode         : out std_logic_vector(3 downto 0));
+		port(clk           : in  std_logic;
+			 reset         : in  std_logic;
+			 sync_2ms      : in  std_logic;
+			 sync_20ms     : in  std_logic;
+			 rotary_event  : in  std_logic;
+			 rotary_left   : in  std_logic;
+			 press         : in  std_logic;
+			 btn_north     : in  std_logic;
+			 btn_west      : in  std_logic;
+			 btn_east      : in  std_logic;
+			 btn_south     : in  std_logic;
+			 sw0           : in  std_logic;
+			 sw1           : in  std_logic;
+			 sw2           : in  std_logic;
+			 sw3           : in  std_logic;
+			 start         : out std_logic;
+			 home_enable   : out std_logic;
+			 kp            : out std_logic_vector(3 downto 0);
+			 set_pos_1     : out std_logic_vector(7 downto 0);
+			 set_pos_2     : out std_logic_vector(7 downto 0);
+			 set_pos_3     : out std_logic_vector(7 downto 0);
+			 set_pos_4     : out std_logic_vector(7 downto 0);
+			 set_pos_5     : out std_logic_vector(7 downto 0);
+			 set_pos_6     : out std_logic_vector(7 downto 0);
+			 drv_mode_1    : out std_logic_vector(1 downto 0);
+			 drv_mode_2    : out std_logic_vector(1 downto 0);
+			 drv_mode_3    : out std_logic_vector(1 downto 0);
+			 drv_mode_4    : out std_logic_vector(1 downto 0);
+			 drv_mode_5    : out std_logic_vector(1 downto 0);
+			 drv_mode_6    : out std_logic_vector(1 downto 0);
+			 drv_man_1     : out std_logic_vector(10 downto 0);
+			 drv_man_2     : out std_logic_vector(10 downto 0);
+			 drv_man_3     : out std_logic_vector(10 downto 0);
+			 drv_man_4     : out std_logic_vector(10 downto 0);
+			 drv_man_5     : out std_logic_vector(10 downto 0);
+			 drv_man_6     : out std_logic_vector(10 downto 0);
+			 led           : out std_logic_vector(7 downto 0);
+			 val_1         : out std_logic_vector(63 downto 0);
+			 ext_setpos_1  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_2  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_3  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_4  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_5  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_6  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_1  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_2  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_3  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_4  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_5  : in  std_logic_vector(7 downto 0);
+			 sin_setpos_6  : in  std_logic_vector(7 downto 0);
+			 mode          : out std_logic_vector(3 downto 0);
+			 errors_1      : in  std_logic_vector(3 downto 0);
+			 errors_2      : in  std_logic_vector(3 downto 0);
+			 errors_3      : in  std_logic_vector(3 downto 0);
+			 errors_4      : in  std_logic_vector(3 downto 0);
+			 errors_5      : in  std_logic_vector(3 downto 0);
+			 errors_6      : in  std_logic_vector(3 downto 0);
+			 com_error     : in  std_logic;
+			 home_sensor_1 : in  std_logic;
+			 home_sensor_2 : in  std_logic;
+			 home_sensor_3 : in  std_logic;
+			 home_sensor_4 : in  std_logic;
+			 home_sensor_5 : in  std_logic;
+			 home_sensor_6 : in  std_logic;
+			 run_switch    : in  std_logic;
+			 reset_button  : in  std_logic;
+			 motor_enable  : out std_logic;
+			 speedlimit    : out std_logic_vector(9 downto 0));
 	end component control;
 
 	component digital_filter
@@ -295,6 +317,14 @@ architecture structure of top_flightsim_controller_n is
 	signal sin_setpos_5    : std_logic_vector(7 downto 0);
 	signal sin_setpos_6    : std_logic_vector(7 downto 0);
 	signal mode            : std_logic_vector(3 downto 0);
+	signal speedlimit      : std_logic_vector(9 downto 0);
+	signal errors_1        : std_logic_vector(3 downto 0);
+	signal errors_2        : std_logic_vector(3 downto 0);
+	signal errors_3        : std_logic_vector(3 downto 0);
+	signal errors_4        : std_logic_vector(3 downto 0);
+	signal errors_5        : std_logic_vector(3 downto 0);
+	signal errors_6        : std_logic_vector(3 downto 0);
+	signal com_error       : std_logic;
 
 begin
 	-- component instantiations statements
@@ -352,6 +382,8 @@ begin
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_1,
@@ -361,14 +393,18 @@ begin
 			set_pos     => set_pos_1,
 			drv_mode    => drv_mode_1,
 			drv_man     => drv_man_1,
+			speedlimit  => speedlimit,
 			position    => position_1,
-			serial_out  => serial_out_1
+			serial_out  => serial_out_1,
+			errors      => errors_1
 		);
 
 	A6 : controller
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_2,
@@ -378,14 +414,18 @@ begin
 			set_pos     => set_pos_2,
 			drv_mode    => drv_mode_2,
 			drv_man     => drv_man_2,
+			speedlimit  => speedlimit,
 			position    => position_2,
-			serial_out  => serial_out_2
+			serial_out  => serial_out_2,
+			errors      => errors_2
 		);
 
 	A7 : controller
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_3,
@@ -395,14 +435,18 @@ begin
 			set_pos     => set_pos_3,
 			drv_mode    => drv_mode_3,
 			drv_man     => drv_man_3,
+			speedlimit  => speedlimit,
 			position    => position_3,
-			serial_out  => serial_out_3
+			serial_out  => serial_out_3,
+			errors      => errors_3
 		);
 
 	A8 : controller
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_4,
@@ -412,14 +456,18 @@ begin
 			set_pos     => set_pos_4,
 			drv_mode    => drv_mode_4,
 			drv_man     => drv_man_4,
+			speedlimit  => speedlimit,
 			position    => position_4,
-			serial_out  => serial_out_4
+			serial_out  => serial_out_4,
+			errors      => errors_4
 		);
 
 	A9 : controller
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_5,
@@ -429,14 +477,18 @@ begin
 			set_pos     => set_pos_5,
 			drv_mode    => drv_mode_5,
 			drv_man     => drv_man_5,
+			speedlimit  => speedlimit,
 			position    => position_5,
-			serial_out  => serial_out_5
+			serial_out  => serial_out_5,
+			errors      => errors_5
 		);
 
 	A10 : controller
 		port map(
 			clk         => clk,
 			reset       => reset,
+			sync_2ms    => sync_2ms,
+			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
 			serial_in   => serial_in_6,
@@ -446,62 +498,82 @@ begin
 			set_pos     => set_pos_6,
 			drv_mode    => drv_mode_6,
 			drv_man     => drv_man_6,
+			speedlimit  => speedlimit,
 			position    => position_6,
-			serial_out  => serial_out_6
+			serial_out  => serial_out_6,
+			errors      => errors_6
 		);
 
 	A11 : component control
 		port map(
-			clk          => clk,
-			reset        => reset,
-			sync_2ms     => sync_2ms,
-			rotary_event => rotary_event,
-			rotary_left  => rotary_left,
-			press        => press,
-			btn_north    => btn_north_f,
-			btn_west     => btn_west_f,
-			btn_east     => btn_east_f,
-			btn_south    => btn_south_f,
-			sw0          => sw0_f,
-			sw1          => sw1_f,
-			sw2          => sw2_f,
-			sw3          => sw3_f,
-			start        => start,
-			home_enable  => home_enable,
-			kp           => kp,
-			set_pos_1    => set_pos_1,
-			set_pos_2    => set_pos_2,
-			set_pos_3    => set_pos_3,
-			set_pos_4    => set_pos_4,
-			set_pos_5    => set_pos_5,
-			set_pos_6    => set_pos_6,
-			drv_mode_1   => drv_mode_1,
-			drv_mode_2   => drv_mode_2,
-			drv_mode_3   => drv_mode_3,
-			drv_mode_4   => drv_mode_4,
-			drv_mode_5   => drv_mode_5,
-			drv_mode_6   => drv_mode_6,
-			drv_man_1    => drv_man_1,
-			drv_man_2    => drv_man_2,
-			drv_man_3    => drv_man_3,
-			drv_man_4    => drv_man_4,
-			drv_man_5    => drv_man_5,
-			drv_man_6    => drv_man_6,
-			led          => led,
-			val_1        => val_1,
-			ext_setpos_1 => byte_2,
-			ext_setpos_2 => byte_3,
-			ext_setpos_3 => byte_4,
-			ext_setpos_4 => byte_5,
-			ext_setpos_5 => byte_6,
-			ext_setpos_6 => byte_7,
-			sin_setpos_1 => sin_setpos_1,
-			sin_setpos_2 => sin_setpos_2,
-			sin_setpos_3 => sin_setpos_3,
-			sin_setpos_4 => sin_setpos_4,
-			sin_setpos_5 => sin_setpos_5,
-			sin_setpos_6 => sin_setpos_6,
-			mode         => mode
+			clk           => clk,
+			reset         => reset,
+			sync_2ms      => sync_2ms,
+			sync_20ms     => sync_20ms,
+			rotary_event  => rotary_event,
+			rotary_left   => rotary_left,
+			press         => press,
+			btn_north     => btn_north_f,
+			btn_west      => btn_west_f,
+			btn_east      => btn_east_f,
+			btn_south     => btn_south_f,
+			sw0           => sw0_f,
+			sw1           => sw1_f,
+			sw2           => sw2_f,
+			sw3           => sw3_f,
+			start         => start,
+			home_enable   => home_enable,
+			kp            => kp,
+			set_pos_1     => set_pos_1,
+			set_pos_2     => set_pos_2,
+			set_pos_3     => set_pos_3,
+			set_pos_4     => set_pos_4,
+			set_pos_5     => set_pos_5,
+			set_pos_6     => set_pos_6,
+			drv_mode_1    => drv_mode_1,
+			drv_mode_2    => drv_mode_2,
+			drv_mode_3    => drv_mode_3,
+			drv_mode_4    => drv_mode_4,
+			drv_mode_5    => drv_mode_5,
+			drv_mode_6    => drv_mode_6,
+			drv_man_1     => drv_man_1,
+			drv_man_2     => drv_man_2,
+			drv_man_3     => drv_man_3,
+			drv_man_4     => drv_man_4,
+			drv_man_5     => drv_man_5,
+			drv_man_6     => drv_man_6,
+			led           => led,
+			val_1         => val_1,
+			ext_setpos_1  => byte_2,
+			ext_setpos_2  => byte_3,
+			ext_setpos_3  => byte_4,
+			ext_setpos_4  => byte_5,
+			ext_setpos_5  => byte_6,
+			ext_setpos_6  => byte_7,
+			sin_setpos_1  => sin_setpos_1,
+			sin_setpos_2  => sin_setpos_2,
+			sin_setpos_3  => sin_setpos_3,
+			sin_setpos_4  => sin_setpos_4,
+			sin_setpos_5  => sin_setpos_5,
+			sin_setpos_6  => sin_setpos_6,
+			mode          => mode,
+			errors_1      => errors_1,
+			errors_2      => errors_2,
+			errors_3      => errors_3,
+			errors_4      => errors_4,
+			errors_5      => errors_5,
+			errors_6      => errors_6,
+			com_error     => com_error,
+			home_sensor_1 => home_sensor_1,
+			home_sensor_2 => home_sensor_2,
+			home_sensor_3 => home_sensor_3,
+			home_sensor_4 => home_sensor_4,
+			home_sensor_5 => home_sensor_5,
+			home_sensor_6 => home_sensor_6,
+			run_switch    => run_switch,
+			reset_button  => reset_button,
+			motor_enable  => motor_enable,
+			speedlimit    => speedlimit
 		);
 
 	A12 : digital_filter
@@ -614,7 +686,7 @@ begin
 			clk   => clk,
 			reset => reset,
 			i     => not run_switch,
-			o     => motor_stop
+			o     => motor_enable
 		);
 
 	A28 : component serial_rx
@@ -639,7 +711,7 @@ begin
 			byte_5        => byte_5,
 			byte_6        => byte_6,
 			byte_7        => byte_7,
-			com_error     => open
+			com_error     => com_error
 		);
 
 	A30 : component filter
