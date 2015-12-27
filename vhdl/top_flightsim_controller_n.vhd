@@ -92,6 +92,7 @@ architecture structure of top_flightsim_controller_n is
 			 reset   : in  std_logic;
 			 val_0   : in  std_logic_vector(63 downto 0);
 			 val_1   : in  std_logic_vector(63 downto 0);
+			 blank   : in  integer range 0 to 6;
 			 data    : out std_logic_vector(7 downto 0);
 			 addr    : out std_logic_vector(6 downto 0);
 			 data_en : out std_logic;
@@ -118,9 +119,9 @@ architecture structure of top_flightsim_controller_n is
 			 kp          : in  std_logic_vector(3 downto 0);
 			 home_sensor : in  std_logic;
 			 set_pos     : in  std_logic_vector(7 downto 0);
-			 drv_mode    : in  std_logic_vector(1 downto 0);
+			 drv_mode    : in  std_logic;
 			 drv_man     : in  std_logic_vector(10 downto 0);
-			 speedlimit  : in  std_logic_vector(9 downto 0);
+			 speed_limit : in  std_logic_vector(9 downto 0);
 			 position    : out std_logic_vector(7 downto 0);
 			 serial_out  : out std_logic;
 			 errors      : out std_logic_vector(3 downto 0));
@@ -151,12 +152,7 @@ architecture structure of top_flightsim_controller_n is
 			 set_pos_4     : out std_logic_vector(7 downto 0);
 			 set_pos_5     : out std_logic_vector(7 downto 0);
 			 set_pos_6     : out std_logic_vector(7 downto 0);
-			 drv_mode_1    : out std_logic_vector(1 downto 0);
-			 drv_mode_2    : out std_logic_vector(1 downto 0);
-			 drv_mode_3    : out std_logic_vector(1 downto 0);
-			 drv_mode_4    : out std_logic_vector(1 downto 0);
-			 drv_mode_5    : out std_logic_vector(1 downto 0);
-			 drv_mode_6    : out std_logic_vector(1 downto 0);
+			 drv_mode      : out std_logic;
 			 drv_man_1     : out std_logic_vector(10 downto 0);
 			 drv_man_2     : out std_logic_vector(10 downto 0);
 			 drv_man_3     : out std_logic_vector(10 downto 0);
@@ -165,6 +161,7 @@ architecture structure of top_flightsim_controller_n is
 			 drv_man_6     : out std_logic_vector(10 downto 0);
 			 led           : out std_logic_vector(7 downto 0);
 			 val_1         : out std_logic_vector(63 downto 0);
+			 blank         : out integer range 0 to 6;
 			 ext_setpos_1  : in  std_logic_vector(7 downto 0);
 			 ext_setpos_2  : in  std_logic_vector(7 downto 0);
 			 ext_setpos_3  : in  std_logic_vector(7 downto 0);
@@ -194,7 +191,7 @@ architecture structure of top_flightsim_controller_n is
 			 run_switch    : in  std_logic;
 			 reset_button  : in  std_logic;
 			 motor_enable  : out std_logic;
-			 speedlimit    : out std_logic_vector(9 downto 0));
+			 speed_limit   : out std_logic_vector(9 downto 0));
 	end component control;
 
 	component digital_filter
@@ -277,12 +274,7 @@ architecture structure of top_flightsim_controller_n is
 	signal set_pos_4       : std_logic_vector(7 downto 0);
 	signal set_pos_5       : std_logic_vector(7 downto 0);
 	signal set_pos_6       : std_logic_vector(7 downto 0);
-	signal drv_mode_1      : std_logic_vector(1 downto 0);
-	signal drv_mode_2      : std_logic_vector(1 downto 0);
-	signal drv_mode_3      : std_logic_vector(1 downto 0);
-	signal drv_mode_4      : std_logic_vector(1 downto 0);
-	signal drv_mode_5      : std_logic_vector(1 downto 0);
-	signal drv_mode_6      : std_logic_vector(1 downto 0);
+	signal drv_mode        : std_logic;
 	signal drv_man_1       : std_logic_vector(10 downto 0);
 	signal drv_man_2       : std_logic_vector(10 downto 0);
 	signal drv_man_3       : std_logic_vector(10 downto 0);
@@ -317,7 +309,7 @@ architecture structure of top_flightsim_controller_n is
 	signal sin_setpos_5    : std_logic_vector(7 downto 0);
 	signal sin_setpos_6    : std_logic_vector(7 downto 0);
 	signal mode            : std_logic_vector(3 downto 0);
-	signal speedlimit      : std_logic_vector(9 downto 0);
+	signal speed_limit     : std_logic_vector(9 downto 0);
 	signal errors_1        : std_logic_vector(3 downto 0);
 	signal errors_2        : std_logic_vector(3 downto 0);
 	signal errors_3        : std_logic_vector(3 downto 0);
@@ -325,6 +317,9 @@ architecture structure of top_flightsim_controller_n is
 	signal errors_5        : std_logic_vector(3 downto 0);
 	signal errors_6        : std_logic_vector(3 downto 0);
 	signal com_error       : std_logic;
+	signal run_switch_f    : std_logic;
+	signal reset_button_f  : std_logic;
+	signal blank           : integer range 0 to 6;
 
 begin
 	-- component instantiations statements
@@ -363,6 +358,7 @@ begin
 			reset   => reset,
 			val_0   => val_0,
 			val_1   => val_1,
+			blank   => blank,
 			data    => data,
 			addr    => addr,
 			data_en => data_en,
@@ -391,9 +387,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_1_f,
 			set_pos     => set_pos_1,
-			drv_mode    => drv_mode_1,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_1,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_1,
 			serial_out  => serial_out_1,
 			errors      => errors_1
@@ -412,9 +408,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_2_f,
 			set_pos     => set_pos_2,
-			drv_mode    => drv_mode_2,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_2,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_2,
 			serial_out  => serial_out_2,
 			errors      => errors_2
@@ -433,9 +429,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_3_f,
 			set_pos     => set_pos_3,
-			drv_mode    => drv_mode_3,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_3,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_3,
 			serial_out  => serial_out_3,
 			errors      => errors_3
@@ -454,9 +450,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_4_f,
 			set_pos     => set_pos_4,
-			drv_mode    => drv_mode_4,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_4,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_4,
 			serial_out  => serial_out_4,
 			errors      => errors_4
@@ -475,9 +471,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_5_f,
 			set_pos     => set_pos_5,
-			drv_mode    => drv_mode_5,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_5,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_5,
 			serial_out  => serial_out_5,
 			errors      => errors_5
@@ -496,9 +492,9 @@ begin
 			kp          => kp,
 			home_sensor => home_sensor_6_f,
 			set_pos     => set_pos_6,
-			drv_mode    => drv_mode_6,
+			drv_mode    => drv_mode,
 			drv_man     => drv_man_6,
-			speedlimit  => speedlimit,
+			speed_limit => speed_limit,
 			position    => position_6,
 			serial_out  => serial_out_6,
 			errors      => errors_6
@@ -530,12 +526,7 @@ begin
 			set_pos_4     => set_pos_4,
 			set_pos_5     => set_pos_5,
 			set_pos_6     => set_pos_6,
-			drv_mode_1    => drv_mode_1,
-			drv_mode_2    => drv_mode_2,
-			drv_mode_3    => drv_mode_3,
-			drv_mode_4    => drv_mode_4,
-			drv_mode_5    => drv_mode_5,
-			drv_mode_6    => drv_mode_6,
+			drv_mode      => drv_mode,
 			drv_man_1     => drv_man_1,
 			drv_man_2     => drv_man_2,
 			drv_man_3     => drv_man_3,
@@ -544,6 +535,7 @@ begin
 			drv_man_6     => drv_man_6,
 			led           => led,
 			val_1         => val_1,
+			blank         => blank,
 			ext_setpos_1  => byte_2,
 			ext_setpos_2  => byte_3,
 			ext_setpos_3  => byte_4,
@@ -570,10 +562,10 @@ begin
 			home_sensor_4 => home_sensor_4,
 			home_sensor_5 => home_sensor_5,
 			home_sensor_6 => home_sensor_6,
-			run_switch    => run_switch,
-			reset_button  => reset_button,
+			run_switch    => run_switch_f,
+			reset_button  => reset_button_f,
 			motor_enable  => motor_enable,
-			speedlimit    => speedlimit
+			speed_limit   => speed_limit
 		);
 
 	A12 : digital_filter
@@ -685,11 +677,19 @@ begin
 		port map(
 			clk   => clk,
 			reset => reset,
-			i     => not run_switch,
-			o     => motor_enable
+			i     => run_switch,
+			o     => run_switch_f
 		);
 
-	A28 : component serial_rx
+	A28 : component digital_filter
+		port map(
+			clk   => clk,
+			reset => reset,
+			i     => reset_button,
+			o     => reset_button_f
+		);
+
+	A29 : component serial_rx
 		port map(
 			clk           => clk,
 			reset         => reset,
@@ -698,7 +698,7 @@ begin
 			rx_data_valid => rx_data_valid
 		);
 
-	A29 : component serial_rx_dec_n
+	A30 : component serial_rx_dec_n
 		port map(
 			clk           => clk,
 			reset         => reset,
@@ -714,7 +714,7 @@ begin
 			com_error     => com_error
 		);
 
-	A30 : component filter
+	A31 : component filter
 		port map(
 			clk   => clk,
 			reset => reset,
@@ -722,7 +722,7 @@ begin
 			o     => rxd_fil
 		);
 
-	A31 : entity work.sinus_rom
+	A32 : entity work.sinus_rom
 		port map(
 			clk_in       => sync_20ms,
 			mode         => mode,

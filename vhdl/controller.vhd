@@ -18,9 +18,9 @@ entity controller is
 		 kp          : in  std_logic_vector(3 downto 0);
 		 home_sensor : in  std_logic;
 		 set_pos     : in  std_logic_vector(7 downto 0); -- 1.6mm 0-41cm
-		 drv_mode    : in  std_logic_vector(1 downto 0);
+		 drv_mode    : in  std_logic;
 		 drv_man     : in  std_logic_vector(10 downto 0);
-		 speedlimit  : in  std_logic_vector(9 downto 0);
+		 speed_limit : in  std_logic_vector(9 downto 0);
 		 position    : out std_logic_vector(7 downto 0); -- 1.6mm 0-41cm
 		 serial_out  : out std_logic;
 		 errors      : out std_logic_vector(3 downto 0)
@@ -65,21 +65,21 @@ architecture structure of controller is
 	end component home_position;
 
 	component p_controller_n
-		port(clk        : in  std_logic;
-			 reset      : in  std_logic;
-			 sync_20ms  : in  std_logic;
-			 kp         : in  std_logic_vector(3 downto 0);
-			 setpos     : in  std_logic_vector(7 downto 0);
-			 pos        : in  std_logic_vector(13 downto 0);
-			 speedlimit : in  std_logic_vector(9 downto 0);
-			 drive      : out std_logic_vector(10 downto 0);
-			 loop_error : out std_logic);
+		port(clk         : in  std_logic;
+			 reset       : in  std_logic;
+			 sync_20ms   : in  std_logic;
+			 kp          : in  std_logic_vector(3 downto 0);
+			 setpos      : in  std_logic_vector(7 downto 0);
+			 pos         : in  std_logic_vector(13 downto 0);
+			 speed_limit : in  std_logic_vector(9 downto 0);
+			 drive       : out std_logic_vector(10 downto 0);
+			 loop_error  : out std_logic);
 	end component p_controller_n;
 
 	component drv_mux
 		port(drv_in   : in  std_logic_vector(10 downto 0);
 			 drv_man  : in  std_logic_vector(10 downto 0);
-			 drv_mode : in  std_logic_vector(1 downto 0);
+			 drv_mode : in  std_logic;
 			 drv_out  : out std_logic_vector(10 downto 0));
 	end component drv_mux;
 
@@ -154,15 +154,15 @@ begin
 
 	A33 : p_controller_n
 		port map(
-			clk        => clk,
-			reset      => reset,
-			sync_20ms  => sync_20ms,
-			kp         => kp,
-			setpos     => set_pos,      --1.6mm 0-41cm  
-			pos        => pos_out(13 downto 0), --25um 0-41cm
-			speedlimit => speedlimit,
-			drive      => drv_in,
-			loop_error => errors(2)
+			clk         => clk,
+			reset       => reset,
+			sync_20ms   => sync_20ms,
+			kp          => kp,
+			setpos      => set_pos,     --1.6mm 0-41cm  
+			pos         => pos_out(13 downto 0), --25um 0-41cm
+			speed_limit => speed_limit,
+			drive       => drv_in,
+			loop_error  => errors(2)
 		);
 
 	A4 : drv_mux

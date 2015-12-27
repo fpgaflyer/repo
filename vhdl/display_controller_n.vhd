@@ -9,8 +9,9 @@ use gen.std.all;
 entity display_controller_n is
 	port(clk     : in  std_logic;
 		 reset   : in  std_logic;
-		 val_0   : in  std_logic_vector(63 downto 0); --"0 FFFF FFFF FFFF"  
-		 val_1   : in  std_logic_vector(63 downto 0); --"K FFFF FFFF FFFF"  K=Kp value
+		 val_0   : in  std_logic_vector(63 downto 0); --"K FFFF FFFF FFFF"  K=Kp value
+		 val_1   : in  std_logic_vector(63 downto 0); --"X FFFF FFFF FFFF"  X= select or mode
+		 blank   : in  integer range 0 to 6; -- blanks val_1 setpositions X 1122 3344 5566, 0 is no blank
 
 		 data    : out std_logic_vector(7 downto 0);
 		 addr    : out std_logic_vector(6 downto 0);
@@ -56,9 +57,36 @@ begin
 					else
 						addr <= "100" & not n(3 downto 0); --0x40;
 						data <= hex2ascii(val_1((i + 3) downto i));
+						case blank is
+							when 1 =>
+								if (not n(3 downto 0) = 2) or (not n(3 downto 0) = 3) then
+									data <= X"20"; -- " "  
+								end if;
+							when 2 =>
+								if (not n(3 downto 0) = 4) or (not n(3 downto 0) = 5) then
+									data <= X"20"; -- " "   
+								end if;
+							when 3 =>
+								if (not n(3 downto 0) = 7) or (not n(3 downto 0) = 8) then
+									data <= X"20"; -- " "  
+								end if;
+							when 4 =>
+								if (not n(3 downto 0) = 9) or (not n(3 downto 0) = 10) then
+									data <= X"20"; -- " "  
+								end if;
+							when 5 =>
+								if (not n(3 downto 0) = 12) or (not n(3 downto 0) = 13) then
+									data <= X"20"; -- " "  
+								end if;
+							when 6 =>
+								if (not n(3 downto 0) = 14) or (not n(3 downto 0) = 15) then
+									data <= X"20"; -- " "  
+								end if;
+							when others => null;
+						end case;
 					end if;
-					if (n(3 downto 0) = 4) or (n(3 downto 0) = 9) or (n(3 downto 0) = 14) then
-						data <= X"20";  -- " "
+					if (not n(3 downto 0) = 1) or (not n(3 downto 0) = 6) or (not n(3 downto 0) = 11) then
+						data <= X"20";  -- " "  
 					end if;
 					n       <= n + 1;
 					data_en <= '1';

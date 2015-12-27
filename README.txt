@@ -1,6 +1,6 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
-Project status: under development, XXXXXXXXXXXXX  THIS COMMIT DOES NOT WORK  XXXXXXXXXXX
+Project status: under development
 
 Project description 
 Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brushless 
@@ -19,17 +19,22 @@ Serial in: actual position motor axis from SBL1360
 
 Home position sensor is a slotted sensor to detect zero position
 
-Rotary switch to set motor_axis position in 1.6mm steps (range 00 - FF)
-Rotary Push_Button enables position controlled mode and sets position
+Rotary switch to set motor_axis position in 1.6mm steps (range 00 - FF), selected LCD display blinks
+Rotary Push_Button will enter set position, selected LCD display stops blinking
 
-Button north/south enables speed mode, north = speed +50 (up), south = speed -50 (down)
-Button west/east:	select controller 1 to 6, index is displayed on LCD lower left corner digit
+Button north/south enables manual control in speed mode, north = speed +50 (up), south = speed -50 (down)
+Button west/east (SW3 = 0):	select controller 1 to 6, index is displayed on LCD lower left corner digit
+Button west/east (SW3 = 1):	sets mode
 
-SW0 = '1' enables home_position (set position counter to zero) when home_position sensor goes high
-SW1,SW2 sets kp value 0..2, kp value is displayed on LCD upper left corner digit
+External run_switch 
+on:		motor activated in position controlled mode, speed ramps up in 20 sec
+off:	stop, motor can be activated in controlled speed mode with button north/south
+External reset_button stops motor and reset error flags
 
+SW0 = '1' enables home_position (set position counter in FPGA to zero) when home_position sensor goes high
+SW1,SW2 sets kp value 0..3, kp value is displayed on LCD upper left corner digit
 SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
-mode
+mode:
 A: set position by rotary switch
 B: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
 C: set position by sinus generator : YAW
@@ -39,14 +44,27 @@ F: set position = 0x80
 
 ** serial data input is BIN format, 38400 Baud
 
+led5 to led0 => controller 1 to 6: 
 led on = position mode
 led off = speed mode
-led5 to led0 => controller 1 to 6 ! 
+
+led6/7 => off=stop, blinking alternately slow=ramp-up, blinking alternately fast=run, on=error
+led6/7 =>  blinking together in stead of alternately means that enable home_position is on 
 
 LCD screen shows 6 actual motor axis positions (00-FF/1.6mm) in the upper line and 
 6 set positions (00-FF/1.6mm) on lower line
+In case there is a error (led6/7 on) the lower line displays error code per actuator. 
 
-
+error codes:
+01:	position too low		<0x06 = 0.96cm
+02: position too high 		>0xF0 = 38.4cm
+04: loop error				loop error > 10.2375cm for 1.28sec
+08: position update error	no position update within 64ms
+10: home error 				not in home position before rampup
+20: home error 				still in home position after rampup
+40: --
+80: --
+error codes are added for a combination of errors 
 
 VHDL Files:
 top_flightsim_controller_n.vhd: top level 
@@ -59,15 +77,18 @@ p_controller_n.vhd: proportial position controller
 interpol.vhd: interpolator on set position improves position stability (more intermediate position steps) NOT USED
 home_position.vhd: gives offset to position counter when home position detected
 drive_mux: selects position mode (position control loop active) or speed mode (no position control)
+sinus_rom: generates position que for testpurposes 
 
-tb_ ... are the testbenches NOT UPDATED 
+
+tb_ ... are the testbenches (not all are updated)
+
 
 Xilinx:
 project file: top_flightsim_controller_n.xise
 constraints : additional sources/top_flightsim_controller_n.ucf
 
 Modelsim:
-/Wavescripts for corresponding testbenches NOT UPDATED
+/Wavescripts for corresponding testbenches (not all are updated)
 
 
 Hardware:

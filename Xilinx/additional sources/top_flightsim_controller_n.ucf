@@ -88,7 +88,7 @@ NET "txd"  	LOC = "M14" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
 
 # run_switch, reset_button, motor_stop(active low) via FX2 CONNECTOR  
 NET "run_switch"  	LOC = "B11" | IOSTANDARD = LVTTL ;
-NET "reset_button"  LOC = "A11" | IOSTANDARD = LVTTL ;
+NET "reset_button"  LOC = "A8" | IOSTANDARD = LVTTL ;
 NET "motor_enable" 	LOC = "C4" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
 
 # End of File

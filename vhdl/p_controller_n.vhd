@@ -5,15 +5,15 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity p_controller_n is
 	port(
-		clk        : in  std_logic;
-		reset      : in  std_logic;
-		sync_20ms  : in  std_logic;
-		kp         : in  std_logic_vector(3 downto 0);
-		setpos     : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
-		pos        : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
-		speedlimit : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
-		drive      : out std_logic_vector(10 downto 0); -- -1000 / +1000
-		loop_error : out std_logic      -- error > 10cm during 1.28sec
+		clk         : in  std_logic;
+		reset       : in  std_logic;
+		sync_20ms   : in  std_logic;
+		kp          : in  std_logic_vector(3 downto 0);
+		setpos      : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
+		pos         : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
+		speed_limit : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
+		drive       : out std_logic_vector(10 downto 0); -- -1000 / +1000
+		loop_error  : out std_logic     -- error > 10cm during 1.28sec
 	);
 
 end;
@@ -70,8 +70,8 @@ begin
 			drv_div <= drv(17 downto 2); --/4
 			sign_3d <= sign_2d;
 
-			if drv_div > "000000" & speedlimit then
-				drv_lim <= "000000" & speedlimit;
+			if drv_div > "000000" & speed_limit then
+				drv_lim <= "000000" & speed_limit;
 			else
 				drv_lim <= drv_div;
 			end if;
