@@ -98,8 +98,10 @@ architecture behav of control is
 	type t_sim is (stop, wait4run, ramp, run, error);
 	signal sim        : t_sim;
 	signal speedlimit : std_logic_vector(9 downto 0);
-	signal blink      : std_logic_vector(5 downto 0);
+	signal cnt_20ms   : std_logic_vector(5 downto 0);
 	signal blanks     : integer range 0 to 6;
+	signal leds       : std_logic_vector(7 downto 0);
+	signal cnt_20ms_d : std_logic;
 
 begin
 	process
@@ -123,13 +125,13 @@ begin
 		errors       := err(1)(3 downto 0) & err(2)(3 downto 0) & err(3)(3 downto 0) & err(4)(3 downto 0) & err(5)(3 downto 0) & err(6)(3 downto 0);
 
 		if sync_20ms = '1' then
-			blink <= blink + 1;
+			cnt_20ms <= cnt_20ms + 1;
 		end if;
+		cnt_20ms_d <= cnt_20ms(2);
 
 		case sim is
 			when stop =>
-				led(6)     <= '0';
-				led(7)     <= '0';
+				leds       <= (others => '0');
 				speedlimit <= (others => '0');
 				if run_switch = '0' then
 					sim <= wait4run;
@@ -142,12 +144,14 @@ begin
 						end loop;
 						sim <= error;
 					else
-						sim <= ramp;
+						sim     <= ramp;
+						leds(0) <= '1';
 					end if;
 				end if;
 			when ramp =>
-				led(6)             <= blink(5);
-				led(7)             <= not blink(5);
+				if cnt_20ms(2) = '1' and cnt_20ms_d = '0' then
+					leds <= leds(0) & leds(7 downto 1);
+				end if;
 				err(1)(3 downto 0) <= errors_1(3) & '0' & errors_1(1 downto 0); -- ignore loop error
 				err(2)(3 downto 0) <= errors_2(3) & '0' & errors_2(1 downto 0);
 				err(3)(3 downto 0) <= errors_3(3) & '0' & errors_3(1 downto 0);
@@ -155,7 +159,6 @@ begin
 				err(5)(3 downto 0) <= errors_5(3) & '0' & errors_5(1 downto 0);
 				err(6)(3 downto 0) <= errors_6(3) & '0' & errors_6(1 downto 0);
 				if sw0 = '1' then
-					led(7) <= blink(5);
 					for j in 1 to 6 loop
 						err(j)(0) <= '0'; -- ignore position low error during home_enable
 					end loop;
@@ -180,19 +183,19 @@ begin
 					sim <= stop;
 				end if;
 			when run =>
-				led(6)             <= blink(3);
-				led(7)             <= not blink(3);
 				err(1)(3 downto 0) <= errors_1;
 				err(2)(3 downto 0) <= errors_2;
 				err(3)(3 downto 0) <= errors_3;
 				err(4)(3 downto 0) <= errors_4;
 				err(5)(3 downto 0) <= errors_5;
 				err(6)(3 downto 0) <= errors_6;
-				if errors > 0 then      --any error
+				if (errors > 0) or (mde = 11 and com_error = '1') then --any error
 					sim <= error;
 				end if;
 				if sw0 = '1' then
-					led(7) <= blink(3);
+					leds <= "01010101";
+				else
+					leds <= "11111111";
 				end if;
 				if run_switch = '0' then
 					sim <= stop;
@@ -230,7 +233,7 @@ begin
 			blanks    <= 0;
 		end if;
 
-		if blink(5) = '1' then
+		if cnt_20ms(5) = '1' then
 			blank <= blanks;
 		else
 			blank <= 0;
@@ -244,20 +247,8 @@ begin
 			start <= '1';
 			if run_switch = '1' then
 				drv_mode <= '1';        -- position mode
-				led(0)   <= '1';
-				led(1)   <= '1';
-				led(2)   <= '1';
-				led(3)   <= '1';
-				led(4)   <= '1';
-				led(5)   <= '1';
 			else
 				drv_mode  <= '0';       -- speed mode
-				led(0)    <= '0';
-				led(1)    <= '0';
-				led(2)    <= '0';
-				led(3)    <= '0';
-				led(4)    <= '0';
-				led(5)    <= '0';
 				drvman(i) := "00000000000";
 				if btn_north = '1' then
 					drvman(i) := "00000110010"; --  +50
@@ -322,21 +313,22 @@ begin
 		end if;
 
 		if sim = error then
-			val_1  <= conv_std_logic_vector(i, 4) & "0000" & err(1) & err(2) & "0000" & err(3) & err(4) & "0000" & err(5) & err(6); --LCD line 2  1.6mm --LCD line 2  1.6mm
-			blank  <= 0;
-			led(0) <= '0';
-			led(1) <= '0';
-			led(2) <= '0';
-			led(3) <= '0';
-			led(4) <= '0';
-			led(5) <= '0';
-			led(6) <= '1';
-			led(7) <= '1';
+			val_1 <= conv_std_logic_vector(i, 4) & "0000" & err(1) & err(2) & "0000" & err(3) & err(4) & "0000" & err(5) & err(6); --LCD line 2  1.6mm --LCD line 2  1.6mm
+			blank <= 0;
+			for i in 0 to 7 loop
+				leds(i) <= cnt_20ms(3);
+			end loop;
+		end if;
+
+		if mde = 11 and com_error = '1' then
+			for i in 0 to 3 loop
+				leds(i + 4) <= cnt_20ms(3);
+				leds(i)     <= not cnt_20ms(3);
+			end loop;
 		end if;
 
 		speed_limit <= speedlimit;
-
-		-- com error flash led 6 7 oid
+		led         <= leds;
 
 		if reset = '1' then
 			sim <= stop;

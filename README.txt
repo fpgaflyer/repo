@@ -44,16 +44,15 @@ F: set position = 0x80
 
 ** serial data input is BIN format, 38400 Baud
 
-led5 to led0 => controller 1 to 6: 
-led on = position mode
-led off = speed mode
-
-led6/7 => off=stop, blinking alternately slow=ramp-up, blinking alternately fast=run, on=error
-led6/7 =>  blinking together in stead of alternately means that enable home_position is on 
+leds:		sim state:
+off			stop 
+scroll		rampup
+on			run 	(only even numbered leds are on when enable home position is on) 
+flashing	error 	(flashing alternately left/right is communication error with PC)
 
 LCD screen shows 6 actual motor axis positions (00-FF/1.6mm) in the upper line and 
 6 set positions (00-FF/1.6mm) on lower line
-In case there is a error (led6/7 on) the lower line displays error code per actuator. 
+In case there is a error the lower line displays error code per actuator. 
 
 error codes:
 01:	position too low		<0x06 = 0.96cm
