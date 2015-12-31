@@ -37,10 +37,11 @@ SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner dig
 mode:
 A: set position by rotary switch
 B: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
-C: set position by sinus generator : YAW
-D: set position by sinus generator : SURGE
-E: set position = 0x10
-F: set position = 0x80 
+C: set position = 0x10
+D: set position = 0x80
+E: set position = 0xE6
+F: set position by demo generator: random sinusoidal movement of actuators, sinusoidal sequence is set
+to different offsets (pseudo random) each time the sim is activated with the run switch.  
 
 ** serial data input is BIN format, 38400 Baud
 

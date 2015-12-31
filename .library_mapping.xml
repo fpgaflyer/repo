@@ -16,6 +16,7 @@
   <Mappings Location="vhdl/controller.vhd" Library="work"/>
   <Mappings Location="vhdl/conv.vhd" Library="work"/>
   <Mappings Location="vhdl/counter.vhd" Library="work"/>
+  <Mappings Location="vhdl/demo_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/digital_filter.vhd" Library="work"/>
   <Mappings Location="vhdl/display_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/drv_mux.vhd" Library="work"/>
@@ -35,6 +36,7 @@
   <Mappings Location="vhdl/sinus_rom.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_clk_divider.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_conv.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_demo_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_interpol.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_ramp_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_readpos.vhd" Library="work"/>

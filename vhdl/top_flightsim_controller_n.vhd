@@ -168,13 +168,13 @@ architecture structure of top_flightsim_controller_n is
 			 ext_setpos_4  : in  std_logic_vector(7 downto 0);
 			 ext_setpos_5  : in  std_logic_vector(7 downto 0);
 			 ext_setpos_6  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_1  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_2  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_3  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_4  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_5  : in  std_logic_vector(7 downto 0);
-			 sin_setpos_6  : in  std_logic_vector(7 downto 0);
-			 mode          : out std_logic_vector(3 downto 0);
+			 demo_setpos_1 : in  std_logic_vector(7 downto 0);
+			 demo_setpos_2 : in  std_logic_vector(7 downto 0);
+			 demo_setpos_3 : in  std_logic_vector(7 downto 0);
+			 demo_setpos_4 : in  std_logic_vector(7 downto 0);
+			 demo_setpos_5 : in  std_logic_vector(7 downto 0);
+			 demo_setpos_6 : in  std_logic_vector(7 downto 0);
+			 calc_offsets  : out std_logic;
 			 errors_1      : in  std_logic_vector(3 downto 0);
 			 errors_2      : in  std_logic_vector(3 downto 0);
 			 errors_3      : in  std_logic_vector(3 downto 0);
@@ -231,17 +231,17 @@ architecture structure of top_flightsim_controller_n is
 			 o     : out std_logic);
 	end component filter;
 
-	component sinus_rom
-		port(clk_in       : in  std_logic;
-			 mode         : in  std_logic_vector(3 downto 0);
-			 sin_setpos_1 : out std_logic_vector(7 downto 0);
-			 sin_setpos_2 : out std_logic_vector(7 downto 0);
-			 sin_setpos_3 : out std_logic_vector(7 downto 0);
-			 sin_setpos_4 : out std_logic_vector(7 downto 0);
-			 sin_setpos_5 : out std_logic_vector(7 downto 0);
-			 sin_setpos_6 : out std_logic_vector(7 downto 0));
-	end component sinus_rom;
-
+	component demo_gen
+		port(clk_in        : in  std_logic;
+			 reset         : in  std_logic;
+			 calc_offsets  : in  std_logic;
+			 demo_setpos_1 : out std_logic_vector(7 downto 0);
+			 demo_setpos_2 : out std_logic_vector(7 downto 0);
+			 demo_setpos_3 : out std_logic_vector(7 downto 0);
+			 demo_setpos_4 : out std_logic_vector(7 downto 0);
+			 demo_setpos_5 : out std_logic_vector(7 downto 0);
+			 demo_setpos_6 : out std_logic_vector(7 downto 0));
+	end component demo_gen;
 	-- declaration of signals used to interconnect 
 
 	signal reset           : std_logic;
@@ -302,13 +302,12 @@ architecture structure of top_flightsim_controller_n is
 	signal byte_6          : std_logic_vector(7 downto 0);
 	signal byte_7          : std_logic_vector(7 downto 0);
 	signal rxd_fil         : std_logic;
-	signal sin_setpos_1    : std_logic_vector(7 downto 0);
-	signal sin_setpos_2    : std_logic_vector(7 downto 0);
-	signal sin_setpos_3    : std_logic_vector(7 downto 0);
-	signal sin_setpos_4    : std_logic_vector(7 downto 0);
-	signal sin_setpos_5    : std_logic_vector(7 downto 0);
-	signal sin_setpos_6    : std_logic_vector(7 downto 0);
-	signal mode            : std_logic_vector(3 downto 0);
+	signal demo_setpos_1   : std_logic_vector(7 downto 0);
+	signal demo_setpos_2   : std_logic_vector(7 downto 0);
+	signal demo_setpos_3   : std_logic_vector(7 downto 0);
+	signal demo_setpos_4   : std_logic_vector(7 downto 0);
+	signal demo_setpos_5   : std_logic_vector(7 downto 0);
+	signal demo_setpos_6   : std_logic_vector(7 downto 0);
 	signal speed_limit     : std_logic_vector(9 downto 0);
 	signal errors_1        : std_logic_vector(3 downto 0);
 	signal errors_2        : std_logic_vector(3 downto 0);
@@ -320,6 +319,7 @@ architecture structure of top_flightsim_controller_n is
 	signal run_switch_f    : std_logic;
 	signal reset_button_f  : std_logic;
 	signal blank           : integer range 0 to 6;
+	signal calc_offsets    : std_logic;
 
 begin
 	-- component instantiations statements
@@ -542,13 +542,13 @@ begin
 			ext_setpos_4  => byte_5,
 			ext_setpos_5  => byte_6,
 			ext_setpos_6  => byte_7,
-			sin_setpos_1  => sin_setpos_1,
-			sin_setpos_2  => sin_setpos_2,
-			sin_setpos_3  => sin_setpos_3,
-			sin_setpos_4  => sin_setpos_4,
-			sin_setpos_5  => sin_setpos_5,
-			sin_setpos_6  => sin_setpos_6,
-			mode          => mode,
+			demo_setpos_1 => demo_setpos_1,
+			demo_setpos_2 => demo_setpos_2,
+			demo_setpos_3 => demo_setpos_3,
+			demo_setpos_4 => demo_setpos_4,
+			demo_setpos_5 => demo_setpos_5,
+			demo_setpos_6 => demo_setpos_6,
+			calc_offsets  => calc_offsets,
 			errors_1      => errors_1,
 			errors_2      => errors_2,
 			errors_3      => errors_3,
@@ -722,16 +722,17 @@ begin
 			o     => rxd_fil
 		);
 
-	A32 : entity work.sinus_rom
+	A32 : component demo_gen
 		port map(
-			clk_in       => sync_20ms,
-			mode         => mode,
-			sin_setpos_1 => sin_setpos_1,
-			sin_setpos_2 => sin_setpos_2,
-			sin_setpos_3 => sin_setpos_3,
-			sin_setpos_4 => sin_setpos_4,
-			sin_setpos_5 => sin_setpos_5,
-			sin_setpos_6 => sin_setpos_6
+			clk_in        => sync_20ms,
+			reset         => reset,
+			calc_offsets  => calc_offsets,
+			demo_setpos_1 => demo_setpos_1,
+			demo_setpos_2 => demo_setpos_2,
+			demo_setpos_3 => demo_setpos_3,
+			demo_setpos_4 => demo_setpos_4,
+			demo_setpos_5 => demo_setpos_5,
+			demo_setpos_6 => demo_setpos_6
 		);
 
 	-- additional statements  

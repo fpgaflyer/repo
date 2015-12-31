@@ -1,7 +1,7 @@
 library IEEE;
-use IEEE.STD_LOGIC_1164.ALL;
-use IEEE.STD_LOGIC_ARITH.ALL;
-use IEEE.STD_LOGIC_UNSIGNED.ALL;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.STD_LOGIC_ARITH.all;
+use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity reset_gen_n is
 	port(
@@ -12,14 +12,14 @@ entity reset_gen_n is
 end;
 
 architecture behav of reset_gen_n is
-	signal cnt : std_logic_vector(7 downto 0) := (others => '0');
+	signal cnt : std_logic_vector(21 downto 0) := (others => '0');
 
 begin
 	process(clk)
 	begin
 		if rising_edge(clk) then        -- use work edge for good synthese, wait until does not work !!!!!
 
-			if cnt(7) = '1' then        -- >32 periods to reset serial clock modules running on clk_o/32
+			if cnt(21) = '1' then       -- >2097152 periods to reset = ~42ms to provide reset to slow clocks like 20ms !
 				reset <= '0';
 			else
 				reset <= '1';

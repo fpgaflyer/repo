@@ -53,14 +53,14 @@ entity control is
 		ext_setpos_5  : in  std_logic_vector(7 downto 0);
 		ext_setpos_6  : in  std_logic_vector(7 downto 0);
 
-		sin_setpos_1  : in  std_logic_vector(7 downto 0);
-		sin_setpos_2  : in  std_logic_vector(7 downto 0);
-		sin_setpos_3  : in  std_logic_vector(7 downto 0);
-		sin_setpos_4  : in  std_logic_vector(7 downto 0);
-		sin_setpos_5  : in  std_logic_vector(7 downto 0);
-		sin_setpos_6  : in  std_logic_vector(7 downto 0);
+		demo_setpos_1 : in  std_logic_vector(7 downto 0);
+		demo_setpos_2 : in  std_logic_vector(7 downto 0);
+		demo_setpos_3 : in  std_logic_vector(7 downto 0);
+		demo_setpos_4 : in  std_logic_vector(7 downto 0);
+		demo_setpos_5 : in  std_logic_vector(7 downto 0);
+		demo_setpos_6 : in  std_logic_vector(7 downto 0);
 
-		mode          : out std_logic_vector(3 downto 0);
+		calc_offsets  : out std_logic;
 
 		errors_1      : in  std_logic_vector(3 downto 0);
 		errors_2      : in  std_logic_vector(3 downto 0);
@@ -111,6 +111,12 @@ begin
 		variable drvman      : t_drvman;
 		variable homesensors : std_logic_vector(6 downto 1);
 		variable errors      : std_logic_vector(23 downto 0);
+		variable setpos_1    : std_logic_vector(7 downto 0);
+		variable setpos_2    : std_logic_vector(7 downto 0);
+		variable setpos_3    : std_logic_vector(7 downto 0);
+		variable setpos_4    : std_logic_vector(7 downto 0);
+		variable setpos_5    : std_logic_vector(7 downto 0);
+		variable setpos_6    : std_logic_vector(7 downto 0);
 
 	begin
 		wait until clk = '1';
@@ -131,8 +137,9 @@ begin
 
 		case sim is
 			when stop =>
-				leds       <= (others => '0');
-				speedlimit <= (others => '0');
+				leds         <= (others => '0');
+				speedlimit   <= (others => '0');
+				calc_offsets <= '0';
 				if run_switch = '0' then
 					sim <= wait4run;
 				end if;
@@ -144,8 +151,9 @@ begin
 						end loop;
 						sim <= error;
 					else
-						sim     <= ramp;
-						leds(0) <= '1';
+						sim          <= ramp;
+						leds(0)      <= '1';
+						calc_offsets <= '1'; -- must be high for >20ms !!
 					end if;
 				end if;
 			when ramp =>
@@ -263,30 +271,50 @@ begin
 			mde <= i + 9;
 		end if;
 
-		mode <= conv_std_logic_vector(mde, 4);
-
 		case mde is
+			when 10 =>                  --A 
+				setpos_1 := setpos(1);
+				setpos_2 := setpos(2);
+				setpos_3 := setpos(3);
+				setpos_4 := setpos(4);
+				setpos_5 := setpos(5);
+				setpos_6 := setpos(6);
 			when 11 =>                  --B
-				set_pos_1 <= ext_setpos_1;
-				set_pos_2 <= ext_setpos_2;
-				set_pos_3 <= ext_setpos_3;
-				set_pos_4 <= ext_setpos_4;
-				set_pos_5 <= ext_setpos_5;
-				set_pos_6 <= ext_setpos_6;
-			when 12 | 13 | 14 | 15 =>   --C | D | E | F
-				set_pos_1 <= sin_setpos_1;
-				set_pos_2 <= sin_setpos_2;
-				set_pos_3 <= sin_setpos_3;
-				set_pos_4 <= sin_setpos_4;
-				set_pos_5 <= sin_setpos_5;
-				set_pos_6 <= sin_setpos_6;
-			when others =>              --A 
-				set_pos_1 <= setpos(1);
-				set_pos_2 <= setpos(2);
-				set_pos_3 <= setpos(3);
-				set_pos_4 <= setpos(4);
-				set_pos_5 <= setpos(5);
-				set_pos_6 <= setpos(6);
+				setpos_1 := ext_setpos_1;
+				setpos_2 := ext_setpos_2;
+				setpos_3 := ext_setpos_3;
+				setpos_4 := ext_setpos_4;
+				setpos_5 := ext_setpos_5;
+				setpos_6 := ext_setpos_6;
+			when 12 =>                  --C
+				setpos_1 := X"10";
+				setpos_2 := X"10";
+				setpos_3 := X"10";
+				setpos_4 := X"10";
+				setpos_5 := X"10";
+				setpos_6 := X"10";
+			when 13 =>                  --D
+				setpos_1 := X"80";
+				setpos_2 := X"80";
+				setpos_3 := X"80";
+				setpos_4 := X"80";
+				setpos_5 := X"80";
+				setpos_6 := X"80";
+			when 14 =>                  --E
+				setpos_1 := X"E6";
+				setpos_2 := X"E6";
+				setpos_3 := X"E6";
+				setpos_4 := X"E6";
+				setpos_5 := X"E6";
+				setpos_6 := X"E6";
+			when 15 =>                  --F
+				setpos_1 := demo_setpos_1;
+				setpos_2 := demo_setpos_2;
+				setpos_3 := demo_setpos_3;
+				setpos_4 := demo_setpos_4;
+				setpos_5 := demo_setpos_5;
+				setpos_6 := demo_setpos_6;
+			when others => null;
 		end case;
 
 		drv_man_1 <= drvman(1);
@@ -296,17 +324,21 @@ begin
 		drv_man_5 <= drvman(5);
 		drv_man_6 <= drvman(6);
 
+		set_pos_1 <= setpos_1;
+		set_pos_2 <= setpos_2;
+		set_pos_3 <= setpos_3;
+		set_pos_4 <= setpos_4;
+		set_pos_5 <= setpos_5;
+		set_pos_6 <= setpos_6;
+
 		kp <= '0' & '0' & sw2 & sw1;
 
 		case mde is
-			when 11 =>
-				val_1 <= conv_std_logic_vector(i, 4) & "0000" & ext_setpos_1 & ext_setpos_2 & "0000" & ext_setpos_3 & ext_setpos_4 & "0000" & ext_setpos_5 & ext_setpos_6; --LCD line 2  1.6mm
-				blank <= 0;
-			when 12 | 13 | 14 | 15 =>
-				val_1 <= conv_std_logic_vector(i, 4) & "0000" & sin_setpos_1 & sin_setpos_2 & "0000" & sin_setpos_3 & sin_setpos_4 & "0000" & sin_setpos_5 & sin_setpos_6; --LCD line 2  1.6mm
-				blank <= 0;
-			when others =>
+			when 10 =>
 				val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
+			when others =>
+				val_1 <= conv_std_logic_vector(i, 4) & "0000" & setpos_1 & setpos_2 & "0000" & setpos_3 & setpos_4 & "0000" & setpos_5 & setpos_6; --LCD line 2  1.6mm
+				blank <= 0;
 		end case;
 		if sw3 = '1' then
 			val_1(63 downto 60) <= conv_std_logic_vector(mde, 4);
@@ -331,13 +363,15 @@ begin
 		led         <= leds;
 
 		if reset = '1' then
-			sim <= stop;
-			i   <= 1;
-			mde <= 10;
+			sim    <= stop;
+			i      <= 1;
+			mde    <= 10;
+			blanks <= 0;
 			for j in 1 to 6 loop
 				setpos(j) := (others => '0');
 				drvman(j) := (others => '0');
 				err(j)    <= (others => '0');
+				cnt(j)    <= (others => '0');
 			end loop;
 		end if;
 
