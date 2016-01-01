@@ -29,14 +29,17 @@ Button west/east (SW3 = 1):	sets mode
 External run_switch 
 on:		motor activated in position controlled mode, speed ramps up in 20 sec
 off:	stop, motor can be activated in controlled speed mode with button north/south
-External reset_button stops motor and reset error flags
 
-SW0 = '1' enables home_position (set position counter in FPGA to zero) when home_position sensor goes high
-SW1,SW2 sets kp value 0..3, kp value is displayed on LCD upper left corner digit
+External reset_button stops motor and reset error flags
+Press external reset_button for >2.5sec to enable home_position (set position counter in FPGA to zero) 
+when home_position sensor goes high (leds will glow)
+
+SW0,SW1,SW2 sets kp value 0..7, kp value is displayed on LCD upper left corner digit
 SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
+
 mode:
-A: set position by rotary switch
-B: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
+A: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
+B: set position by rotary switch
 C: set position = 0x10
 D: set position = 0x80
 E: set position = 0xE6
@@ -47,9 +50,10 @@ to different offsets (pseudo random) each time the sim is activated with the run
 
 leds:		sim state:
 off			stop 
+glow		homeposition enable is on 
 scroll		rampup
-on			run 	(only even numbered leds are on when enable home position is on) 
-flashing	error 	(flashing alternately left/right is communication error with PC)
+on			run		(only even numbered leds are on when enable home position is on) 
+flashing	error	(flashing alternately left/right is communication error with PC)
 
 LCD screen shows 6 actual motor axis positions (00-FF/1.6mm) in the upper line and 
 6 set positions (00-FF/1.6mm) on lower line
@@ -57,11 +61,11 @@ In case there is a error the lower line displays error code per actuator.
 
 error codes:
 01:	position too low		<0x06 = 0.96cm
-02: position too high 		>0xF0 = 38.4cm
-04: loop error				loop error > 10.2375cm for 1.28sec
+02: position too high		>0xF0 = 38.4cm
+04: loop errorloop error 	>10.2375cm for 1.28sec
 08: position update error	no position update within 64ms
-10: home error 				not in home position before rampup
-20: home error 				still in home position after rampup
+10: home error				not in home position before rampup
+20: home error				still in home position after rampup
 40: --
 80: --
 error codes are added for a combination of errors 

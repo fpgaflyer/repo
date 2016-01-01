@@ -98,10 +98,14 @@ architecture behav of control is
 	type t_sim is (stop, wait4run, ramp, run, error);
 	signal sim        : t_sim;
 	signal speedlimit : std_logic_vector(9 downto 0);
+	signal cnt_20ns   : std_logic_vector(9 downto 0);
 	signal cnt_20ms   : std_logic_vector(5 downto 0);
+	signal cntt_20ms  : std_logic_vector(7 downto 0);
 	signal blanks     : integer range 0 to 6;
 	signal leds       : std_logic_vector(7 downto 0);
 	signal cnt_20ms_d : std_logic;
+	signal home       : std_logic;
+	signal scroll     : std_logic_vector(7 downto 0);
 
 begin
 	process
@@ -117,6 +121,7 @@ begin
 		variable setpos_4    : std_logic_vector(7 downto 0);
 		variable setpos_5    : std_logic_vector(7 downto 0);
 		variable setpos_6    : std_logic_vector(7 downto 0);
+		variable glow        : std_logic;
 
 	begin
 		wait until clk = '1';
@@ -135,38 +140,72 @@ begin
 		end if;
 		cnt_20ms_d <= cnt_20ms(2);
 
+		if (reset_button = '1') and (sync_20ms = '1') and (cntt_20ms(7) = '0') then
+			cntt_20ms <= cntt_20ms + 1;
+		end if;
+		if reset_button = '0' then
+			cntt_20ms <= (others => '0');
+		end if;
+		if cntt_20ms(7) = '1' then
+			home <= '1';
+		end if;
+
+		cnt_20ns <= cnt_20ns + 1;
+		if cnt_20ns > "1110000000" then
+			glow := '1';
+		else
+			glow := '0';
+		end if;
+
 		case sim is
 			when stop =>
-				leds         <= (others => '0');
+				if home = '1' then
+					for j in 0 to 7 loop
+						leds(j) <= glow;
+					end loop;
+				else
+					leds <= (others => '0');
+				end if;
 				speedlimit   <= (others => '0');
 				calc_offsets <= '0';
 				if run_switch = '0' then
 					sim <= wait4run;
 				end if;
 			when wait4run =>
+				if home = '1' then
+					for j in 0 to 7 loop
+						leds(j) <= glow;
+					end loop;
+				end if;
 				if run_switch = '1' then
-					if sw0 = '1' and homesensors > 0 then
+					if home = '1' and homesensors > 0 then
 						for j in 1 to 6 loop
 							err(j)(4) <= homesensors(j); -- not in home position before rampup
 						end loop;
 						sim <= error;
 					else
 						sim          <= ramp;
-						leds(0)      <= '1';
+						scroll       <= "10000000";
 						calc_offsets <= '1'; -- must be high for >20ms !!
 					end if;
 				end if;
 			when ramp =>
 				if cnt_20ms(2) = '1' and cnt_20ms_d = '0' then
-					leds <= leds(0) & leds(7 downto 1);
+					scroll <= scroll(0) & scroll(7 downto 1);
 				end if;
+				leds               <= scroll;
 				err(1)(3 downto 0) <= errors_1(3) & '0' & errors_1(1 downto 0); -- ignore loop error
 				err(2)(3 downto 0) <= errors_2(3) & '0' & errors_2(1 downto 0);
 				err(3)(3 downto 0) <= errors_3(3) & '0' & errors_3(1 downto 0);
 				err(4)(3 downto 0) <= errors_4(3) & '0' & errors_4(1 downto 0);
 				err(5)(3 downto 0) <= errors_5(3) & '0' & errors_5(1 downto 0);
 				err(6)(3 downto 0) <= errors_6(3) & '0' & errors_6(1 downto 0);
-				if sw0 = '1' then
+				if home = '1' then
+					for i in 0 to 7 loop
+						if scroll(i) = '0' then
+							leds(i) <= glow;
+						end if;
+					end loop;
 					for j in 1 to 6 loop
 						err(j)(0) <= '0'; -- ignore position low error during home_enable
 					end loop;
@@ -178,7 +217,7 @@ begin
 					speedlimit <= speedlimit + 1;
 				end if;
 				if speedlimit = 1000 then
-					if sw0 = '1' and homesensors /= "111111" then
+					if home = '1' and homesensors /= "111111" then
 						for j in 1 to 6 loop
 							err(j)(5) <= not homesensors(j); -- still in home position after rampup
 						end loop;
@@ -188,27 +227,27 @@ begin
 					end if;
 				end if;
 				if run_switch = '0' then
-					sim <= stop;
+					sim  <= stop;
+					home <= '0';
 				end if;
 			when run =>
+				home               <= '0';
 				err(1)(3 downto 0) <= errors_1;
 				err(2)(3 downto 0) <= errors_2;
 				err(3)(3 downto 0) <= errors_3;
 				err(4)(3 downto 0) <= errors_4;
 				err(5)(3 downto 0) <= errors_5;
 				err(6)(3 downto 0) <= errors_6;
-				if (errors > 0) or (mde = 11 and com_error = '1') then --any error
+				if (errors > 0) or (mde = 10 and com_error = '1') then --any error
 					sim <= error;
 				end if;
-				if sw0 = '1' then
-					leds <= "01010101";
-				else
-					leds <= "11111111";
-				end if;
+				leds <= "11111111";
 				if run_switch = '0' then
 					sim <= stop;
 				end if;
-			when error  => motor_enable <= '0';
+			when error =>
+				motor_enable   <= '0';
+				home           <= '0';
 			when others => sim <= stop;
 		end case;
 
@@ -217,7 +256,6 @@ begin
 			for i in 1 to 6 loop
 				err(i) <= (others => '0');
 			end loop;
-
 		end if;
 
 		if (btn_west = '1') and (btn_w_d = '0') and (i > 1) then
@@ -247,7 +285,7 @@ begin
 			blank <= 0;
 		end if;
 
-		if sw0 = '1' then
+		if home = '1' then
 			home_enable <= '1';
 		end if;
 
@@ -272,20 +310,20 @@ begin
 		end if;
 
 		case mde is
-			when 10 =>                  --A 
-				setpos_1 := setpos(1);
-				setpos_2 := setpos(2);
-				setpos_3 := setpos(3);
-				setpos_4 := setpos(4);
-				setpos_5 := setpos(5);
-				setpos_6 := setpos(6);
-			when 11 =>                  --B
+			when 10 =>                  --A
 				setpos_1 := ext_setpos_1;
 				setpos_2 := ext_setpos_2;
 				setpos_3 := ext_setpos_3;
 				setpos_4 := ext_setpos_4;
 				setpos_5 := ext_setpos_5;
 				setpos_6 := ext_setpos_6;
+			when 11 =>                  --B 
+				setpos_1 := setpos(1);
+				setpos_2 := setpos(2);
+				setpos_3 := setpos(3);
+				setpos_4 := setpos(4);
+				setpos_5 := setpos(5);
+				setpos_6 := setpos(6);
 			when 12 =>                  --C
 				setpos_1 := X"10";
 				setpos_2 := X"10";
@@ -331,10 +369,10 @@ begin
 		set_pos_5 <= setpos_5;
 		set_pos_6 <= setpos_6;
 
-		kp <= '0' & '0' & sw2 & sw1;
+		kp <= '0' & sw2 & sw1 & sw0;
 
 		case mde is
-			when 10 =>
+			when 11 =>
 				val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
 			when others =>
 				val_1 <= conv_std_logic_vector(i, 4) & "0000" & setpos_1 & setpos_2 & "0000" & setpos_3 & setpos_4 & "0000" & setpos_5 & setpos_6; --LCD line 2  1.6mm
@@ -352,7 +390,7 @@ begin
 			end loop;
 		end if;
 
-		if mde = 11 and com_error = '1' then
+		if mde = 10 and com_error = '1' then
 			for i in 0 to 3 loop
 				leds(i + 4) <= cnt_20ms(3);
 				leds(i)     <= not cnt_20ms(3);
