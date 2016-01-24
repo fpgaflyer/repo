@@ -68,6 +68,7 @@ entity control is
 		errors_4      : in  std_logic_vector(3 downto 0);
 		errors_5      : in  std_logic_vector(3 downto 0);
 		errors_6      : in  std_logic_vector(3 downto 0);
+		singul_error  : in  std_logic;
 		com_error     : in  std_logic;
 
 		home_sensor_1 : in  std_logic;
@@ -80,6 +81,7 @@ entity control is
 		run_switch    : in  std_logic;
 		reset_button  : in  std_logic;
 		motor_enable  : out std_logic;
+		power_off     : out std_logic;
 
 		speed_limit   : out std_logic_vector(9 downto 0)
 	);
@@ -96,16 +98,19 @@ architecture behav of control is
 	signal i   : integer range 1 to 6;
 	signal mde : integer range 10 to 15;
 	type t_sim is (stop, wait4run, ramp, run, error);
-	signal sim        : t_sim;
-	signal speedlimit : std_logic_vector(9 downto 0);
-	signal cnt_20ns   : std_logic_vector(9 downto 0);
-	signal cnt_20ms   : std_logic_vector(5 downto 0);
-	signal cntt_20ms  : std_logic_vector(7 downto 0);
-	signal blanks     : integer range 0 to 6;
-	signal leds       : std_logic_vector(7 downto 0);
-	signal cnt_20ms_d : std_logic;
-	signal home       : std_logic;
-	signal scroll     : std_logic_vector(7 downto 0);
+	signal sim            : t_sim;
+	signal speedlimit     : std_logic_vector(9 downto 0);
+	signal cnt_20ns       : std_logic_vector(9 downto 0);
+	signal cnt_20ms       : std_logic_vector(5 downto 0);
+	signal cntt_20ms      : std_logic_vector(9 downto 0);
+	signal blanks         : integer range 0 to 6;
+	signal leds           : std_logic_vector(7 downto 0);
+	signal cnt_20ms_d     : std_logic;
+	signal home           : std_logic;
+	signal scroll         : std_logic_vector(7 downto 0);
+	signal gohome         : std_logic;
+	signal gohome_start   : std_logic;
+	signal gohome_start_d : std_logic;
 
 begin
 	process
@@ -126,28 +131,40 @@ begin
 	begin
 		wait until clk = '1';
 
-		press_d      <= press;
-		btn_w_d      <= btn_west;
-		btn_e_d      <= btn_east;
-		start        <= '0';
-		home_enable  <= '0';
-		motor_enable <= '1';
-		homesensors  := home_sensor_6 & home_sensor_5 & home_sensor_4 & home_sensor_3 & home_sensor_2 & home_sensor_1;
-		errors       := err(1)(3 downto 0) & err(2)(3 downto 0) & err(3)(3 downto 0) & err(4)(3 downto 0) & err(5)(3 downto 0) & err(6)(3 downto 0);
+		press_d        <= press;
+		btn_w_d        <= btn_west;
+		btn_e_d        <= btn_east;
+		gohome_start_d <= gohome_start;
+		start          <= '0';
+		home_enable    <= '0';
+		motor_enable   <= '1';
+		homesensors    := home_sensor_6 & home_sensor_5 & home_sensor_4 & home_sensor_3 & home_sensor_2 & home_sensor_1;
+		errors         := err(1)(3 downto 0) & err(2)(3 downto 0) & err(3)(3 downto 0) & err(4)(3 downto 0) & err(5)(3 downto 0) & err(6)(3 downto 0);
 
 		if sync_20ms = '1' then
 			cnt_20ms <= cnt_20ms + 1;
 		end if;
 		cnt_20ms_d <= cnt_20ms(2);
 
-		if (reset_button = '1') and (sync_20ms = '1') and (cntt_20ms(7) = '0') then
-			cntt_20ms <= cntt_20ms + 1;
+		if (reset_button = '1') and (sync_20ms = '1') and (cntt_20ms(9) = '0') then
+			cntt_20ms    <= cntt_20ms + 1;
+			home         <= '0';
+			gohome_start <= '0';
+			if cntt_20ms(8 downto 7) = "01" or cntt_20ms(8 downto 7) = "10" then
+				home <= '1';
+			elsif cntt_20ms(8 downto 7) = "11" then
+				gohome_start <= '1';
+			end if;
 		end if;
+		if gohome_start = '1' and gohome_start_d = '0' then
+			gohome <= '1';              -- bring platform down to lowest position
+		end if;
+		if homesensors = 0 then         -- disable gohome mode after all actuators are in lowest position
+			gohome <= '0';
+		end if;
+
 		if reset_button = '0' then
 			cntt_20ms <= (others => '0');
-		end if;
-		if cntt_20ms(7) = '1' then
-			home <= '1';
 		end if;
 
 		cnt_20ns <= cnt_20ns + 1;
@@ -176,6 +193,8 @@ begin
 					for j in 0 to 7 loop
 						leds(j) <= glow;
 					end loop;
+				else
+					leds <= (others => '0');
 				end if;
 				if run_switch = '1' then
 					if home = '1' and homesensors > 0 then
@@ -238,7 +257,19 @@ begin
 				err(4)(3 downto 0) <= errors_4;
 				err(5)(3 downto 0) <= errors_5;
 				err(6)(3 downto 0) <= errors_6;
-				if (errors > 0) or (mde = 10 and com_error = '1') then --any error
+				if singul_error = '1' then -- singularity error
+					for j in 1 to 6 loop
+						err(j)(6) <= '1';
+					end loop;
+				end if;
+				if homesensors /= "111111" then -- home position detected during run => power_off
+					power_off <= '1';
+					sim       <= error;
+					for j in 1 to 6 loop
+						err(j)(7) <= not homesensors(j);
+					end loop;
+				end if;
+				if (errors > 0) or (mde = 10 and com_error = '1') or (singul_error = '1') then --any error
 					sim <= error;
 				end if;
 				leds <= "11111111";
@@ -289,18 +320,41 @@ begin
 			home_enable <= '1';
 		end if;
 
+		if gohome = '1' then
+			leds(7) <= cnt_20ms(3);
+			leds(6) <= not cnt_20ms(3);
+			leds(5) <= cnt_20ms(3);
+			leds(4) <= not cnt_20ms(3);
+			leds(3) <= cnt_20ms(3);
+			leds(2) <= not cnt_20ms(3);
+			leds(1) <= cnt_20ms(3);
+			leds(0) <= not cnt_20ms(3);
+		end if;
+
 		if sync_2ms = '1' then
 			start <= '1';
+			for j in 1 to 6 loop
+				drvman(j) := "00000000000";
+			end loop;
 			if run_switch = '1' then
 				drv_mode <= '1';        -- position mode
+				gohome   <= '0';
 			else
-				drv_mode  <= '0';       -- speed mode
-				drvman(i) := "00000000000";
+				drv_mode <= '0';        -- speed mode
 				if btn_north = '1' then
+					gohome    <= '0';
 					drvman(i) := "00000110010"; --  +50
 				end if;
 				if btn_south = '1' then
+					gohome    <= '0';
 					drvman(i) := "11111001110"; -- -50
+				end if;
+				if gohome = '1' then    -- bring platform down to lowest position
+					for j in 1 to 6 loop
+						if homesensors(j) = '1' then
+							drvman(j) := "11111001110"; -- -50
+						end if;
+					end loop;
 				end if;
 			end if;
 		end if;
@@ -325,12 +379,12 @@ begin
 				setpos_5 := setpos(5);
 				setpos_6 := setpos(6);
 			when 12 =>                  --C
-				setpos_1 := X"10";
-				setpos_2 := X"10";
-				setpos_3 := X"10";
-				setpos_4 := X"10";
-				setpos_5 := X"10";
-				setpos_6 := X"10";
+				setpos_1 := X"30";
+				setpos_2 := X"30";
+				setpos_3 := X"30";
+				setpos_4 := X"30";
+				setpos_5 := X"30";
+				setpos_6 := X"30";
 			when 13 =>                  --D
 				setpos_1 := X"80";
 				setpos_2 := X"80";
@@ -339,12 +393,12 @@ begin
 				setpos_5 := X"80";
 				setpos_6 := X"80";
 			when 14 =>                  --E
-				setpos_1 := X"E6";
-				setpos_2 := X"E6";
-				setpos_3 := X"E6";
-				setpos_4 := X"E6";
-				setpos_5 := X"E6";
-				setpos_6 := X"E6";
+				setpos_1 := X"D0";
+				setpos_2 := X"D0";
+				setpos_3 := X"D0";
+				setpos_4 := X"D0";
+				setpos_5 := X"D0";
+				setpos_6 := X"D0";
 			when 15 =>                  --F
 				setpos_1 := demo_setpos_1;
 				setpos_2 := demo_setpos_2;
@@ -391,20 +445,22 @@ begin
 		end if;
 
 		if mde = 10 and com_error = '1' then
-			for i in 0 to 3 loop
-				leds(i + 4) <= cnt_20ms(3);
-				leds(i)     <= not cnt_20ms(3);
-			end loop;
+			leds(0)          <= cnt_20ms(3);
+			leds(7 downto 1) <= (others => '0');
 		end if;
 
 		speed_limit <= speedlimit;
 		led         <= leds;
 
 		if reset = '1' then
-			sim    <= stop;
-			i      <= 1;
-			mde    <= 10;
-			blanks <= 0;
+			sim            <= stop;
+			i              <= 1;
+			mde            <= 10;
+			blanks         <= 0;
+			power_off      <= '0';
+			gohome_start   <= '0';
+			gohome_start_d <= '0';
+			gohome         <= '0';
 			for j in 1 to 6 loop
 				setpos(j) := (others => '0');
 				drvman(j) := (others => '0');

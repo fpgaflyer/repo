@@ -33,6 +33,7 @@
   <Mappings Location="vhdl/rotary_decoder_n.vhd" Library="work"/>
   <Mappings Location="vhdl/serial_rx.vhd" Library="work"/>
   <Mappings Location="vhdl/serial_rx_dec_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/singularity_detector.vhd" Library="work"/>
   <Mappings Location="vhdl/sinus_rom.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_clk_divider.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_conv.vhd" Library="work"/>

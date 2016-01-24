@@ -36,10 +36,10 @@ begin
 
 		posout := pos_in - diff;
 
-		if posout(13 downto 6) > X"F0" then -->38.4cm
+		if posout(13 downto 6) > X"E0" then -->35.84cm
 			pos_high_error <= '1';
 		end if;
-		if posout(13 downto 6) < X"06" then --<0.96cm
+		if posout(13 downto 6) < X"20" then --<5.12cm
 			pos_low_error <= '1';
 		end if;
 

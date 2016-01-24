@@ -86,10 +86,11 @@ NET "serial_in_6"  LOC = "E8" | IOSTANDARD = LVTTL ;
 NET "rxd"  	LOC = "R7"  | IOSTANDARD = LVTTL ;  
 NET "txd"  	LOC = "M14" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
 
-# run_switch, reset_button, motor_stop(active low) via FX2 CONNECTOR  
+# run_switch, reset_button, motor_enable, power_off via FX2 CONNECTOR  
 NET "run_switch"  	LOC = "B11" | IOSTANDARD = LVTTL ;
 NET "reset_button"  LOC = "A8" | IOSTANDARD = LVTTL ;
 NET "motor_enable" 	LOC = "C4" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+NET "power_off" 	LOC = "G9" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
 
 # End of File
 

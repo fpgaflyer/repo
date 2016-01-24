@@ -30,6 +30,7 @@ entity top_flightsim_controller_n is
 		 run_switch     : in  std_logic;
 		 reset_button   : in  std_logic;
 		 motor_enable   : out std_logic;
+		 power_off      : out std_logic;
 
 		 home_sensor_1  : in  std_logic;
 		 home_sensor_2  : in  std_logic;
@@ -181,6 +182,7 @@ architecture structure of top_flightsim_controller_n is
 			 errors_4      : in  std_logic_vector(3 downto 0);
 			 errors_5      : in  std_logic_vector(3 downto 0);
 			 errors_6      : in  std_logic_vector(3 downto 0);
+			 singul_error  : in  std_logic;
 			 com_error     : in  std_logic;
 			 home_sensor_1 : in  std_logic;
 			 home_sensor_2 : in  std_logic;
@@ -191,6 +193,7 @@ architecture structure of top_flightsim_controller_n is
 			 run_switch    : in  std_logic;
 			 reset_button  : in  std_logic;
 			 motor_enable  : out std_logic;
+			 power_off     : out std_logic;
 			 speed_limit   : out std_logic_vector(9 downto 0));
 	end component control;
 
@@ -242,6 +245,18 @@ architecture structure of top_flightsim_controller_n is
 			 demo_setpos_5 : out std_logic_vector(7 downto 0);
 			 demo_setpos_6 : out std_logic_vector(7 downto 0));
 	end component demo_gen;
+
+	component singularity_detector
+		port(clk          : in  std_logic;
+			 position_1   : in  std_logic_vector(7 downto 0);
+			 position_2   : in  std_logic_vector(7 downto 0);
+			 position_3   : in  std_logic_vector(7 downto 0);
+			 position_4   : in  std_logic_vector(7 downto 0);
+			 position_5   : in  std_logic_vector(7 downto 0);
+			 position_6   : in  std_logic_vector(7 downto 0);
+			 singul_error : out std_logic);
+	end component singularity_detector;
+
 	-- declaration of signals used to interconnect 
 
 	signal reset           : std_logic;
@@ -320,6 +335,7 @@ architecture structure of top_flightsim_controller_n is
 	signal reset_button_f  : std_logic;
 	signal blank           : integer range 0 to 6;
 	signal calc_offsets    : std_logic;
+	signal singul_error    : std_logic;
 
 begin
 	-- component instantiations statements
@@ -500,7 +516,7 @@ begin
 			errors      => errors_6
 		);
 
-	A11 : component control
+	A11 : control
 		port map(
 			clk           => clk,
 			reset         => reset,
@@ -555,6 +571,7 @@ begin
 			errors_4      => errors_4,
 			errors_5      => errors_5,
 			errors_6      => errors_6,
+			singul_error  => singul_error,
 			com_error     => com_error,
 			home_sensor_1 => home_sensor_1,
 			home_sensor_2 => home_sensor_2,
@@ -565,6 +582,7 @@ begin
 			run_switch    => run_switch_f,
 			reset_button  => reset_button_f,
 			motor_enable  => motor_enable,
+			power_off     => power_off,
 			speed_limit   => speed_limit
 		);
 
@@ -673,7 +691,7 @@ begin
 			     o     => home_sensor_6_f
 		);
 
-	A27 : component digital_filter
+	A27 : digital_filter
 		port map(
 			clk   => clk,
 			reset => reset,
@@ -681,7 +699,7 @@ begin
 			o     => run_switch_f
 		);
 
-	A28 : component digital_filter
+	A28 : digital_filter
 		port map(
 			clk   => clk,
 			reset => reset,
@@ -689,7 +707,7 @@ begin
 			o     => reset_button_f
 		);
 
-	A29 : component serial_rx
+	A29 : serial_rx
 		port map(
 			clk           => clk,
 			reset         => reset,
@@ -698,7 +716,7 @@ begin
 			rx_data_valid => rx_data_valid
 		);
 
-	A30 : component serial_rx_dec_n
+	A30 : serial_rx_dec_n
 		port map(
 			clk           => clk,
 			reset         => reset,
@@ -714,7 +732,7 @@ begin
 			com_error     => com_error
 		);
 
-	A31 : component filter
+	A31 : filter
 		port map(
 			clk   => clk,
 			reset => reset,
@@ -722,7 +740,7 @@ begin
 			o     => rxd_fil
 		);
 
-	A32 : component demo_gen
+	A32 : demo_gen
 		port map(
 			clk_in        => sync_20ms,
 			reset         => reset,
@@ -733,6 +751,18 @@ begin
 			demo_setpos_4 => demo_setpos_4,
 			demo_setpos_5 => demo_setpos_5,
 			demo_setpos_6 => demo_setpos_6
+		);
+
+	A33 : singularity_detector
+		port map(
+			clk          => clk,
+			position_1   => position_1,
+			position_2   => position_2,
+			position_3   => position_3,
+			position_4   => position_4,
+			position_5   => position_5,
+			position_6   => position_6,
+			singul_error => singul_error
 		);
 
 	-- additional statements  
