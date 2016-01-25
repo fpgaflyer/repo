@@ -8,12 +8,13 @@ use gen.std.all;
 
 entity conv is
 	port(
-		clk    : in  bool;
-		rst    : in  bool;
-		di     : in  int(10 downto 0);
-		start  : in  bool;
-		do     : out int(7 downto 0);
-		dvalid : out bool
+		clk          : in  bool;
+		rst          : in  bool;
+		di           : in  int(10 downto 0);
+		start        : in  bool;
+		rst_mot_ctrl : in  bool;
+		do           : out int(7 downto 0);
+		dvalid       : out bool
 	);
 end entity conv;
 
@@ -33,7 +34,7 @@ architecture RTL of conv is
 	signal digits       : digit_v(0 to 3);
 	signal bin          : int(10 downto 0);
 	signal sign, nozero : bool;
-	signal pc           : integer range 0 to 17;
+	signal pc           : integer range 0 to 18;
 
 begin
 	process
@@ -72,10 +73,16 @@ begin
 				digits(i) <= (others => '0');
 			end loop;
 		end;
+		variable n : integer range 0 to 18;
 	begin
 		wait until clk = '1';
 		dvalid <= '0';
-		if pc < 16 then
+		if rst_mot_ctrl = '1' then
+			n := 17;
+		else
+			n := 16;
+		end if;
+		if pc < n then
 			pc <= pc + 1;
 		else
 			pc <= 0;
@@ -95,29 +102,102 @@ begin
 					pc <= pc;
 				end if;
 
-			when 1 => ascii_out('!');
-				bcd_shift;
-			when 2 => ascii_out('G');
-				bcd_shift;
-			when 3 => ascii_out(' ');
-				bcd_shift;
-			when 4 =>
-				if sign = '1' then
-					ascii_out('-');
+			when 1 => if rst_mot_ctrl = '1' then
+					ascii_out('%');
+				else
+					ascii_out('!');
+					bcd_shift;
 				end if;
-				bcd_shift;
-			when 5 | 6 | 7 | 8 | 9 | 10 | 11 =>
-				bcd_shift;
-			when 12 => digit_out(digits(3), nozero);
+			when 2 => if rst_mot_ctrl = '1' then
+					ascii_out('R');
+				else
+					ascii_out('G');
+					bcd_shift;
+				end if;
+			when 3 => if rst_mot_ctrl = '1' then
+					ascii_out('E');
+				else
+					ascii_out(' ');
+					bcd_shift;
+				end if;
+			when 4 => if rst_mot_ctrl = '1' then
+					ascii_out('S');
+				else
+					if sign = '1' then
+						ascii_out('-');
+					end if;
+					bcd_shift;
+				end if;
+			when 5 => if rst_mot_ctrl = '1' then
+					ascii_out('E');
+				else
+					bcd_shift;
+				end if;
+			when 6 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out('T');
+				else
+					bcd_shift;
+				end if;
+			when 7 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out(' ');
+				else
+					bcd_shift;
+				end if;
+			when 8 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out('3');
+				else
+					bcd_shift;
+				end if;
+			when 9 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out('2');
+				else
+					bcd_shift;
+				end if;
+			when 10 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out('1');
+				else
+					bcd_shift;
+				end if;
+			when 11 =>
+				if rst_mot_ctrl = '1' then
+					ascii_out('6');
+				else
+					bcd_shift;
+				end if;
 
-			when 13 => digit_out(digits(2), nozero);
+			when 12 => if rst_mot_ctrl = '1' then
+					ascii_out('5');
+				else
+					digit_out(digits(3), nozero);
+				end if;
 
-			when 14 => digit_out(digits(1), nozero);
-				nozero <= '0';
-			when 15 => digit_out(digits(0), nozero);
-
-			when 16 => ascii_out(cr);
-
+			when 13 => if rst_mot_ctrl = '1' then
+					ascii_out('4');
+				else
+					digit_out(digits(2), nozero);
+				end if;
+			when 14 => if rst_mot_ctrl = '1' then
+					ascii_out('9');
+				else
+					digit_out(digits(1), nozero);
+					nozero <= '0';
+				end if;
+			when 15 => if rst_mot_ctrl = '1' then
+					ascii_out('8');
+				else
+					digit_out(digits(0), nozero);
+				end if;
+			when 16 => if rst_mot_ctrl = '1' then
+					ascii_out('7');
+				else
+					ascii_out(cr);
+				end if;
+			when 17     => ascii_out(cr);
 			when others => pc <= 0;
 		end case;
 		if rst = '1' then

@@ -18,6 +18,10 @@ Serial out: !G runtime commands to SBL1360
 Serial in: actual position motor axis from SBL1360
 
 Home position sensor is a slotted sensor to detect zero position
+This sensor input is also used as safety limit switch: the sensor input is activated if the actuator
+reaches its minimal (home position) but also if the actuator reaches its maximal mechanical position.
+The last is a limit switch connected in parallel with the home position sensor. This safety feature 
+cuts the power and is only active during rampup and run     
 
 Rotary switch to set motor_axis position in 1.6mm steps (range 00 - FF), selected LCD display blinks
 Rotary Push_Button will enter set position, selected LCD display stops blinking
@@ -71,9 +75,9 @@ error codes:
 04: loop errorloop error 	>10.2375cm for 1.28sec
 08: position update error	no position update within 64ms
 10: home error			not in home position before rampup
-20: home error			still in home position after rampup
-40: singul_error		singularity error (all)
-80: home pos during run		home position detected during run
+20: singul_error		singularity error (all)
+40: home pos during ramp	home position detected during rampup (safety limit, cuts power)
+80: home pos during run		home position detected during run (safety limit, cuts power)
 error codes are added for a combination of errors 
 
 VHDL Files:
