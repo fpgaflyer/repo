@@ -95,14 +95,17 @@ architecture behav of control is
 	signal cnt : t_cnt;
 	type t_err is array (1 to 6) of std_logic_vector(7 downto 0);
 	signal err : t_err;
-	signal i   : integer range 1 to 6;
-	signal mde : integer range 10 to 15;
+	type t_cnttt_20ms is array (1 to 6) of std_logic_vector(4 downto 0);
+	signal cnttt_20ms : t_cnttt_20ms;
+	signal i          : integer range 1 to 6;
+	signal mde        : integer range 10 to 15;
 	type t_sim is (stop, wait4run, ramp, run, error);
-	signal sim            : t_sim;
-	signal speedlimit     : std_logic_vector(9 downto 0);
-	signal cnt_20ns       : std_logic_vector(9 downto 0);
-	signal cnt_20ms       : std_logic_vector(5 downto 0);
-	signal cntt_20ms      : std_logic_vector(9 downto 0);
+	signal sim        : t_sim;
+	signal speedlimit : std_logic_vector(9 downto 0);
+	signal cnt_20ns   : std_logic_vector(9 downto 0);
+	signal cnt_20ms   : std_logic_vector(5 downto 0);
+	signal cntt_20ms  : std_logic_vector(9 downto 0);
+
 	signal blanks         : integer range 0 to 6;
 	signal leds           : std_logic_vector(7 downto 0);
 	signal cnt_20ms_d     : std_logic;
@@ -196,6 +199,9 @@ begin
 				else
 					leds <= (others => '0');
 				end if;
+				for j in 1 to 6 loop
+					cnttt_20ms(j) <= (others => '0');
+				end loop;
 				if run_switch = '1' then
 					if home = '1' and homesensors > 0 then
 						for j in 1 to 6 loop
@@ -236,14 +242,27 @@ begin
 					speedlimit <= speedlimit + 1;
 				end if;
 				if speedlimit = 1000 then
-					if home = '1' and homesensors /= "111111" then
-						for j in 1 to 6 loop
-							err(j)(5) <= not homesensors(j); -- still in home position after rampup
-						end loop;
-						sim <= error;
-					else
-						sim <= run;
+					sim <= run;
+				end if;
+				for j in 1 to 6 loop
+					if homesensors(j) = '1' and cnttt_20ms(j)(4) = '0' and sync_20ms = '1' then
+						cnttt_20ms(j) <= cnttt_20ms(j) + 1;
 					end if;
+				end loop;
+				if 	(cnttt_20ms(1)(4) = '1' and homesensors(1) = '0') or 
+					(cnttt_20ms(2)(4) = '1' and homesensors(2) = '0') or
+					(cnttt_20ms(3)(4) = '1' and homesensors(3) = '0') or
+					(cnttt_20ms(4)(4) = '1' and homesensors(4) = '0') or 
+					(cnttt_20ms(5)(4) = '1' and homesensors(5) = '0') or
+					(cnttt_20ms(6)(4) = '1' and homesensors(6) = '0') then -- home position detected during rampup 
+					 power_off <= '1';
+					 sim       <= error;
+					 err(1)(5) <= not homesensors(1);
+					 err(2)(5) <= not homesensors(2);
+					 err(3)(5) <= not homesensors(3);
+					 err(4)(5) <= not homesensors(4);
+					 err(5)(5) <= not homesensors(5);
+					 err(6)(5) <= not homesensors(6);
 				end if;
 				if run_switch = '0' then
 					sim  <= stop;
@@ -259,14 +278,14 @@ begin
 				err(6)(3 downto 0) <= errors_6;
 				if singul_error = '1' then -- singularity error
 					for j in 1 to 6 loop
-						err(j)(6) <= '1';
+						err(j)(7) <= '1';
 					end loop;
 				end if;
-				if homesensors /= "111111" then -- home position detected during run => power_off
+				if homesensors /= "111111" then -- home position detected during run 
 					power_off <= '1';
 					sim       <= error;
 					for j in 1 to 6 loop
-						err(j)(7) <= not homesensors(j);
+						err(j)(6) <= not homesensors(j);
 					end loop;
 				end if;
 				if (errors > 0) or (mde = 10 and com_error = '1') or (singul_error = '1') then --any error

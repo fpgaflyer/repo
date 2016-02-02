@@ -198,10 +198,11 @@ architecture structure of top_flightsim_controller_n is
 	end component control;
 
 	component digital_filter
-		port(clk   : in  std_logic;
-			 reset : in  std_logic;
-			 i     : in  std_logic;
-			 o     : out std_logic);
+		port(clk      : in  std_logic;
+			 sync_2ms : in  std_logic;
+			 reset    : in  std_logic;
+			 i        : in  std_logic;
+			 o        : out std_logic);
 	end component digital_filter;
 
 	component serial_rx
@@ -279,7 +280,7 @@ architecture structure of top_flightsim_controller_n is
 	signal sw1_f           : std_logic;
 	signal sw2_f           : std_logic;
 	signal sw3_f           : std_logic;
-	signal press           : std_logic;
+	signal rotary_press_f  : std_logic;
 	signal kp              : std_logic_vector(3 downto 0);
 	signal start           : std_logic;
 	signal home_enable     : std_logic;
@@ -524,7 +525,7 @@ begin
 			sync_20ms     => sync_20ms,
 			rotary_event  => rotary_event,
 			rotary_left   => rotary_left,
-			press         => press,
+			press         => rotary_press_f,
 			btn_north     => btn_north_f,
 			btn_west      => btn_west_f,
 			btn_east      => btn_east_f,
@@ -573,12 +574,12 @@ begin
 			errors_6      => errors_6,
 			singul_error  => singul_error,
 			com_error     => com_error,
-			home_sensor_1 => home_sensor_1,
-			home_sensor_2 => home_sensor_2,
-			home_sensor_3 => home_sensor_3,
-			home_sensor_4 => home_sensor_4,
-			home_sensor_5 => home_sensor_5,
-			home_sensor_6 => home_sensor_6,
+			home_sensor_1 => home_sensor_1_f,
+			home_sensor_2 => home_sensor_2_f,
+			home_sensor_3 => home_sensor_3_f,
+			home_sensor_4 => home_sensor_4_f,
+			home_sensor_5 => home_sensor_5_f,
+			home_sensor_6 => home_sensor_6_f,
 			run_switch    => run_switch_f,
 			reset_button  => reset_button_f,
 			motor_enable  => motor_enable,
@@ -587,124 +588,139 @@ begin
 		);
 
 	A12 : digital_filter
-		port map(clk   => sync_2ms,
-			     reset => reset,
-			     i     => rotary_press,
-			     o     => press
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => rotary_press,
+			     o        => rotary_press_f
 		);
 
 	A13 : digital_filter
-		port map(clk   => sync_2ms,
-			     reset => reset,
-			     i     => btn_west,
-			     o     => btn_west_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => btn_west,
+			     o        => btn_west_f
 		);
 
 	A14 : digital_filter
-		port map(clk   => sync_2ms,
-			     reset => reset,
-			     i     => btn_east,
-			     o     => btn_east_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => btn_east,
+			     o        => btn_east_f
 		);
 
 	A15 : digital_filter
-		port map(clk   => sync_2ms,
-			     reset => reset,
-			     i     => btn_south,
-			     o     => btn_south_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => btn_south,
+			     o        => btn_south_f
 		);
 
 	A16 : digital_filter
-		port map(clk   => sync_2ms,
-			     reset => reset,
-			     i     => btn_north,
-			     o     => btn_north_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => btn_north,
+			     o        => btn_north_f
 		);
 
 	A17 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => sw0,
-			     o     => sw0_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => sw0,
+			     o        => sw0_f
 		);
 
 	A18 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => sw1,
-			     o     => sw1_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => sw1,
+			     o        => sw1_f
 		);
 
 	A19 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => sw2,
-			     o     => sw2_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => sw2,
+			     o        => sw2_f
 		);
 
 	A20 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => sw3,
-			     o     => sw3_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => sw3,
+			     o        => sw3_f
 		);
 
 	A21 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_1,
-			     o     => home_sensor_1_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_1,
+			     o        => home_sensor_1_f
 		);
 
 	A22 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_2,
-			     o     => home_sensor_2_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_2,
+			     o        => home_sensor_2_f
 		);
 
 	A23 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_3,
-			     o     => home_sensor_3_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_3,
+			     o        => home_sensor_3_f
 		);
 
 	A24 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_4,
-			     o     => home_sensor_4_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_4,
+			     o        => home_sensor_4_f
 		);
 
 	A25 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_5,
-			     o     => home_sensor_5_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_5,
+			     o        => home_sensor_5_f
 		);
 
 	A26 : digital_filter
-		port map(clk   => clk,
-			     reset => reset,
-			     i     => home_sensor_6,
-			     o     => home_sensor_6_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => home_sensor_6,
+			     o        => home_sensor_6_f
 		);
 
 	A27 : digital_filter
-		port map(
-			clk   => clk,
-			reset => reset,
-			i     => run_switch,
-			o     => run_switch_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => run_switch,
+			     o        => run_switch_f
 		);
 
 	A28 : digital_filter
-		port map(
-			clk   => clk,
-			reset => reset,
-			i     => reset_button,
-			o     => reset_button_f
+		port map(clk      => clk,
+			     sync_2ms => sync_2ms,
+			     reset    => reset,
+			     i        => reset_button,
+			     o        => reset_button_f
 		);
 
 	A29 : serial_rx
