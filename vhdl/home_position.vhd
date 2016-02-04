@@ -34,7 +34,7 @@ begin
 			diff <= pos_in;
 		end if;
 
-		posout := pos_in - diff;
+		posout := pos_in - diff + X"400"; -- home position is 2.56cm
 
 		if posout(13 downto 6) > X"E0" then -->35.84cm
 			pos_high_error <= '1';

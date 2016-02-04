@@ -17,7 +17,7 @@ Position control loop implemented in FPGA:
 Serial out: !G runtime commands to SBL1360
 Serial in: actual position motor axis from SBL1360
 
-Home position sensor is a slotted sensor to detect zero position
+Home position sensor is a slotted sensor to detect home position
 This sensor input is also used as safety limit switch: the sensor input is activated if the actuator
 reaches its minimal (home position) but also if a limit switch is activated when the actuator reaches
 the maximal mechanical position. The limit switch is connected in parallel with the home position sensor.
@@ -29,6 +29,7 @@ Rotary Push_Button will enter set position, selected LCD display stops blinking
 Button north/south enables manual control in speed mode, north = speed +50 (up), south = speed -50 (down)
 Button west/east (SW3 = 0):	select controller 1 to 6, index is displayed on LCD lower left corner digit
 Button west/east (SW3 = 1):	sets mode
+remark: speed mode is a not protected mode! 
 
 External run_switch 
 on:	motor activated in position controlled mode, speed ramps up in 20 sec
@@ -36,9 +37,8 @@ off:	stop, motor can be activated in controlled speed mode with button north/sou
 
 External reset_button stops motor and reset error flags
 Press external reset_button for: 
->2.5sec to enable home_position (set position counter in FPGA to zero) 
+>2.5sec to enable home_position (set position counter in FPGA to preset value 0x10) 
 >7.5sec to drive actuators down until home position sensor is active (bring the platform down) 
-when home_position sensor goes high (leds will glow)
 
 motor_enable: signal to roboteq motor controller, low will stop motor 
 power_off: signal disables power to motor controllers   
@@ -57,13 +57,15 @@ to different offsets (pseudo random) each time the sim is activated with the run
 
 ** serial data input is BIN format, 38400 Baud
 
-leds:		sim state:
-off		stop 
-glow		homeposition enable is on 
-scroll		rampup
-on		run		
-flashing	error	(flashing only led0 and other leds off is communication error with PC)
-alternate   	gohome  
+leds:			sim state:
+off			stop 
+glow			homeposition enable is on 
+scroll			rampup
+on			run		
+flashing all		error (see error codes)
+flashing led0 		communication error with PC
+flashing led7		singularity error
+alternate   		going to home position (bring the platform down)  
 
 LCD screen shows 6 actual motor axis positions (00-FF/1.6mm) in the upper line and 
 6 set positions (00-FF/1.6mm) on lower line
@@ -72,13 +74,13 @@ In case there is a error the lower line displays error code per actuator.
 error codes:
 01: position too low		<0x20 = 5.12cm
 02: position too high		>0xE0 = 35.84cm
-04: loop errorloop error 	>10.2375cm for 1.28sec
-08: position update error	no position update within 64ms
+04: loop error			loop error >10.2375cm for 1.28sec
+08: position update error	no position update received within 64ms
 
-10: home error			not in home position before rampup
-20: home pos during rampup	home position detected during rampup
-40: home pos during run		home position detected during run
-80: singul_error		singularity error (all)
+10: setpos error		set position <0x20 = 5.12cm or >0xE0 = 35.84cm
+20: home error			not in home position before rampup
+40: home pos during rampup	home position detected during rampup
+80: home pos during run		home position detected during run
 
 error codes are added for a combination of errors 
 

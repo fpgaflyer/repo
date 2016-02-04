@@ -5,15 +5,16 @@ use IEEE.STD_LOGIC_UNSIGNED.all;
 
 entity p_controller_n is
 	port(
-		clk         : in  std_logic;
-		reset       : in  std_logic;
-		sync_20ms   : in  std_logic;
-		kp          : in  std_logic_vector(3 downto 0);
-		setpos      : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
-		pos         : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
-		speed_limit : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
-		drive       : out std_logic_vector(10 downto 0); -- -1000 / +1000
-		loop_error  : out std_logic     -- error > 10cm during 1.28sec
+		clk          : in  std_logic;
+		reset        : in  std_logic;
+		sync_20ms    : in  std_logic;
+		kp           : in  std_logic_vector(3 downto 0);
+		setpos       : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
+		pos          : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
+		speed_limit  : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
+		drive        : out std_logic_vector(10 downto 0); -- -1000 / +1000
+		loop_error   : out std_logic;   -- error > 10cm during 1.28sec
+		setpos_error : out std_logic    -- setpos < 0x20  or  setpos > 0xE0
 	);
 
 end;
@@ -49,7 +50,8 @@ begin
 			drive   <= (others => '0'); -- stop
 
 		else
-			err <= '0';
+			err          <= '0';
+			setpos_error <= '0';
 
 			e <= ('0' & setpos & "000000") - ('0' & pos); -- setpos - pos
 
@@ -90,6 +92,10 @@ begin
 				cnt_20ms := (others => '0');
 			end if;
 			loop_error <= cnt_20ms(6);
+
+			if setpos > X"E0" or setpos < X"20" then --setpos_error
+				setpos_error <= '1';
+			end if;
 
 		end if;
 

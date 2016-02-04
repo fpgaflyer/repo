@@ -125,7 +125,7 @@ architecture structure of top_flightsim_controller_n is
 			 speed_limit : in  std_logic_vector(9 downto 0);
 			 position    : out std_logic_vector(7 downto 0);
 			 serial_out  : out std_logic;
-			 errors      : out std_logic_vector(3 downto 0));
+			 errors      : out std_logic_vector(4 downto 0));
 	end component controller;
 
 	component control
@@ -176,12 +176,12 @@ architecture structure of top_flightsim_controller_n is
 			 demo_setpos_5 : in  std_logic_vector(7 downto 0);
 			 demo_setpos_6 : in  std_logic_vector(7 downto 0);
 			 calc_offsets  : out std_logic;
-			 errors_1      : in  std_logic_vector(3 downto 0);
-			 errors_2      : in  std_logic_vector(3 downto 0);
-			 errors_3      : in  std_logic_vector(3 downto 0);
-			 errors_4      : in  std_logic_vector(3 downto 0);
-			 errors_5      : in  std_logic_vector(3 downto 0);
-			 errors_6      : in  std_logic_vector(3 downto 0);
+			 errors_1      : in  std_logic_vector(4 downto 0);
+			 errors_2      : in  std_logic_vector(4 downto 0);
+			 errors_3      : in  std_logic_vector(4 downto 0);
+			 errors_4      : in  std_logic_vector(4 downto 0);
+			 errors_5      : in  std_logic_vector(4 downto 0);
+			 errors_6      : in  std_logic_vector(4 downto 0);
 			 singul_error  : in  std_logic;
 			 com_error     : in  std_logic;
 			 home_sensor_1 : in  std_logic;
@@ -325,12 +325,12 @@ architecture structure of top_flightsim_controller_n is
 	signal demo_setpos_5   : std_logic_vector(7 downto 0);
 	signal demo_setpos_6   : std_logic_vector(7 downto 0);
 	signal speed_limit     : std_logic_vector(9 downto 0);
-	signal errors_1        : std_logic_vector(3 downto 0);
-	signal errors_2        : std_logic_vector(3 downto 0);
-	signal errors_3        : std_logic_vector(3 downto 0);
-	signal errors_4        : std_logic_vector(3 downto 0);
-	signal errors_5        : std_logic_vector(3 downto 0);
-	signal errors_6        : std_logic_vector(3 downto 0);
+	signal errors_1        : std_logic_vector(4 downto 0);
+	signal errors_2        : std_logic_vector(4 downto 0);
+	signal errors_3        : std_logic_vector(4 downto 0);
+	signal errors_4        : std_logic_vector(4 downto 0);
+	signal errors_5        : std_logic_vector(4 downto 0);
+	signal errors_6        : std_logic_vector(4 downto 0);
 	signal com_error       : std_logic;
 	signal run_switch_f    : std_logic;
 	signal reset_button_f  : std_logic;

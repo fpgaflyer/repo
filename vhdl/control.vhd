@@ -62,12 +62,12 @@ entity control is
 
 		calc_offsets  : out std_logic;
 
-		errors_1      : in  std_logic_vector(3 downto 0);
-		errors_2      : in  std_logic_vector(3 downto 0);
-		errors_3      : in  std_logic_vector(3 downto 0);
-		errors_4      : in  std_logic_vector(3 downto 0);
-		errors_5      : in  std_logic_vector(3 downto 0);
-		errors_6      : in  std_logic_vector(3 downto 0);
+		errors_1      : in  std_logic_vector(4 downto 0);
+		errors_2      : in  std_logic_vector(4 downto 0);
+		errors_3      : in  std_logic_vector(4 downto 0);
+		errors_4      : in  std_logic_vector(4 downto 0);
+		errors_5      : in  std_logic_vector(4 downto 0);
+		errors_6      : in  std_logic_vector(4 downto 0);
 		singul_error  : in  std_logic;
 		com_error     : in  std_logic;
 
@@ -122,7 +122,7 @@ begin
 		type t_drvman is array (1 to 6) of std_logic_vector(10 downto 0);
 		variable drvman      : t_drvman;
 		variable homesensors : std_logic_vector(6 downto 1);
-		variable errors      : std_logic_vector(23 downto 0);
+		variable errors      : std_logic_vector(29 downto 0);
 		variable setpos_1    : std_logic_vector(7 downto 0);
 		variable setpos_2    : std_logic_vector(7 downto 0);
 		variable setpos_3    : std_logic_vector(7 downto 0);
@@ -142,7 +142,7 @@ begin
 		home_enable    <= '0';
 		motor_enable   <= '1';
 		homesensors    := home_sensor_6 & home_sensor_5 & home_sensor_4 & home_sensor_3 & home_sensor_2 & home_sensor_1;
-		errors         := err(1)(3 downto 0) & err(2)(3 downto 0) & err(3)(3 downto 0) & err(4)(3 downto 0) & err(5)(3 downto 0) & err(6)(3 downto 0);
+		errors         := err(1)(4 downto 0) & err(2)(4 downto 0) & err(3)(4 downto 0) & err(4)(4 downto 0) & err(5)(4 downto 0) & err(6)(4 downto 0);
 
 		if sync_20ms = '1' then
 			cnt_20ms <= cnt_20ms + 1;
@@ -205,7 +205,7 @@ begin
 				if run_switch = '1' then
 					if home = '1' and homesensors > 0 then
 						for j in 1 to 6 loop
-							err(j)(4) <= homesensors(j); -- not in home position before rampup
+							err(j)(5) <= homesensors(j); -- not in home position before rampup
 						end loop;
 						sim <= error;
 					else
@@ -219,12 +219,12 @@ begin
 					scroll <= scroll(0) & scroll(7 downto 1);
 				end if;
 				leds               <= scroll;
-				err(1)(3 downto 0) <= errors_1(3) & '0' & errors_1(1 downto 0); -- ignore loop error
-				err(2)(3 downto 0) <= errors_2(3) & '0' & errors_2(1 downto 0);
-				err(3)(3 downto 0) <= errors_3(3) & '0' & errors_3(1 downto 0);
-				err(4)(3 downto 0) <= errors_4(3) & '0' & errors_4(1 downto 0);
-				err(5)(3 downto 0) <= errors_5(3) & '0' & errors_5(1 downto 0);
-				err(6)(3 downto 0) <= errors_6(3) & '0' & errors_6(1 downto 0);
+				err(1)(4 downto 0) <= errors_1(4 downto 3) & '0' & errors_1(1 downto 0); -- ignore loop error
+				err(2)(4 downto 0) <= errors_2(4 downto 3) & '0' & errors_2(1 downto 0);
+				err(3)(4 downto 0) <= errors_3(4 downto 3) & '0' & errors_3(1 downto 0);
+				err(4)(4 downto 0) <= errors_4(4 downto 3) & '0' & errors_4(1 downto 0);
+				err(5)(4 downto 0) <= errors_5(4 downto 3) & '0' & errors_5(1 downto 0);
+				err(6)(4 downto 0) <= errors_6(4 downto 3) & '0' & errors_6(1 downto 0);
 				if home = '1' then
 					for i in 0 to 7 loop
 						if scroll(i) = '0' then
@@ -235,7 +235,7 @@ begin
 						err(j)(0) <= '0'; -- ignore position low error during home_enable
 					end loop;
 				end if;
-				if errors > 0 then      --any error
+				if errors > 0 or (mde = 10 and com_error = '1') or (singul_error = '1') then  --any error
 					sim <= error;
 				end if;
 				if sync_20ms = '1' then
@@ -257,12 +257,12 @@ begin
 					(cnttt_20ms(6)(4) = '1' and homesensors(6) = '0') then -- home position detected during rampup 
 					 power_off <= '1';
 					 sim       <= error;
-					 err(1)(5) <= not homesensors(1);
-					 err(2)(5) <= not homesensors(2);
-					 err(3)(5) <= not homesensors(3);
-					 err(4)(5) <= not homesensors(4);
-					 err(5)(5) <= not homesensors(5);
-					 err(6)(5) <= not homesensors(6);
+					 err(1)(6) <= not homesensors(1);
+					 err(2)(6) <= not homesensors(2);
+					 err(3)(6) <= not homesensors(3);
+					 err(4)(6) <= not homesensors(4);
+					 err(5)(6) <= not homesensors(5);
+					 err(6)(6) <= not homesensors(6);
 				end if;
 				if run_switch = '0' then
 					sim  <= stop;
@@ -270,22 +270,17 @@ begin
 				end if;
 			when run =>
 				home               <= '0';
-				err(1)(3 downto 0) <= errors_1;
-				err(2)(3 downto 0) <= errors_2;
-				err(3)(3 downto 0) <= errors_3;
-				err(4)(3 downto 0) <= errors_4;
-				err(5)(3 downto 0) <= errors_5;
-				err(6)(3 downto 0) <= errors_6;
-				if singul_error = '1' then -- singularity error
-					for j in 1 to 6 loop
-						err(j)(7) <= '1';
-					end loop;
-				end if;
+				err(1)(4 downto 0) <= errors_1;
+				err(2)(4 downto 0) <= errors_2;
+				err(3)(4 downto 0) <= errors_3;
+				err(4)(4 downto 0) <= errors_4;
+				err(5)(4 downto 0) <= errors_5;
+				err(6)(4 downto 0) <= errors_6;
 				if homesensors /= "111111" then -- home position detected during run 
 					power_off <= '1';
 					sim       <= error;
 					for j in 1 to 6 loop
-						err(j)(6) <= not homesensors(j);
+						err(j)(7) <= not homesensors(j);
 					end loop;
 				end if;
 				if (errors > 0) or (mde = 10 and com_error = '1') or (singul_error = '1') then --any error
@@ -466,6 +461,11 @@ begin
 		if mde = 10 and com_error = '1' then
 			leds(0)          <= cnt_20ms(3);
 			leds(7 downto 1) <= (others => '0');
+		end if;
+		
+		if singul_error = '1' then
+			leds(7)          <= cnt_20ms(3);
+			leds(6 downto 0) <= (others => '0');
 		end if;
 
 		speed_limit <= speedlimit;
