@@ -31,6 +31,7 @@ entity top_flightsim_controller_n is
 		 reset_button   : in  std_logic;
 		 motor_enable   : out std_logic;
 		 power_off      : out std_logic;
+		 buzzer         : out std_logic;
 
 		 home_sensor_1  : in  std_logic;
 		 home_sensor_2  : in  std_logic;
@@ -782,8 +783,9 @@ begin
 		);
 
 	-- additional statements  
-	val_0 <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
-	txd   <= '1';
+	val_0  <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
+	txd    <= '1';
+	buzzer <= singul_error;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';
