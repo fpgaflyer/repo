@@ -23,7 +23,8 @@ entity controller is
 		 speed_limit : in  std_logic_vector(9 downto 0);
 		 position    : out std_logic_vector(7 downto 0); -- 1.6mm 0-41cm
 		 serial_out  : out std_logic;
-		 errors      : out std_logic_vector(4 downto 0)
+		 errors      : out std_logic_vector(4 downto 0);
+		 drv_log     : out std_logic_vector(3 downto 0)
 	);
 end;
 
@@ -197,5 +198,6 @@ begin
 
 	-- additional statements  
 	position <= pos_out(13 downto 6);   --1.6mm 0-41cm <= 25um x 64
+	drv_log  <= drv_out(10 downto 7);
 
 end;

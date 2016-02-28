@@ -82,9 +82,10 @@ NET "serial_in_5"  LOC = "C7" | IOSTANDARD = LVTTL ;
 NET "serial_out_6" LOC = "F8" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
 NET "serial_in_6"  LOC = "E8" | IOSTANDARD = LVTTL ;
 
-# RS-232 Serial Ports DCE female data from PC 
-NET "rxd"  	LOC = "R7"  | IOSTANDARD = LVTTL ;  
-NET "txd"  	LOC = "M14" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# RS-232 Serial Ports: DCE female position data from PC, DTE male log data to PC
+NET "rxd"  		LOC = "R7"  | IOSTANDARD = LVTTL ;  
+NET "txd"  		LOC = "M14" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+NET "log_txd"  	LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ; 
 
 # run_switch, reset_button, motor_enable, power_off, buzzer via FX2 CONNECTOR  
 NET "run_switch"  	LOC = "B11" | IOSTANDARD = LVTTL ;

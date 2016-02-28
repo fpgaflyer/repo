@@ -11,11 +11,13 @@
   <Mappings Location="Common Libraries/unisim" Library="unisim"/>
   <Mappings Location="" Library="work"/>
   <Mappings Location="vhdl/bbfifo_16x8.vhd" Library="work"/>
+  <Mappings Location="vhdl/bram_2048x128.vhd" Library="work"/>
   <Mappings Location="vhdl/clk_divider_n.vhd" Library="work"/>
   <Mappings Location="vhdl/control.vhd" Library="work"/>
   <Mappings Location="vhdl/controller.vhd" Library="work"/>
   <Mappings Location="vhdl/conv.vhd" Library="work"/>
   <Mappings Location="vhdl/counter.vhd" Library="work"/>
+  <Mappings Location="vhdl/data_logger_n.vhd" Library="work"/>
   <Mappings Location="vhdl/demo_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/digital_filter.vhd" Library="work"/>
   <Mappings Location="vhdl/display_controller_n.vhd" Library="work"/>
@@ -26,6 +28,7 @@
   <Mappings Location="vhdl/kcuart_rx.vhd" Library="work"/>
   <Mappings Location="vhdl/kcuart_tx.vhd" Library="work"/>
   <Mappings Location="vhdl/lcd_controller_n.vhd" Library="work"/>
+  <Mappings Location="vhdl/log_serial_tx.vhd" Library="work"/>
   <Mappings Location="vhdl/p_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/ramp_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/readpos.vhd" Library="work"/>
@@ -37,6 +40,7 @@
   <Mappings Location="vhdl/sinus_rom.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_clk_divider.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_conv.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_datalog_n.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_demo_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_interpol.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_ramp_gen.vhd" Library="work"/>

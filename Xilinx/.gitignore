@@ -15,7 +15,7 @@ _xmsgs/
 # *.gise  
 *.lso
 *.ncd
-*.ngc
+# *.ngc
 *.ngd
 *.ngr
 *.pad

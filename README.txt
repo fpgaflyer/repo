@@ -29,6 +29,8 @@ Rotary Push_Button will enter set position, selected LCD display stops blinking
 Button north/south enables manual control in speed mode, north = speed +50 (up), south = speed -50 (down)
 Button west/east (SW3 = 0):	select controller 1 to 6, index is displayed on LCD lower left corner digit
 Button west/east (SW3 = 1):	sets mode
+Button west/east together : export datalog to PC
+
 remark: speed mode is a not protected mode! 
 
 External run_switch 
@@ -103,6 +105,8 @@ sinus_rom.vhd: generates position que for testpurposes
 demo_gen.vhd: generates position que for demos
 sinus.xls: sinus table for sinus/demo 
 singularity_detector: detector for singular situations
+data_logger_n: stores all position,setposition,drive and homesensor data each 2ms for 4.096 seconds (circular buffer)
+log_serial_tx: serial datalogger output 38400Baud to PC: 2048 lines x 16 bytes  
 
 
 tb_ ... are the testbenches (not all are updated)

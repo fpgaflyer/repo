@@ -55,7 +55,8 @@ entity top_flightsim_controller_n is
 		 serial_out_6   : out std_logic;
 
 		 rxd            : in  std_logic;
-		 txd            : out std_logic
+		 txd            : out std_logic;
+		 log_txd        : out std_logic
 	);
 end;
 
@@ -126,7 +127,8 @@ architecture structure of top_flightsim_controller_n is
 			 speed_limit : in  std_logic_vector(9 downto 0);
 			 position    : out std_logic_vector(7 downto 0);
 			 serial_out  : out std_logic;
-			 errors      : out std_logic_vector(4 downto 0));
+			 errors      : out std_logic_vector(4 downto 0);
+			 drv_log     : out std_logic_vector(3 downto 0));
 	end component controller;
 
 	component control
@@ -195,6 +197,9 @@ architecture structure of top_flightsim_controller_n is
 			 reset_button  : in  std_logic;
 			 motor_enable  : out std_logic;
 			 power_off     : out std_logic;
+			 log_enable    : out std_logic;
+			 send_log      : out std_logic;
+			 tx_datalog    : in  std_logic;
 			 speed_limit   : out std_logic_vector(9 downto 0));
 	end component control;
 
@@ -258,6 +263,68 @@ architecture structure of top_flightsim_controller_n is
 			 position_6   : in  std_logic_vector(7 downto 0);
 			 singul_error : out std_logic);
 	end component singularity_detector;
+
+	component data_logger_n
+		port(clk             : in  std_logic;
+			 reset           : in  std_logic;
+			 position_1      : in  std_logic_vector(7 downto 0);
+			 position_2      : in  std_logic_vector(7 downto 0);
+			 position_3      : in  std_logic_vector(7 downto 0);
+			 position_4      : in  std_logic_vector(7 downto 0);
+			 position_5      : in  std_logic_vector(7 downto 0);
+			 position_6      : in  std_logic_vector(7 downto 0);
+			 set_pos_1       : in  std_logic_vector(7 downto 0);
+			 set_pos_2       : in  std_logic_vector(7 downto 0);
+			 set_pos_3       : in  std_logic_vector(7 downto 0);
+			 set_pos_4       : in  std_logic_vector(7 downto 0);
+			 set_pos_5       : in  std_logic_vector(7 downto 0);
+			 set_pos_6       : in  std_logic_vector(7 downto 0);
+			 drv_log_1       : in  std_logic_vector(3 downto 0);
+			 drv_log_2       : in  std_logic_vector(3 downto 0);
+			 drv_log_3       : in  std_logic_vector(3 downto 0);
+			 drv_log_4       : in  std_logic_vector(3 downto 0);
+			 drv_log_5       : in  std_logic_vector(3 downto 0);
+			 drv_log_6       : in  std_logic_vector(3 downto 0);
+			 home_sensor_1_f : in  std_logic;
+			 home_sensor_2_f : in  std_logic;
+			 home_sensor_3_f : in  std_logic;
+			 home_sensor_4_f : in  std_logic;
+			 home_sensor_5_f : in  std_logic;
+			 home_sensor_6_f : in  std_logic;
+			 drv_mode        : in  std_logic;
+			 motor_enable    : in  std_logic;
+			 sync_2ms        : in  std_logic;
+			 log_enable      : in  std_logic;
+			 send_log        : in  std_logic;
+			 tx_datalog      : out std_logic;
+			 nxt_data        : in  std_logic;
+			 log_data        : out std_logic_vector(7 downto 0);
+			 data_rdy        : out std_logic;
+			 addra           : out std_logic_vector(14 downto 0);
+			 addrb           : out std_logic_vector(10 downto 0);
+			 dinb            : out std_logic_vector(127 downto 0);
+			 douta           : in  std_logic_vector(7 downto 0);
+			 web             : out std_logic);
+	end component data_logger_n;
+
+	component log_serial_tx
+		port(clk        : in  std_logic;
+			 reset      : in  std_logic;
+			 tx_data    : in  std_logic_vector(7 downto 0);
+			 start_send : in  std_logic;
+			 tx         : out std_logic;
+			 nxt_data   : out std_logic);
+	end component log_serial_tx;
+
+	component bram_2048x128
+		port(addra : in  std_logic_VECTOR(14 downto 0);
+			 addrb : in  std_logic_VECTOR(10 downto 0);
+			 clka  : in  std_logic;
+			 clkb  : in  std_logic;
+			 dinb  : in  std_logic_VECTOR(127 downto 0);
+			 douta : out std_logic_VECTOR(7 downto 0);
+			 web   : in  std_logic);
+	end component bram_2048x128;
 
 	-- declaration of signals used to interconnect 
 
@@ -338,6 +405,24 @@ architecture structure of top_flightsim_controller_n is
 	signal blank           : integer range 0 to 6;
 	signal calc_offsets    : std_logic;
 	signal singul_error    : std_logic;
+	signal log_enable      : std_logic;
+	signal send_log        : std_logic;
+	signal tx_datalog      : std_logic;
+	signal nxt_data        : std_logic;
+	signal log_data        : std_logic_vector(7 downto 0);
+	signal data_rdy        : std_logic;
+	signal addra           : std_logic_vector(14 downto 0);
+	signal addrb           : std_logic_vector(10 downto 0);
+	signal dinb            : std_logic_vector(127 downto 0);
+	signal douta           : std_logic_vector(7 downto 0);
+	signal web             : std_logic;
+	signal drv_log_1       : std_logic_vector(3 downto 0);
+	signal drv_log_2       : std_logic_vector(3 downto 0);
+	signal drv_log_3       : std_logic_vector(3 downto 0);
+	signal drv_log_4       : std_logic_vector(3 downto 0);
+	signal drv_log_5       : std_logic_vector(3 downto 0);
+	signal drv_log_6       : std_logic_vector(3 downto 0);
+	signal motorenable     : std_logic;
 
 begin
 	-- component instantiations statements
@@ -410,7 +495,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_1,
 			serial_out  => serial_out_1,
-			errors      => errors_1
+			errors      => errors_1,
+			drv_log     => drv_log_1
 		);
 
 	A6 : controller
@@ -431,7 +517,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_2,
 			serial_out  => serial_out_2,
-			errors      => errors_2
+			errors      => errors_2,
+			drv_log     => drv_log_2
 		);
 
 	A7 : controller
@@ -452,7 +539,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_3,
 			serial_out  => serial_out_3,
-			errors      => errors_3
+			errors      => errors_3,
+			drv_log     => drv_log_3
 		);
 
 	A8 : controller
@@ -473,7 +561,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_4,
 			serial_out  => serial_out_4,
-			errors      => errors_4
+			errors      => errors_4,
+			drv_log     => drv_log_4
 		);
 
 	A9 : controller
@@ -494,7 +583,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_5,
 			serial_out  => serial_out_5,
-			errors      => errors_5
+			errors      => errors_5,
+			drv_log     => drv_log_5
 		);
 
 	A10 : controller
@@ -515,7 +605,8 @@ begin
 			speed_limit => speed_limit,
 			position    => position_6,
 			serial_out  => serial_out_6,
-			errors      => errors_6
+			errors      => errors_6,
+			drv_log     => drv_log_6
 		);
 
 	A11 : control
@@ -583,8 +674,11 @@ begin
 			home_sensor_6 => home_sensor_6_f,
 			run_switch    => run_switch_f,
 			reset_button  => reset_button_f,
-			motor_enable  => motor_enable,
+			motor_enable  => motorenable,
 			power_off     => power_off,
+			log_enable    => log_enable,
+			send_log      => send_log,
+			tx_datalog    => tx_datalog,
 			speed_limit   => speed_limit
 		);
 
@@ -782,10 +876,76 @@ begin
 			singul_error => singul_error
 		);
 
+	A34 : data_logger_n
+		port map(
+			clk             => clk,
+			reset           => reset,
+			position_1      => position_1,
+			position_2      => position_2,
+			position_3      => position_3,
+			position_4      => position_4,
+			position_5      => position_5,
+			position_6      => position_6,
+			set_pos_1       => set_pos_1,
+			set_pos_2       => set_pos_2,
+			set_pos_3       => set_pos_3,
+			set_pos_4       => set_pos_4,
+			set_pos_5       => set_pos_5,
+			set_pos_6       => set_pos_6,
+			drv_log_1       => drv_log_1,
+			drv_log_2       => drv_log_2,
+			drv_log_3       => drv_log_3,
+			drv_log_4       => drv_log_4,
+			drv_log_5       => drv_log_5,
+			drv_log_6       => drv_log_6,
+			home_sensor_1_f => home_sensor_1_f,
+			home_sensor_2_f => home_sensor_2_f,
+			home_sensor_3_f => home_sensor_3_f,
+			home_sensor_4_f => home_sensor_4_f,
+			home_sensor_5_f => home_sensor_5_f,
+			home_sensor_6_f => home_sensor_6_f,
+			drv_mode        => drv_mode,
+			motor_enable    => motorenable,
+			sync_2ms        => sync_2ms,
+			log_enable      => log_enable,
+			send_log        => send_log,
+			tx_datalog      => tx_datalog,
+			nxt_data        => nxt_data,
+			log_data        => log_data,
+			data_rdy        => data_rdy,
+			addra           => addra,
+			addrb           => addrb,
+			dinb            => dinb,
+			douta           => douta,
+			web             => web
+		);
+
+	A35 : log_serial_tx
+		port map(
+			clk        => clk,
+			reset      => reset,
+			tx_data    => log_data,
+			start_send => data_rdy,
+			tx         => log_txd,
+			nxt_data   => nxt_data
+		);
+
+	A36 : bram_2048x128
+		port map(
+			addra => addra,
+			addrb => addrb,
+			clka  => clk,
+			clkb  => clk,
+			dinb  => dinb,
+			douta => douta,
+			web   => web
+		);
+
 	-- additional statements  
-	val_0  <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
-	txd    <= '1';
-	buzzer <= singul_error;
+	val_0       <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
+	txd         <= '1';
+	buzzer      <= singul_error;
+	motor_enable <= motorenable;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
 	strataflash_oe <= '1';
