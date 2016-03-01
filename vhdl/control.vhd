@@ -82,6 +82,7 @@ entity control is
 		reset_button  : in  std_logic;
 		motor_enable  : out std_logic;
 		power_off     : out std_logic;
+		buzzer        : out std_logic;
 
 		log_enable    : out std_logic;
 		send_log      : out std_logic;
@@ -104,20 +105,24 @@ architecture behav of control is
 	signal i          : integer range 1 to 6;
 	signal mde        : integer range 10 to 15;
 	type t_sim is (stop, wait4run, ramp, run, error);
-	signal sim            : t_sim;
-	signal speedlimit     : std_logic_vector(9 downto 0);
-	signal cnt_20ns       : std_logic_vector(9 downto 0);
-	signal cnt_20ms       : std_logic_vector(5 downto 0);
-	signal cntt_20ms      : std_logic_vector(9 downto 0);
-	signal cntttt_20ms    : std_logic_vector(6 downto 0);
-	signal blanks         : integer range 0 to 6;
-	signal leds           : std_logic_vector(7 downto 0);
-	signal cnt_20ms_d     : std_logic;
-	signal home           : std_logic;
-	signal scroll         : std_logic_vector(7 downto 0);
-	signal gohome         : std_logic;
-	signal gohome_start   : std_logic;
-	signal gohome_start_d : std_logic;
+	signal sim          : t_sim;
+	signal speedlimit   : std_logic_vector(9 downto 0);
+	signal cnt_20ns     : std_logic_vector(9 downto 0);
+	signal cnt_20ms     : std_logic_vector(5 downto 0);
+	signal cntt_20ms    : std_logic_vector(9 downto 0);
+	signal cntttt_20ms  : std_logic_vector(6 downto 0);
+	signal cnttttt_20ms : std_logic_vector(7 downto 0);
+
+	signal blanks          : integer range 0 to 6;
+	signal leds            : std_logic_vector(7 downto 0);
+	signal cnt_20ms_d      : std_logic;
+	signal home            : std_logic;
+	signal scroll          : std_logic_vector(7 downto 0);
+	signal gohome          : std_logic;
+	signal gohome_start    : std_logic;
+	signal gohome_start_d  : std_logic;
+	signal not_homed_alarm : std_logic;
+	signal onetime         : std_logic;
 
 begin
 	process
@@ -147,11 +152,13 @@ begin
 		motor_enable   <= '1';
 		log_enable     <= '1';
 		send_log       <= '0';
+		buzzer         <= '0';
 		homesensors    := home_sensor_6 & home_sensor_5 & home_sensor_4 & home_sensor_3 & home_sensor_2 & home_sensor_1;
 		errors         := err(1)(4 downto 0) & err(2)(4 downto 0) & err(3)(4 downto 0) & err(4)(4 downto 0) & err(5)(4 downto 0) & err(6)(4 downto 0);
 
 		if sync_20ms = '1' then
-			cnt_20ms <= cnt_20ms + 1;
+			cnt_20ms     <= cnt_20ms + 1;
+			cnttttt_20ms <= cnttttt_20ms + 1;
 		end if;
 		cnt_20ms_d <= cnt_20ms(2);
 
@@ -489,7 +496,19 @@ begin
 			leds(7 downto 1) <= (others => '0');
 		end if;
 
+		if (cnttttt_20ms(7) = '1') and (onetime = '0') then
+			onetime <= '1';
+			if (homesensors > 0) then
+				not_homed_alarm <= '1';
+			end if;
+		end if;
+
+		if not_homed_alarm = '1' and cnttttt_20ms > 254 then -- buzzer short beep
+			buzzer <= '1';
+		end if;
+
 		if singul_error = '1' then
+			buzzer           <= '1';
 			leds(7)          <= cnt_20ms(3);
 			leds(6 downto 0) <= (others => '0');
 		end if;
@@ -502,15 +521,18 @@ begin
 		led         <= leds;
 
 		if reset = '1' then
-			sim            <= stop;
-			i              <= 1;
-			mde            <= 10;
-			blanks         <= 0;
-			power_off      <= '0';
-			gohome_start   <= '0';
-			gohome_start_d <= '0';
-			gohome         <= '0';
-			cntttt_20ms    <= (others => '0');
+			sim             <= stop;
+			i               <= 1;
+			mde             <= 10;
+			blanks          <= 0;
+			power_off       <= '0';
+			gohome_start    <= '0';
+			gohome_start_d  <= '0';
+			gohome          <= '0';
+			cntttt_20ms     <= (others => '0');
+			cnttttt_20ms    <= (others => '0');
+			not_homed_alarm <= '0';
+			onetime         <= '0';
 			for j in 1 to 6 loop
 				setpos(j) := (others => '0');
 				drvman(j) := (others => '0');

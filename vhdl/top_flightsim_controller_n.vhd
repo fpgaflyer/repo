@@ -197,6 +197,7 @@ architecture structure of top_flightsim_controller_n is
 			 reset_button  : in  std_logic;
 			 motor_enable  : out std_logic;
 			 power_off     : out std_logic;
+			 buzzer        : out std_logic;
 			 log_enable    : out std_logic;
 			 send_log      : out std_logic;
 			 tx_datalog    : in  std_logic;
@@ -676,6 +677,7 @@ begin
 			reset_button  => reset_button_f,
 			motor_enable  => motorenable,
 			power_off     => power_off,
+			buzzer        => buzzer,
 			log_enable    => log_enable,
 			send_log      => send_log,
 			tx_datalog    => tx_datalog,
@@ -942,9 +944,8 @@ begin
 		);
 
 	-- additional statements  
-	val_0       <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
-	txd         <= '1';
-	buzzer      <= singul_error;
+	val_0        <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
+	txd          <= '1';
 	motor_enable <= motorenable;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 

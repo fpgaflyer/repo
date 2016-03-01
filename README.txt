@@ -69,8 +69,12 @@ flashing led0 		communication error with PC
 flashing led7		singularity error
 alternate   		going to home position (bring the platform down)  
 
-buzzer: 		singularity error, be carefull not to bring the platform in a singular condition especially
-			after power off !
+buzzer: 		singularity error, be carefull not to bring the platform in a singular condition
+			especially after power off !
+
+buzzer short beep:	platform is not in home position when the controllers were powered, this can cause 
+			an unwanted position offset			
+			
 
 LCD screen shows 6 actual motor axis positions (00-FF/1.6mm) in the upper line and 
 6 set positions (00-FF/1.6mm) on lower line
