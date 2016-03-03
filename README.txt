@@ -112,6 +112,7 @@ singularity_detector: detector for singular situations
 data_logger_n: stores all position,setposition,drive and homesensor data each 2ms for 4.096 seconds (circular buffer)
 log_serial_tx: serial datalogger output 38400Baud to PC: 2048 lines x 16 bytes  
 
+dumplog: application to readout serial datalog, with example datafile and excellsheet to display data 
 
 tb_ ... are the testbenches (not all are updated)
 
