@@ -104,7 +104,7 @@ architecture behav of control is
 	signal cnttt_20ms : t_cnttt_20ms;
 	signal i          : integer range 1 to 6;
 	signal mde        : integer range 10 to 15;
-	type t_sim is (stop, wait4run, ramp, run, error);
+	type t_sim is (stop, wait4run, ramp, run, rampdown, error);
 	signal sim          : t_sim;
 	signal speedlimit   : std_logic_vector(9 downto 0);
 	signal cnt_20ns     : std_logic_vector(9 downto 0);
@@ -310,6 +310,31 @@ begin
 				end if;
 				leds <= "11111111";
 				if run_switch = '0' then
+					sim <= rampdown;
+				end if;
+			when rampdown =>
+				home               <= '0';
+				err(1)(4 downto 0) <= errors_1;
+				err(2)(4 downto 0) <= errors_2;
+				err(3)(4 downto 0) <= errors_3;
+				err(4)(4 downto 0) <= errors_4;
+				err(5)(4 downto 0) <= errors_5;
+				err(6)(4 downto 0) <= errors_6;
+				if homesensors /= "111111" then -- home position detected during rampdown 
+					power_off <= '1';
+					sim       <= error;
+					for j in 1 to 6 loop
+						err(j)(7) <= not homesensors(j);
+					end loop;
+				end if;
+				if (errors > 0) or (mde = 10 and com_error = '1') or (singul_error = '1') then --any error
+					sim <= error;
+				end if;
+				leds <= "00011000";
+				if sync_2ms = '1' then
+					speedlimit <= speedlimit - 1;
+				end if;
+				if speedlimit = 0 then
 					sim <= stop;
 				end if;
 			when error =>
@@ -383,7 +408,7 @@ begin
 			for j in 1 to 6 loop
 				drvman(j) := "00000000000";
 			end loop;
-			if run_switch = '1' then
+			if run_switch = '1' or sim = rampdown then
 				drv_mode <= '1';        -- position mode
 				gohome   <= '0';
 			else

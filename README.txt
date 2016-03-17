@@ -36,6 +36,7 @@ remark: speed mode is a not protected mode!
 External run_switch 
 on:	motor activated in position controlled mode, speed ramps up in 20 sec
 off:	stop, motor can be activated in controlled speed mode with button north/south
+off (during run): speed ramps down in 2sec followed by stop		
 
 External reset_button stops motor and reset error flags
 Press external reset_button for: 
@@ -63,7 +64,8 @@ leds:			sim state:
 off			stop 
 glow			homeposition enable is on 
 scroll			rampup
-on			run		
+on			run	
+led3+4 on		rampdown	
 flashing all		error (see error codes)
 flashing led0 		communication error with PC
 flashing led7		singularity error
