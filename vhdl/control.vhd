@@ -26,12 +26,12 @@ entity control is
 		home_enable   : out std_logic;
 		kp            : out std_logic_vector(3 downto 0);
 
-		set_pos_1     : out std_logic_vector(7 downto 0);
-		set_pos_2     : out std_logic_vector(7 downto 0);
-		set_pos_3     : out std_logic_vector(7 downto 0);
-		set_pos_4     : out std_logic_vector(7 downto 0);
-		set_pos_5     : out std_logic_vector(7 downto 0);
-		set_pos_6     : out std_logic_vector(7 downto 0);
+		set_pos_1     : out std_logic_vector(13 downto 0);
+		set_pos_2     : out std_logic_vector(13 downto 0);
+		set_pos_3     : out std_logic_vector(13 downto 0);
+		set_pos_4     : out std_logic_vector(13 downto 0);
+		set_pos_5     : out std_logic_vector(13 downto 0);
+		set_pos_6     : out std_logic_vector(13 downto 0);
 
 		drv_mode      : out std_logic;
 
@@ -46,12 +46,12 @@ entity control is
 		val_1         : out std_logic_vector(63 downto 0);
 		blank         : out integer range 0 to 6;
 
-		ext_setpos_1  : in  std_logic_vector(7 downto 0);
-		ext_setpos_2  : in  std_logic_vector(7 downto 0);
-		ext_setpos_3  : in  std_logic_vector(7 downto 0);
-		ext_setpos_4  : in  std_logic_vector(7 downto 0);
-		ext_setpos_5  : in  std_logic_vector(7 downto 0);
-		ext_setpos_6  : in  std_logic_vector(7 downto 0);
+		ext_setpos_1  : in  std_logic_vector(15 downto 0);
+		ext_setpos_2  : in  std_logic_vector(15 downto 0);
+		ext_setpos_3  : in  std_logic_vector(15 downto 0);
+		ext_setpos_4  : in  std_logic_vector(15 downto 0);
+		ext_setpos_5  : in  std_logic_vector(15 downto 0);
+		ext_setpos_6  : in  std_logic_vector(15 downto 0);
 
 		demo_setpos_1 : in  std_logic_vector(7 downto 0);
 		demo_setpos_2 : in  std_logic_vector(7 downto 0);
@@ -132,12 +132,12 @@ begin
 		variable drvman      : t_drvman;
 		variable homesensors : std_logic_vector(6 downto 1);
 		variable errors      : std_logic_vector(29 downto 0);
-		variable setpos_1    : std_logic_vector(7 downto 0);
-		variable setpos_2    : std_logic_vector(7 downto 0);
-		variable setpos_3    : std_logic_vector(7 downto 0);
-		variable setpos_4    : std_logic_vector(7 downto 0);
-		variable setpos_5    : std_logic_vector(7 downto 0);
-		variable setpos_6    : std_logic_vector(7 downto 0);
+		variable setpos_1    : std_logic_vector(13 downto 0);
+		variable setpos_2    : std_logic_vector(13 downto 0);
+		variable setpos_3    : std_logic_vector(13 downto 0);
+		variable setpos_4    : std_logic_vector(13 downto 0);
+		variable setpos_5    : std_logic_vector(13 downto 0);
+		variable setpos_6    : std_logic_vector(13 downto 0);
 		variable glow        : std_logic;
 
 	begin
@@ -437,47 +437,47 @@ begin
 
 		case mde is
 			when 10 =>                  --A
-				setpos_1 := ext_setpos_1;
-				setpos_2 := ext_setpos_2;
-				setpos_3 := ext_setpos_3;
-				setpos_4 := ext_setpos_4;
-				setpos_5 := ext_setpos_5;
-				setpos_6 := ext_setpos_6;
+				setpos_1 := ext_setpos_1(15 downto 2);
+				setpos_2 := ext_setpos_2(15 downto 2);
+				setpos_3 := ext_setpos_3(15 downto 2);
+				setpos_4 := ext_setpos_4(15 downto 2);
+				setpos_5 := ext_setpos_5(15 downto 2);
+				setpos_6 := ext_setpos_6(15 downto 2);
 			when 11 =>                  --B 
-				setpos_1 := setpos(1);
-				setpos_2 := setpos(2);
-				setpos_3 := setpos(3);
-				setpos_4 := setpos(4);
-				setpos_5 := setpos(5);
-				setpos_6 := setpos(6);
+				setpos_1 := setpos(1) & "000000";
+				setpos_2 := setpos(2) & "000000";
+				setpos_3 := setpos(3) & "000000";
+				setpos_4 := setpos(4) & "000000";
+				setpos_5 := setpos(5) & "000000";
+				setpos_6 := setpos(6) & "000000";
 			when 12 =>                  --C
-				setpos_1 := X"30";
-				setpos_2 := X"30";
-				setpos_3 := X"30";
-				setpos_4 := X"30";
-				setpos_5 := X"30";
-				setpos_6 := X"30";
+				setpos_1 := X"30" & "000000";
+				setpos_2 := X"30" & "000000";
+				setpos_3 := X"30" & "000000";
+				setpos_4 := X"30" & "000000";
+				setpos_5 := X"30" & "000000";
+				setpos_6 := X"30" & "000000";
 			when 13 =>                  --D
-				setpos_1 := X"80";
-				setpos_2 := X"80";
-				setpos_3 := X"80";
-				setpos_4 := X"80";
-				setpos_5 := X"80";
-				setpos_6 := X"80";
+				setpos_1 := X"80" & "000000";
+				setpos_2 := X"80" & "000000";
+				setpos_3 := X"80" & "000000";
+				setpos_4 := X"80" & "000000";
+				setpos_5 := X"80" & "000000";
+				setpos_6 := X"80" & "000000";
 			when 14 =>                  --E
-				setpos_1 := X"D0";
-				setpos_2 := X"D0";
-				setpos_3 := X"D0";
-				setpos_4 := X"D0";
-				setpos_5 := X"D0";
-				setpos_6 := X"D0";
+				setpos_1 := X"D0" & "000000";
+				setpos_2 := X"D0" & "000000";
+				setpos_3 := X"D0" & "000000";
+				setpos_4 := X"D0" & "000000";
+				setpos_5 := X"D0" & "000000";
+				setpos_6 := X"D0" & "000000";
 			when 15 =>                  --F
-				setpos_1 := demo_setpos_1;
-				setpos_2 := demo_setpos_2;
-				setpos_3 := demo_setpos_3;
-				setpos_4 := demo_setpos_4;
-				setpos_5 := demo_setpos_5;
-				setpos_6 := demo_setpos_6;
+				setpos_1 := demo_setpos_1 & "000000";
+				setpos_2 := demo_setpos_2 & "000000";
+				setpos_3 := demo_setpos_3 & "000000";
+				setpos_4 := demo_setpos_4 & "000000";
+				setpos_5 := demo_setpos_5 & "000000";
+				setpos_6 := demo_setpos_6 & "000000";
 			when others => null;
 		end case;
 
@@ -501,7 +501,7 @@ begin
 			when 11 =>
 				val_1 <= conv_std_logic_vector(i, 4) & "0000" & cnt(1) & cnt(2) & "0000" & cnt(3) & cnt(4) & "0000" & cnt(5) & cnt(6); --LCD line 2  1.6mm
 			when others =>
-				val_1 <= conv_std_logic_vector(i, 4) & "0000" & setpos_1 & setpos_2 & "0000" & setpos_3 & setpos_4 & "0000" & setpos_5 & setpos_6; --LCD line 2  1.6mm
+				val_1 <= conv_std_logic_vector(i, 4) & "0000" & setpos_1(13 downto 6) & setpos_2(13 downto 6) & "0000" & setpos_3(13 downto 6) & setpos_4(13 downto 6) & "0000" & setpos_5(13 downto 6) & setpos_6(13 downto 6); --LCD line 2  1.6mm
 				blank <= 0;
 		end case;
 		if sw3 = '1' then

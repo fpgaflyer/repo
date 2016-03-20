@@ -1,6 +1,6 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
-Project status: under development
+Project status: test fase
 
 Project description 
 Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brushless 
@@ -58,7 +58,7 @@ E: set position = 0xD0 (highest operational position)
 F: set position by demo generator: random sinusoidal movement of actuators, sinusoidal sequence is set
 to different offsets (pseudo random) each time the sim is activated with the run switch.  
 
-** serial data input is BIN format, 38400 Baud
+** serial data input is BIN2B (16 bits) format, 115200 Baud
 
 leds:			sim state:
 off			stop 
