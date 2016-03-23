@@ -644,7 +644,7 @@ begin
 			drv_man_5     => drv_man_5,
 			drv_man_6     => drv_man_6,
 			led           => led,
-			val_1         => val_1,
+			val_1         => open, --test
 			blank         => blank,
 			ext_setpos_1  => rx_2,
 			ext_setpos_2  => rx_3,
@@ -944,8 +944,14 @@ begin
 		);
 
 	-- additional statements  
-	val_0        <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
-	txd          <= '1';
+	--val_0        <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
+	
+	--TEST
+	val_0 <= "0000" & "0000" & rx_2(15 downto 8) & rx_3(15 downto 8) & "0000" & rx_4(15 downto 8) & rx_5(15 downto 8) & "0000" & rx_6(15 downto 8) & rx_7(15 downto 8); --LCD line1 
+	val_1 <= "0000" & "0000" & rx_2(7 downto 0)  & rx_3(7 downto 0)  & "0000" & rx_4(7 downto 0)  & rx_5(7 downto 0)  & "0000" & rx_6(7 downto 0)  & rx_7(7 downto 0); --LCD line2 
+	--TEST
+	
+		txd          <= '1';
 	motor_enable <= motorenable;
 
 	--StrataFLASH must be disabled to prevent it conflicting with the LCD display 
