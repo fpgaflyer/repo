@@ -15,10 +15,10 @@ entity serial_rx is
 end;
 
 architecture behav of serial_rx is
-	constant clkdiv   : std_logic_vector(8 downto 0) := "110110010"; --434 115200 BAUD @ 50MHZ
-	constant clkdiv2  : std_logic_vector(8 downto 0) := "011011001"; --217
+	constant clkdiv   : std_logic_vector(10 downto 0) := "10100010110"; --1302 38400BAUD @ 50MHZ
+	constant clkdiv2  : std_logic_vector(10 downto 0) := "01010001011"; --651
 	signal rx_d       : std_logic;
-	signal rx_brdcnt  : std_logic_vector(8 downto 0);
+	signal rx_brdcnt  : std_logic_vector(10 downto 0);
 	signal rx_datacnt : std_logic_vector(2 downto 0);
 	type t_sm is (init, edge_detect, start, data, stop, ready);
 	signal sm : t_sm;

@@ -17,7 +17,7 @@ entity controller is
 		 home_en     : in  std_logic;
 		 kp          : in  std_logic_vector(3 downto 0);
 		 home_sensor : in  std_logic;
-		 set_pos     : in  std_logic_vector(13 downto 0); -- 25um 0-41cm
+		 set_pos     : in  std_logic_vector(7 downto 0); -- 1.6mm 0-41cm
 		 drv_mode    : in  std_logic;
 		 drv_man     : in  std_logic_vector(10 downto 0);
 		 speed_limit : in  std_logic_vector(9 downto 0);
@@ -70,7 +70,7 @@ architecture structure of controller is
 			 reset        : in  std_logic;
 			 sync_20ms    : in  std_logic;
 			 kp           : in  std_logic_vector(3 downto 0);
-			 setpos       : in  std_logic_vector(13 downto 0);
+			 setpos       : in  std_logic_vector(7 downto 0);
 			 pos          : in  std_logic_vector(13 downto 0);
 			 speed_limit  : in  std_logic_vector(9 downto 0);
 			 drive        : out std_logic_vector(10 downto 0);
@@ -160,7 +160,7 @@ begin
 			reset        => reset,
 			sync_20ms    => sync_20ms,
 			kp           => kp,
-			setpos       => set_pos,    --25um 0-41cm
+			setpos       => set_pos,    --1.6mm 0-41cm  
 			pos          => pos_out(13 downto 0), --25um 0-41cm
 			speed_limit  => speed_limit,
 			drive        => drv_in,

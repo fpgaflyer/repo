@@ -121,7 +121,7 @@ architecture structure of top_flightsim_controller_n is
 			 home_en     : in  std_logic;
 			 kp          : in  std_logic_vector(3 downto 0);
 			 home_sensor : in  std_logic;
-			 set_pos     : in  std_logic_vector(13 downto 0);
+			 set_pos     : in  std_logic_vector(7 downto 0);
 			 drv_mode    : in  std_logic;
 			 drv_man     : in  std_logic_vector(10 downto 0);
 			 speed_limit : in  std_logic_vector(9 downto 0);
@@ -150,12 +150,12 @@ architecture structure of top_flightsim_controller_n is
 			 start         : out std_logic;
 			 home_enable   : out std_logic;
 			 kp            : out std_logic_vector(3 downto 0);
-			 set_pos_1     : out std_logic_vector(13 downto 0);
-			 set_pos_2     : out std_logic_vector(13 downto 0);
-			 set_pos_3     : out std_logic_vector(13 downto 0);
-			 set_pos_4     : out std_logic_vector(13 downto 0);
-			 set_pos_5     : out std_logic_vector(13 downto 0);
-			 set_pos_6     : out std_logic_vector(13 downto 0);
+			 set_pos_1     : out std_logic_vector(7 downto 0);
+			 set_pos_2     : out std_logic_vector(7 downto 0);
+			 set_pos_3     : out std_logic_vector(7 downto 0);
+			 set_pos_4     : out std_logic_vector(7 downto 0);
+			 set_pos_5     : out std_logic_vector(7 downto 0);
+			 set_pos_6     : out std_logic_vector(7 downto 0);
 			 drv_mode      : out std_logic;
 			 drv_man_1     : out std_logic_vector(10 downto 0);
 			 drv_man_2     : out std_logic_vector(10 downto 0);
@@ -166,12 +166,12 @@ architecture structure of top_flightsim_controller_n is
 			 led           : out std_logic_vector(7 downto 0);
 			 val_1         : out std_logic_vector(63 downto 0);
 			 blank         : out integer range 0 to 6;
-			 ext_setpos_1  : in  std_logic_vector(15 downto 0);
-			 ext_setpos_2  : in  std_logic_vector(15 downto 0);
-			 ext_setpos_3  : in  std_logic_vector(15 downto 0);
-			 ext_setpos_4  : in  std_logic_vector(15 downto 0);
-			 ext_setpos_5  : in  std_logic_vector(15 downto 0);
-			 ext_setpos_6  : in  std_logic_vector(15 downto 0);
+			 ext_setpos_1  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_2  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_3  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_4  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_5  : in  std_logic_vector(7 downto 0);
+			 ext_setpos_6  : in  std_logic_vector(7 downto 0);
 			 demo_setpos_1 : in  std_logic_vector(7 downto 0);
 			 demo_setpos_2 : in  std_logic_vector(7 downto 0);
 			 demo_setpos_3 : in  std_logic_vector(7 downto 0);
@@ -225,13 +225,13 @@ architecture structure of top_flightsim_controller_n is
 			 reset         : in  std_logic;
 			 rx_data       : in  std_logic_vector(7 downto 0);
 			 rx_data_valid : in  std_logic;
-			 rx_1          : out std_logic_vector(7 downto 0);
-			 rx_2          : out std_logic_vector(15 downto 0);
-			 rx_3          : out std_logic_vector(15 downto 0);
-			 rx_4          : out std_logic_vector(15 downto 0);
-			 rx_5          : out std_logic_vector(15 downto 0);
-			 rx_6          : out std_logic_vector(15 downto 0);
-			 rx_7          : out std_logic_vector(15 downto 0);
+			 byte_1        : out std_logic_vector(7 downto 0);
+			 byte_2        : out std_logic_vector(7 downto 0);
+			 byte_3        : out std_logic_vector(7 downto 0);
+			 byte_4        : out std_logic_vector(7 downto 0);
+			 byte_5        : out std_logic_vector(7 downto 0);
+			 byte_6        : out std_logic_vector(7 downto 0);
+			 byte_7        : out std_logic_vector(7 downto 0);
 			 com_error     : out std_logic);
 	end component serial_rx_dec_n;
 
@@ -327,6 +327,23 @@ architecture structure of top_flightsim_controller_n is
 			 web   : in  std_logic);
 	end component bram_2048x128;
 
+	component moving_avg_filter
+		port(clk   : in  std_logic;
+			 reset : in  std_logic;
+			 in_1  : in  std_logic_vector(7 downto 0);
+			 in_2  : in  std_logic_vector(7 downto 0);
+			 in_3  : in  std_logic_vector(7 downto 0);
+			 in_4  : in  std_logic_vector(7 downto 0);
+			 in_5  : in  std_logic_vector(7 downto 0);
+			 in_6  : in  std_logic_vector(7 downto 0);
+			 out_1 : out std_logic_vector(7 downto 0);
+			 out_2 : out std_logic_vector(7 downto 0);
+			 out_3 : out std_logic_vector(7 downto 0);
+			 out_4 : out std_logic_vector(7 downto 0);
+			 out_5 : out std_logic_vector(7 downto 0);
+			 out_6 : out std_logic_vector(7 downto 0));
+	end component moving_avg_filter;
+
 	-- declaration of signals used to interconnect 
 
 	signal reset           : std_logic;
@@ -353,12 +370,12 @@ architecture structure of top_flightsim_controller_n is
 	signal kp              : std_logic_vector(3 downto 0);
 	signal start           : std_logic;
 	signal home_enable     : std_logic;
-	signal set_pos_1       : std_logic_vector(13 downto 0);
-	signal set_pos_2       : std_logic_vector(13 downto 0);
-	signal set_pos_3       : std_logic_vector(13 downto 0);
-	signal set_pos_4       : std_logic_vector(13 downto 0);
-	signal set_pos_5       : std_logic_vector(13 downto 0);
-	signal set_pos_6       : std_logic_vector(13 downto 0);
+	signal set_pos_1       : std_logic_vector(7 downto 0);
+	signal set_pos_2       : std_logic_vector(7 downto 0);
+	signal set_pos_3       : std_logic_vector(7 downto 0);
+	signal set_pos_4       : std_logic_vector(7 downto 0);
+	signal set_pos_5       : std_logic_vector(7 downto 0);
+	signal set_pos_6       : std_logic_vector(7 downto 0);
 	signal drv_mode        : std_logic;
 	signal drv_man_1       : std_logic_vector(10 downto 0);
 	signal drv_man_2       : std_logic_vector(10 downto 0);
@@ -380,12 +397,12 @@ architecture structure of top_flightsim_controller_n is
 	signal home_sensor_6_f : std_logic;
 	signal rx_data         : std_logic_vector(7 downto 0);
 	signal rx_data_valid   : std_logic;
-	signal rx_2            : std_logic_vector(15 downto 0);
-	signal rx_3            : std_logic_vector(15 downto 0);
-	signal rx_4            : std_logic_vector(15 downto 0);
-	signal rx_5            : std_logic_vector(15 downto 0);
-	signal rx_6            : std_logic_vector(15 downto 0);
-	signal rx_7            : std_logic_vector(15 downto 0);
+	signal byte_2          : std_logic_vector(7 downto 0);
+	signal byte_3          : std_logic_vector(7 downto 0);
+	signal byte_4          : std_logic_vector(7 downto 0);
+	signal byte_5          : std_logic_vector(7 downto 0);
+	signal byte_6          : std_logic_vector(7 downto 0);
+	signal byte_7          : std_logic_vector(7 downto 0);
 	signal rxd_fil         : std_logic;
 	signal demo_setpos_1   : std_logic_vector(7 downto 0);
 	signal demo_setpos_2   : std_logic_vector(7 downto 0);
@@ -424,6 +441,12 @@ architecture structure of top_flightsim_controller_n is
 	signal drv_log_5       : std_logic_vector(3 downto 0);
 	signal drv_log_6       : std_logic_vector(3 downto 0);
 	signal motorenable     : std_logic;
+	signal byte_avg_2      : std_logic_vector(7 downto 0);
+	signal byte_avg_3      : std_logic_vector(7 downto 0);
+	signal byte_avg_4      : std_logic_vector(7 downto 0);
+	signal byte_avg_5      : std_logic_vector(7 downto 0);
+	signal byte_avg_6      : std_logic_vector(7 downto 0);
+	signal byte_avg_7      : std_logic_vector(7 downto 0);
 
 begin
 	-- component instantiations statements
@@ -646,12 +669,12 @@ begin
 			led           => led,
 			val_1         => val_1,
 			blank         => blank,
-			ext_setpos_1  => rx_2,
-			ext_setpos_2  => rx_3,
-			ext_setpos_3  => rx_4,
-			ext_setpos_4  => rx_5,
-			ext_setpos_5  => rx_6,
-			ext_setpos_6  => rx_7,
+			ext_setpos_1  => byte_avg_2,
+			ext_setpos_2  => byte_avg_3,
+			ext_setpos_3  => byte_avg_4,
+			ext_setpos_4  => byte_avg_5,
+			ext_setpos_5  => byte_avg_6,
+			ext_setpos_6  => byte_avg_7,
 			demo_setpos_1 => demo_setpos_1,
 			demo_setpos_2 => demo_setpos_2,
 			demo_setpos_3 => demo_setpos_3,
@@ -835,13 +858,13 @@ begin
 			reset         => reset,
 			rx_data       => rx_data,
 			rx_data_valid => rx_data_valid,
-			rx_1          => open,
-			rx_2          => rx_2,
-			rx_3          => rx_3,
-			rx_4          => rx_4,
-			rx_5          => rx_5,
-			rx_6          => rx_6,
-			rx_7          => rx_7,
+			byte_1        => open,
+			byte_2        => byte_2,
+			byte_3        => byte_3,
+			byte_4        => byte_4,
+			byte_5        => byte_5,
+			byte_6        => byte_6,
+			byte_7        => byte_7,
 			com_error     => com_error
 		);
 
@@ -888,12 +911,12 @@ begin
 			position_4      => position_4,
 			position_5      => position_5,
 			position_6      => position_6,
-			set_pos_1       => set_pos_1(13 downto 6),
-			set_pos_2       => set_pos_2(13 downto 6),
-			set_pos_3       => set_pos_3(13 downto 6),
-			set_pos_4       => set_pos_4(13 downto 6),
-			set_pos_5       => set_pos_5(13 downto 6),
-			set_pos_6       => set_pos_6(13 downto 6),
+			set_pos_1       => set_pos_1,
+			set_pos_2       => set_pos_2,
+			set_pos_3       => set_pos_3,
+			set_pos_4       => set_pos_4,
+			set_pos_5       => set_pos_5,
+			set_pos_6       => set_pos_6,
 			drv_log_1       => drv_log_1,
 			drv_log_2       => drv_log_2,
 			drv_log_3       => drv_log_3,
@@ -943,7 +966,25 @@ begin
 			web   => web
 		);
 
-	-- additional statements  
+	A37 : moving_avg_filter
+		port map(
+			clk   => sync_20ms,
+			reset => reset,
+			in_1  => byte_2,
+			in_2  => byte_3,
+			in_3  => byte_4,
+			in_4  => byte_5,
+			in_5  => byte_6,
+			in_6  => byte_7,
+			out_1 => byte_avg_2,
+			out_2 => byte_avg_3,
+			out_3 => byte_avg_4,
+			out_4 => byte_avg_5,
+			out_5 => byte_avg_6,
+			out_6 => byte_avg_7
+		);
+
+	-- additional statements 
 	val_0        <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
 	txd          <= '1';
 	motor_enable <= motorenable;

@@ -9,7 +9,7 @@ entity p_controller_n is
 		reset        : in  std_logic;
 		sync_20ms    : in  std_logic;
 		kp           : in  std_logic_vector(3 downto 0);
-		setpos       : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
+		setpos       : in  std_logic_vector(7 downto 0); --1.6mm unit, range 0-41cm
 		pos          : in  std_logic_vector(13 downto 0); --25um unit, range 0-41cm
 		speed_limit  : in  std_logic_vector(9 downto 0); --drive limit 0 - 1000
 		drive        : out std_logic_vector(10 downto 0); -- -1000 / +1000
@@ -53,7 +53,7 @@ begin
 			err          <= '0';
 			setpos_error <= '0';
 
-			e <= ('0' & setpos) - ('0' & pos); -- setpos - pos
+			e <= ('0' & setpos & "000000") - ('0' & pos); -- setpos - pos
 
 			if e(14) = '1' then         --neg
 				e_abs <= (not e(13 downto 0)) + 1;
@@ -93,7 +93,7 @@ begin
 			end if;
 			loop_error <= cnt_20ms(6);
 
-			if setpos(13 downto 6) > X"E0" or setpos(13 downto 6) < X"20" then --setpos_error
+			if setpos > X"E0" or setpos < X"20" then --setpos_error
 				setpos_error <= '1';
 			end if;
 

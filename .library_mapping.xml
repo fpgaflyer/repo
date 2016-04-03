@@ -29,6 +29,7 @@
   <Mappings Location="vhdl/kcuart_tx.vhd" Library="work"/>
   <Mappings Location="vhdl/lcd_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/log_serial_tx.vhd" Library="work"/>
+  <Mappings Location="vhdl/moving_avg_filter.vhd" Library="work"/>
   <Mappings Location="vhdl/p_controller_n.vhd" Library="work"/>
   <Mappings Location="vhdl/ramp_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/readpos.vhd" Library="work"/>
@@ -43,6 +44,7 @@
   <Mappings Location="vhdl/tb_datalog_n.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_demo_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_interpol.vhd" Library="work"/>
+  <Mappings Location="vhdl/tb_moving_avg_filter.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_ramp_gen.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_readpos.vhd" Library="work"/>
   <Mappings Location="vhdl/tb_sinus_rom.vhd" Library="work"/>

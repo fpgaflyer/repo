@@ -58,7 +58,7 @@ E: set position = 0xD0 (highest operational position)
 F: set position by demo generator: random sinusoidal movement of actuators, sinusoidal sequence is set
 to different offsets (pseudo random) each time the sim is activated with the run switch.  
 
-** serial data input is BIN2B (16 bits) format, 115200 Baud
+** serial data input is BIN (8 bits) format, 38400 Baud
 
 leds:			sim state:
 off			stop 
@@ -113,6 +113,8 @@ sinus.xls: sinus table for sinus/demo
 singularity_detector: detector for singular situations
 data_logger_n: stores all position,setposition,drive and homesensor data each 2ms for 4.096 seconds (circular buffer)
 log_serial_tx: serial datalogger output 38400Baud to PC: 2048 lines x 16 bytes  
+moving_avg_filter: moving average filter added to set pos via serial input to smooth movements due 
+too large BFF driver processing time (>60ms) 
 
 dumplog: application to readout serial datalog, with example datafile and excellsheet to display data 
 
