@@ -34,29 +34,15 @@ entity top_flightsim_controller_n is
 		 buzzer         : out std_logic;
 
 		 home_sensor_1  : in  std_logic;
-		 home_sensor_2  : in  std_logic;
-		 home_sensor_3  : in  std_logic;
-		 home_sensor_4  : in  std_logic;
-		 home_sensor_5  : in  std_logic;
-		 home_sensor_6  : in  std_logic;
-
+	
 		 serial_in_1    : in  std_logic;
-		 serial_in_2    : in  std_logic;
-		 serial_in_3    : in  std_logic;
-		 serial_in_4    : in  std_logic;
-		 serial_in_5    : in  std_logic;
-		 serial_in_6    : in  std_logic;
-
+		
 		 serial_out_1   : out std_logic;
-		 serial_out_2   : out std_logic;
-		 serial_out_3   : out std_logic;
-		 serial_out_4   : out std_logic;
-		 serial_out_5   : out std_logic;
-		 serial_out_6   : out std_logic;
+		
 
 		 rxd            : in  std_logic;
-		 txd            : out std_logic;
-		 log_txd        : out std_logic
+		 txd            : out std_logic
+	--	 log_txd        : out std_logic
 	);
 end;
 
@@ -531,7 +517,7 @@ begin
 			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
-			serial_in   => serial_in_2,
+			serial_in   => serial_in_1,
 			home_en     => home_enable,
 			kp          => kp,
 			home_sensor => home_sensor_2_f,
@@ -540,7 +526,7 @@ begin
 			drv_man     => drv_man_2,
 			speed_limit => speed_limit,
 			position    => position_2,
-			serial_out  => serial_out_2,
+			serial_out  => open,
 			errors      => errors_2,
 			drv_log     => drv_log_2
 		);
@@ -553,7 +539,7 @@ begin
 			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
-			serial_in   => serial_in_3,
+			serial_in   => serial_in_1,
 			home_en     => home_enable,
 			kp          => kp,
 			home_sensor => home_sensor_3_f,
@@ -562,7 +548,7 @@ begin
 			drv_man     => drv_man_3,
 			speed_limit => speed_limit,
 			position    => position_3,
-			serial_out  => serial_out_3,
+			serial_out  => open,
 			errors      => errors_3,
 			drv_log     => drv_log_3
 		);
@@ -575,7 +561,7 @@ begin
 			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
-			serial_in   => serial_in_4,
+			serial_in   => serial_in_1,
 			home_en     => home_enable,
 			kp          => kp,
 			home_sensor => home_sensor_4_f,
@@ -584,7 +570,7 @@ begin
 			drv_man     => drv_man_4,
 			speed_limit => speed_limit,
 			position    => position_4,
-			serial_out  => serial_out_4,
+			serial_out  => open,
 			errors      => errors_4,
 			drv_log     => drv_log_4
 		);
@@ -597,7 +583,7 @@ begin
 			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
-			serial_in   => serial_in_5,
+			serial_in   => serial_in_1,
 			home_en     => home_enable,
 			kp          => kp,
 			home_sensor => home_sensor_5_f,
@@ -606,7 +592,7 @@ begin
 			drv_man     => drv_man_5,
 			speed_limit => speed_limit,
 			position    => position_5,
-			serial_out  => serial_out_5,
+			serial_out  => open,
 			errors      => errors_5,
 			drv_log     => drv_log_5
 		);
@@ -619,7 +605,7 @@ begin
 			sync_20ms   => sync_20ms,
 			start       => start,
 			en_16xbaud  => en_16xbaud,
-			serial_in   => serial_in_6,
+			serial_in   => serial_in_1,
 			home_en     => home_enable,
 			kp          => kp,
 			home_sensor => home_sensor_6_f,
@@ -628,7 +614,7 @@ begin
 			drv_man     => drv_man_6,
 			speed_limit => speed_limit,
 			position    => position_6,
-			serial_out  => serial_out_6,
+			serial_out  => open,
 			errors      => errors_6,
 			drv_log     => drv_log_6
 		);
@@ -791,7 +777,7 @@ begin
 		port map(clk      => clk,
 			     sync_2ms => sync_2ms,
 			     reset    => reset,
-			     i        => home_sensor_2,
+			     i        => home_sensor_1,
 			     o        => home_sensor_2_f
 		);
 
@@ -799,7 +785,7 @@ begin
 		port map(clk      => clk,
 			     sync_2ms => sync_2ms,
 			     reset    => reset,
-			     i        => home_sensor_3,
+			     i        => home_sensor_1,
 			     o        => home_sensor_3_f
 		);
 
@@ -807,7 +793,7 @@ begin
 		port map(clk      => clk,
 			     sync_2ms => sync_2ms,
 			     reset    => reset,
-			     i        => home_sensor_4,
+			     i        => home_sensor_1,
 			     o        => home_sensor_4_f
 		);
 
@@ -815,7 +801,7 @@ begin
 		port map(clk      => clk,
 			     sync_2ms => sync_2ms,
 			     reset    => reset,
-			     i        => home_sensor_5,
+			     i        => home_sensor_1,
 			     o        => home_sensor_5_f
 		);
 
@@ -823,7 +809,7 @@ begin
 		port map(clk      => clk,
 			     sync_2ms => sync_2ms,
 			     reset    => reset,
-			     i        => home_sensor_6,
+			     i        => home_sensor_1,
 			     o        => home_sensor_6_f
 		);
 
@@ -951,7 +937,7 @@ begin
 			reset      => reset,
 			tx_data    => log_data,
 			start_send => data_rdy,
-			tx         => log_txd,
+			tx         => open,
 			nxt_data   => nxt_data
 		);
 

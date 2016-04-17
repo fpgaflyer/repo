@@ -1,6 +1,7 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
-Project status: test fase
+>>>> SPECIAL VERSION ONLY FOR TEST A SINGLE CONTROLLER (NR1) ON SERIAL DTE CONNECTOR <<<<<<
+Project status: test fase 
 
 Project description 
 Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brushless 
@@ -8,7 +9,11 @@ Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brush
 
 
 Speed control loop implemented on SBL1360 controller:
-configuration settings = profile_roboteq/Profile.xml 
+configuration settings = profile_roboteq/Profile_test.xml 
+add to profile roboteq:
+^ECHOF 1	(disable character echo)
+^DINA 4 19	(set input4 to dead man switch / motor stop)
+%EESAV		(save configuration)
 microBasic script = scripts_roboteq/dec2hex.mbs MicroBasic script sents every ms the absolute encoder value 
 in hexadecimal format (25um steps, only positive values !)
 

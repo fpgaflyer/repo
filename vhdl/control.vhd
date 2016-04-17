@@ -438,18 +438,18 @@ begin
 		case mde is
 			when 10 =>                  --A
 				setpos_1 := ext_setpos_1;
-				setpos_2 := ext_setpos_2;
-				setpos_3 := ext_setpos_3;
-				setpos_4 := ext_setpos_4;
-				setpos_5 := ext_setpos_5;
-				setpos_6 := ext_setpos_6;
+				setpos_2 := ext_setpos_1;
+				setpos_3 := ext_setpos_1;
+				setpos_4 := ext_setpos_1;
+				setpos_5 := ext_setpos_1;
+				setpos_6 := ext_setpos_1;
 			when 11 =>                  --B 
 				setpos_1 := setpos(1);
-				setpos_2 := setpos(2);
-				setpos_3 := setpos(3);
-				setpos_4 := setpos(4);
-				setpos_5 := setpos(5);
-				setpos_6 := setpos(6);
+				setpos_2 := setpos(1);
+				setpos_3 := setpos(1);
+				setpos_4 := setpos(1);
+				setpos_5 := setpos(1);
+				setpos_6 := setpos(1);
 			when 12 =>                  --C
 				setpos_1 := X"30";
 				setpos_2 := X"30";
@@ -473,11 +473,11 @@ begin
 				setpos_6 := X"D0";
 			when 15 =>                  --F
 				setpos_1 := demo_setpos_1;
-				setpos_2 := demo_setpos_2;
-				setpos_3 := demo_setpos_3;
-				setpos_4 := demo_setpos_4;
-				setpos_5 := demo_setpos_5;
-				setpos_6 := demo_setpos_6;
+				setpos_2 := demo_setpos_1;
+				setpos_3 := demo_setpos_1;
+				setpos_4 := demo_setpos_1;
+				setpos_5 := demo_setpos_1;
+				setpos_6 := demo_setpos_1;
 			when others => null;
 		end case;
 

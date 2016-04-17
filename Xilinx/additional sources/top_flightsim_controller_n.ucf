@@ -39,15 +39,15 @@ NET "sw2" LOC = "H18" | IOSTANDARD = LVTTL | PULLUP ;
 NET "sw3" LOC = "N17" | IOSTANDARD = LVTTL | PULLUP ;
 
 # Header J2 
-# NET "home_sensor_1" LOC = "A6" | IOSTANDARD = LVTTL ;
+NET "home_sensor_1" LOC = "A6" | IOSTANDARD = LVTTL ;
 
 # FX2 CONNECTOR
-NET "home_sensor_1" LOC = "A13" | IOSTANDARD = LVTTL ;
-NET "home_sensor_2" LOC = "B13" | IOSTANDARD = LVTTL ;
-NET "home_sensor_3" LOC = "A14" | IOSTANDARD = LVTTL ;
-NET "home_sensor_4" LOC = "B14" | IOSTANDARD = LVTTL ;
-NET "home_sensor_5" LOC = "C14" | IOSTANDARD = LVTTL ;
-NET "home_sensor_6" LOC = "D14" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_1" LOC = "A13" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_2" LOC = "B13" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_3" LOC = "A14" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_4" LOC = "B14" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_5" LOC = "C14" | IOSTANDARD = LVTTL ;
+# NET "home_sensor_6" LOC = "D14" | IOSTANDARD = LVTTL ;
 
 # LEDs 
 NET "led<0>" LOC = "F12" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
@@ -60,39 +60,47 @@ NET "led<6>" LOC = "E9" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
 NET "led<7>" LOC = "F9" | IOSTANDARD = LVTTL | SLEW = SLOW | DRIVE = 8 ;
 
 # RS-232 Serial Ports DTE male 
-# NET "serial_out_1" LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-# NET "serial_in_1"  LOC = "U8" | IOSTANDARD = LVTTL ;
+NET "serial_out_1" LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+NET "serial_in_1"  LOC = "U8" | IOSTANDARD = LVTTL ;
 
 # RS-232 Serial Ports FX2 CONNECTOR via MAX3232 
-NET "serial_out_1" LOC = "B4" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_1"  LOC = "A4" | IOSTANDARD = LVTTL ;
+# NET "serial_out_1" LOC = "B4" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_1"  LOC = "A4" | IOSTANDARD = LVTTL ;
 
-NET "serial_out_2" LOC = "D5" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_2"  LOC = "C5" | IOSTANDARD = LVTTL ;
+# NET "serial_out_2" LOC = "D5" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_2"  LOC = "C5" | IOSTANDARD = LVTTL ;
 
-NET "serial_out_3" LOC = "A6" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_3"  LOC = "B6" | IOSTANDARD = LVTTL ;
+# NET "serial_out_3" LOC = "A6" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_3"  LOC = "B6" | IOSTANDARD = LVTTL ;
 
-NET "serial_out_4" LOC = "E7" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_4"  LOC = "F7" | IOSTANDARD = LVTTL ;
+# NET "serial_out_4" LOC = "E7" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_4"  LOC = "F7" | IOSTANDARD = LVTTL ;
 
-NET "serial_out_5" LOC = "D7" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_5"  LOC = "C7" | IOSTANDARD = LVTTL ;
+# NET "serial_out_5" LOC = "D7" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_5"  LOC = "C7" | IOSTANDARD = LVTTL ;
 
-NET "serial_out_6" LOC = "F8" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "serial_in_6"  LOC = "E8" | IOSTANDARD = LVTTL ;
+# NET "serial_out_6" LOC = "F8" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "serial_in_6"  LOC = "E8" | IOSTANDARD = LVTTL ;
 
 # RS-232 Serial Ports: DCE female position data from PC, DTE male log data to PC
 NET "rxd"  		LOC = "R7"  | IOSTANDARD = LVTTL ;  
 NET "txd"  		LOC = "M14" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "log_txd"  	LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ; 
+# NET "log_txd"  	LOC = "M13" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ; 
 
 # run_switch, reset_button, motor_enable, power_off, buzzer via FX2 CONNECTOR  
-NET "run_switch"  	LOC = "B11" | IOSTANDARD = LVTTL ;
-NET "reset_button"  LOC = "A8" | IOSTANDARD = LVTTL ;
-NET "motor_enable" 	LOC = "C4" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "power_off" 	LOC = "G9" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
-NET "buzzer" 		LOC = "C3" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "run_switch"  	LOC = "B11" | IOSTANDARD = LVTTL ;
+# NET "reset_button"  	LOC = "A8"  | IOSTANDARD = LVTTL ;
+# NET "motor_enable" 	LOC = "C4"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+# NET "power_off" 		LOC = "G9"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+NET "buzzer" 			LOC = "C3"  | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+
+# run_switch, reset_button, motor_enable, power_off via J1  
+NET "run_switch"  	LOC = "B4" | IOSTANDARD = LVTTL ;
+NET "reset_button"  LOC = "A4" | IOSTANDARD = LVTTL ;
+NET "motor_enable" 	LOC = "D5" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+NET "power_off" 	LOC = "C5" | IOSTANDARD = LVTTL | DRIVE = 8 | SLEW = SLOW ;
+
+
 
 # End of File
 
