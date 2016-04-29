@@ -1,6 +1,6 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
->>>> SPECIAL VERSION ONLY FOR TEST A SINGLE CONTROLLER (NR1) ON SERIAL DTE CONNECTOR <<<<<<
+>>>> SPECIAL VERSION ONLY FOR TEST A SINGLE CONTROLLER (NR1) @24V ON SERIAL DTE CONNECTOR <<<<<<
 Project status: test fase 
 
 Project description 

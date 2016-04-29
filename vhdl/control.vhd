@@ -415,16 +415,16 @@ begin
 				drv_mode <= '0';        -- speed mode
 				if btn_north = '1' then
 					gohome    <= '0';
-					drvman(i) := "00000110010"; --  +50
+					drvman(i) := "00000011001"; --  +25 (24V)
 				end if;
 				if btn_south = '1' then
 					gohome    <= '0';
-					drvman(i) := "11111001110"; -- -50
+					drvman(i) := "11111100111"; -- -25  (24V)
 				end if;
 				if gohome = '1' then    -- bring platform down to lowest position
 					for j in 1 to 6 loop
 						if homesensors(j) = '1' then
-							drvman(j) := "11111001110"; -- -50
+							drvman(j) := "11111100111"; -- -25 (24V)
 						end if;
 					end loop;
 				end if;
