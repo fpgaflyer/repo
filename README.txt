@@ -1,6 +1,6 @@
 Project: Flightsimulator controller VHDL code to control Brushless DC motors for a 6DOF moving platform
 
-Project status: test fase
+Project status: test fase for 24V
 
 Project description 
 Code running on Xilinx FPGA Starter Kit Board to drive six Roboteq SBL1360 Brushless 
@@ -12,7 +12,7 @@ configuration settings = profile_roboteq/Profile.xml
 microBasic script = scripts_roboteq/dec2hex.mbs MicroBasic script sents every ms the absolute encoder value 
 in hexadecimal format (25um steps, only positive values !)
 
-Position control loop implemented in FPGA:
+Position control loop implemented in FPGA, kp = control loop gain 0 - 3 (SW0,SW1)  
 
 Serial out: !G runtime commands to SBL1360
 Serial in: actual position motor axis from SBL1360
@@ -46,7 +46,7 @@ Press external reset_button for:
 motor_enable: signal to roboteq motor controller, low will stop motor 
 power_off: signal disables power to motor controllers   
 
-SW0,SW1,SW2 sets kp value 0..7, kp value is displayed on LCD upper left corner digit
+SW0,SW1 sets kp value 0..3, kp value is displayed on LCD upper left corner digit
 SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
 
 mode:

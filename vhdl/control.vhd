@@ -9,7 +9,6 @@ entity control is
 		reset         : in  std_logic;
 		sync_2ms      : in  std_logic;
 		sync_20ms     : in  std_logic;
-
 		rotary_event  : in  std_logic;
 		rotary_left   : in  std_logic;
 		press         : in  std_logic;
@@ -21,47 +20,38 @@ entity control is
 		sw1           : in  std_logic;
 		sw2           : in  std_logic;
 		sw3           : in  std_logic;
-
 		start         : out std_logic;
 		home_enable   : out std_logic;
 		kp            : out std_logic_vector(3 downto 0);
-
 		set_pos_1     : out std_logic_vector(7 downto 0);
 		set_pos_2     : out std_logic_vector(7 downto 0);
 		set_pos_3     : out std_logic_vector(7 downto 0);
 		set_pos_4     : out std_logic_vector(7 downto 0);
 		set_pos_5     : out std_logic_vector(7 downto 0);
 		set_pos_6     : out std_logic_vector(7 downto 0);
-
 		drv_mode      : out std_logic;
-
 		drv_man_1     : out std_logic_vector(10 downto 0);
 		drv_man_2     : out std_logic_vector(10 downto 0);
 		drv_man_3     : out std_logic_vector(10 downto 0);
 		drv_man_4     : out std_logic_vector(10 downto 0);
 		drv_man_5     : out std_logic_vector(10 downto 0);
 		drv_man_6     : out std_logic_vector(10 downto 0);
-
 		led           : out std_logic_vector(7 downto 0);
 		val_1         : out std_logic_vector(63 downto 0);
 		blank         : out integer range 0 to 6;
-
 		ext_setpos_1  : in  std_logic_vector(7 downto 0);
 		ext_setpos_2  : in  std_logic_vector(7 downto 0);
 		ext_setpos_3  : in  std_logic_vector(7 downto 0);
 		ext_setpos_4  : in  std_logic_vector(7 downto 0);
 		ext_setpos_5  : in  std_logic_vector(7 downto 0);
 		ext_setpos_6  : in  std_logic_vector(7 downto 0);
-
 		demo_setpos_1 : in  std_logic_vector(7 downto 0);
 		demo_setpos_2 : in  std_logic_vector(7 downto 0);
 		demo_setpos_3 : in  std_logic_vector(7 downto 0);
 		demo_setpos_4 : in  std_logic_vector(7 downto 0);
 		demo_setpos_5 : in  std_logic_vector(7 downto 0);
 		demo_setpos_6 : in  std_logic_vector(7 downto 0);
-
 		calc_offsets  : out std_logic;
-
 		errors_1      : in  std_logic_vector(4 downto 0);
 		errors_2      : in  std_logic_vector(4 downto 0);
 		errors_3      : in  std_logic_vector(4 downto 0);
@@ -70,24 +60,20 @@ entity control is
 		errors_6      : in  std_logic_vector(4 downto 0);
 		singul_error  : in  std_logic;
 		com_error     : in  std_logic;
-
 		home_sensor_1 : in  std_logic;
 		home_sensor_2 : in  std_logic;
 		home_sensor_3 : in  std_logic;
 		home_sensor_4 : in  std_logic;
 		home_sensor_5 : in  std_logic;
 		home_sensor_6 : in  std_logic;
-
 		run_switch    : in  std_logic;
 		reset_button  : in  std_logic;
 		motor_enable  : out std_logic;
 		power_off     : out std_logic;
 		buzzer        : out std_logic;
-
 		log_enable    : out std_logic;
 		send_log      : out std_logic;
 		tx_datalog    : in  std_logic;
-
 		speed_limit   : out std_logic_vector(9 downto 0)
 	);
 end;
@@ -415,16 +401,16 @@ begin
 				drv_mode <= '0';        -- speed mode
 				if btn_north = '1' then
 					gohome    <= '0';
-					drvman(i) := "00000110010"; --  +50
+					drvman(i) := "00000011001"; --  +25 (24V)
 				end if;
 				if btn_south = '1' then
 					gohome    <= '0';
-					drvman(i) := "11111001110"; -- -50
+					drvman(i) := "11111100111"; -- -25  (24V)
 				end if;
 				if gohome = '1' then    -- bring platform down to lowest position
 					for j in 1 to 6 loop
 						if homesensors(j) = '1' then
-							drvman(j) := "11111001110"; -- -50
+							drvman(j) := "11111100111"; -- -25 (24V)
 						end if;
 					end loop;
 				end if;
@@ -495,7 +481,7 @@ begin
 		set_pos_5 <= setpos_5;
 		set_pos_6 <= setpos_6;
 
-		kp <= '0' & sw2 & sw1 & sw0;
+		kp <= '0' & '0' & sw1 & sw0;
 
 		case mde is
 			when 11 =>
