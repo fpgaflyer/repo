@@ -26,7 +26,7 @@ This safety feature cuts the power (power_off) and is only active during rampup 
 Rotary switch to set motor_axis position in 1.6mm steps (range 00 - FF), selected LCD display blinks
 Rotary Push_Button will enter set position, selected LCD display stops blinking
 
-Button north/south enables manual control in speed mode, north = speed +50 (up), south = speed -50 (down)
+Button north/south enables manual control in speed mode, north = speed +25 (up), south = speed -25 (down)
 Button west/east (SW3 = 0):	select controller 1 to 6, index is displayed on LCD lower left corner digit
 Button west/east (SW3 = 1):	sets mode
 Button west/east together : export datalog to PC
@@ -46,8 +46,11 @@ Press external reset_button for:
 motor_enable: signal to roboteq motor controller, low will stop motor 
 power_off: signal disables power to motor controllers   
 
-SW0,SW1 sets kp value 0..3, kp value is displayed on LCD upper left corner digit
+SW0,SW1 sets kp value 0..3 
+SW2 sets moving average: '0': 64 samples x 2ms (display 'A') '1': 128 samples x 2ms (display 'B')
 SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
+
+kp value / moving average setting is displayed alternately on LCD upper left corner digit
 
 mode:
 A: set position via serial input, interface see 6-DOF BFF Motion Driver User Guide**
