@@ -32,28 +32,24 @@ entity top_flightsim_controller_n is
 		 motor_enable   : out std_logic;
 		 power_off      : out std_logic;
 		 buzzer         : out std_logic;
-
 		 home_sensor_1  : in  std_logic;
 		 home_sensor_2  : in  std_logic;
 		 home_sensor_3  : in  std_logic;
 		 home_sensor_4  : in  std_logic;
 		 home_sensor_5  : in  std_logic;
 		 home_sensor_6  : in  std_logic;
-
 		 serial_in_1    : in  std_logic;
 		 serial_in_2    : in  std_logic;
 		 serial_in_3    : in  std_logic;
 		 serial_in_4    : in  std_logic;
 		 serial_in_5    : in  std_logic;
 		 serial_in_6    : in  std_logic;
-
 		 serial_out_1   : out std_logic;
 		 serial_out_2   : out std_logic;
 		 serial_out_3   : out std_logic;
 		 serial_out_4   : out std_logic;
 		 serial_out_5   : out std_logic;
 		 serial_out_6   : out std_logic;
-
 		 rxd            : in  std_logic;
 		 txd            : out std_logic;
 		 log_txd        : out std_logic
@@ -111,97 +107,103 @@ architecture structure of top_flightsim_controller_n is
 	end component rotary_decoder_n;
 
 	component controller
-		port(clk         : in  std_logic;
-			 reset       : in  std_logic;
-			 sync_2ms    : in  std_logic;
-			 sync_20ms   : in  std_logic;
-			 start       : in  std_logic;
-			 en_16xbaud  : in  std_logic;
-			 serial_in   : in  std_logic;
-			 home_en     : in  std_logic;
-			 kp          : in  std_logic_vector(3 downto 0);
-			 home_sensor : in  std_logic;
-			 set_pos     : in  std_logic_vector(7 downto 0);
-			 drv_mode    : in  std_logic;
-			 drv_man     : in  std_logic_vector(10 downto 0);
-			 speed_limit : in  std_logic_vector(9 downto 0);
-			 position    : out std_logic_vector(7 downto 0);
-			 serial_out  : out std_logic;
-			 errors      : out std_logic_vector(4 downto 0);
-			 drv_log     : out std_logic_vector(3 downto 0));
+		port(
+			clk         : in  std_logic;
+			reset       : in  std_logic;
+			sync_2ms    : in  std_logic;
+			sync_20ms   : in  std_logic;
+			start       : in  std_logic;
+			en_16xbaud  : in  std_logic;
+			serial_in   : in  std_logic;
+			home_en     : in  std_logic;
+			kp          : in  std_logic_vector(3 downto 0);
+			home_sensor : in  std_logic;
+			set_pos     : in  std_logic_vector(13 downto 0);
+			drv_mode    : in  std_logic;
+			drv_man     : in  std_logic_vector(10 downto 0);
+			speed_limit : in  std_logic_vector(9 downto 0);
+			position    : out std_logic_vector(7 downto 0);
+			serial_out  : out std_logic;
+			errors      : out std_logic_vector(4 downto 0);
+			drv_log     : out std_logic_vector(3 downto 0)
+		);
 	end component controller;
 
 	component control
-		port(clk           : in  std_logic;
-			 reset         : in  std_logic;
-			 sync_2ms      : in  std_logic;
-			 sync_20ms     : in  std_logic;
-			 rotary_event  : in  std_logic;
-			 rotary_left   : in  std_logic;
-			 press         : in  std_logic;
-			 btn_north     : in  std_logic;
-			 btn_west      : in  std_logic;
-			 btn_east      : in  std_logic;
-			 btn_south     : in  std_logic;
-			 sw0           : in  std_logic;
-			 sw1           : in  std_logic;
-			 sw2           : in  std_logic;
-			 sw3           : in  std_logic;
-			 start         : out std_logic;
-			 home_enable   : out std_logic;
-			 kp            : out std_logic_vector(3 downto 0);
-			 set_pos_1     : out std_logic_vector(7 downto 0);
-			 set_pos_2     : out std_logic_vector(7 downto 0);
-			 set_pos_3     : out std_logic_vector(7 downto 0);
-			 set_pos_4     : out std_logic_vector(7 downto 0);
-			 set_pos_5     : out std_logic_vector(7 downto 0);
-			 set_pos_6     : out std_logic_vector(7 downto 0);
-			 drv_mode      : out std_logic;
-			 drv_man_1     : out std_logic_vector(10 downto 0);
-			 drv_man_2     : out std_logic_vector(10 downto 0);
-			 drv_man_3     : out std_logic_vector(10 downto 0);
-			 drv_man_4     : out std_logic_vector(10 downto 0);
-			 drv_man_5     : out std_logic_vector(10 downto 0);
-			 drv_man_6     : out std_logic_vector(10 downto 0);
-			 led           : out std_logic_vector(7 downto 0);
-			 val_1         : out std_logic_vector(63 downto 0);
-			 blank         : out integer range 0 to 6;
-			 ext_setpos_1  : in  std_logic_vector(7 downto 0);
-			 ext_setpos_2  : in  std_logic_vector(7 downto 0);
-			 ext_setpos_3  : in  std_logic_vector(7 downto 0);
-			 ext_setpos_4  : in  std_logic_vector(7 downto 0);
-			 ext_setpos_5  : in  std_logic_vector(7 downto 0);
-			 ext_setpos_6  : in  std_logic_vector(7 downto 0);
-			 demo_setpos_1 : in  std_logic_vector(7 downto 0);
-			 demo_setpos_2 : in  std_logic_vector(7 downto 0);
-			 demo_setpos_3 : in  std_logic_vector(7 downto 0);
-			 demo_setpos_4 : in  std_logic_vector(7 downto 0);
-			 demo_setpos_5 : in  std_logic_vector(7 downto 0);
-			 demo_setpos_6 : in  std_logic_vector(7 downto 0);
-			 calc_offsets  : out std_logic;
-			 errors_1      : in  std_logic_vector(4 downto 0);
-			 errors_2      : in  std_logic_vector(4 downto 0);
-			 errors_3      : in  std_logic_vector(4 downto 0);
-			 errors_4      : in  std_logic_vector(4 downto 0);
-			 errors_5      : in  std_logic_vector(4 downto 0);
-			 errors_6      : in  std_logic_vector(4 downto 0);
-			 singul_error  : in  std_logic;
-			 com_error     : in  std_logic;
-			 home_sensor_1 : in  std_logic;
-			 home_sensor_2 : in  std_logic;
-			 home_sensor_3 : in  std_logic;
-			 home_sensor_4 : in  std_logic;
-			 home_sensor_5 : in  std_logic;
-			 home_sensor_6 : in  std_logic;
-			 run_switch    : in  std_logic;
-			 reset_button  : in  std_logic;
-			 motor_enable  : out std_logic;
-			 power_off     : out std_logic;
-			 buzzer        : out std_logic;
-			 log_enable    : out std_logic;
-			 send_log      : out std_logic;
-			 tx_datalog    : in  std_logic;
-			 speed_limit   : out std_logic_vector(9 downto 0));
+		port(
+			clk           : in  std_logic;
+			reset         : in  std_logic;
+			sync_2ms      : in  std_logic;
+			sync_20ms     : in  std_logic;
+			rotary_event  : in  std_logic;
+			rotary_left   : in  std_logic;
+			press         : in  std_logic;
+			btn_north     : in  std_logic;
+			btn_west      : in  std_logic;
+			btn_east      : in  std_logic;
+			btn_south     : in  std_logic;
+			sw0           : in  std_logic;
+			sw1           : in  std_logic;
+			sw2           : in  std_logic;
+			sw3           : in  std_logic;
+			start         : out std_logic;
+			home_enable   : out std_logic;
+			kp            : out std_logic_vector(3 downto 0);
+			avg           : out std_logic;
+			lcd_char0     : out std_logic_vector(3 downto 0);
+			set_pos_1     : out std_logic_vector(13 downto 0);
+			set_pos_2     : out std_logic_vector(13 downto 0);
+			set_pos_3     : out std_logic_vector(13 downto 0);
+			set_pos_4     : out std_logic_vector(13 downto 0);
+			set_pos_5     : out std_logic_vector(13 downto 0);
+			set_pos_6     : out std_logic_vector(13 downto 0);
+			drv_mode      : out std_logic;
+			drv_man_1     : out std_logic_vector(10 downto 0);
+			drv_man_2     : out std_logic_vector(10 downto 0);
+			drv_man_3     : out std_logic_vector(10 downto 0);
+			drv_man_4     : out std_logic_vector(10 downto 0);
+			drv_man_5     : out std_logic_vector(10 downto 0);
+			drv_man_6     : out std_logic_vector(10 downto 0);
+			led           : out std_logic_vector(7 downto 0);
+			val_1         : out std_logic_vector(63 downto 0);
+			blank         : out integer range 0 to 6;
+			ext_setpos_1  : in  std_logic_vector(13 downto 0);
+			ext_setpos_2  : in  std_logic_vector(13 downto 0);
+			ext_setpos_3  : in  std_logic_vector(13 downto 0);
+			ext_setpos_4  : in  std_logic_vector(13 downto 0);
+			ext_setpos_5  : in  std_logic_vector(13 downto 0);
+			ext_setpos_6  : in  std_logic_vector(13 downto 0);
+			demo_setpos_1 : in  std_logic_vector(7 downto 0);
+			demo_setpos_2 : in  std_logic_vector(7 downto 0);
+			demo_setpos_3 : in  std_logic_vector(7 downto 0);
+			demo_setpos_4 : in  std_logic_vector(7 downto 0);
+			demo_setpos_5 : in  std_logic_vector(7 downto 0);
+			demo_setpos_6 : in  std_logic_vector(7 downto 0);
+			calc_offsets  : out std_logic;
+			errors_1      : in  std_logic_vector(4 downto 0);
+			errors_2      : in  std_logic_vector(4 downto 0);
+			errors_3      : in  std_logic_vector(4 downto 0);
+			errors_4      : in  std_logic_vector(4 downto 0);
+			errors_5      : in  std_logic_vector(4 downto 0);
+			errors_6      : in  std_logic_vector(4 downto 0);
+			singul_error  : in  std_logic;
+			com_error     : in  std_logic;
+			home_sensor_1 : in  std_logic;
+			home_sensor_2 : in  std_logic;
+			home_sensor_3 : in  std_logic;
+			home_sensor_4 : in  std_logic;
+			home_sensor_5 : in  std_logic;
+			home_sensor_6 : in  std_logic;
+			run_switch    : in  std_logic;
+			reset_button  : in  std_logic;
+			motor_enable  : out std_logic;
+			power_off     : out std_logic;
+			buzzer        : out std_logic;
+			log_enable    : out std_logic;
+			send_log      : out std_logic;
+			tx_datalog    : in  std_logic;
+			speed_limit   : out std_logic_vector(9 downto 0)
+		);
 	end component control;
 
 	component digital_filter
@@ -328,20 +330,23 @@ architecture structure of top_flightsim_controller_n is
 	end component bram_2048x128;
 
 	component moving_avg_filter
-		port(clk   : in  std_logic;
-			 reset : in  std_logic;
-			 in_1  : in  std_logic_vector(7 downto 0);
-			 in_2  : in  std_logic_vector(7 downto 0);
-			 in_3  : in  std_logic_vector(7 downto 0);
-			 in_4  : in  std_logic_vector(7 downto 0);
-			 in_5  : in  std_logic_vector(7 downto 0);
-			 in_6  : in  std_logic_vector(7 downto 0);
-			 out_1 : out std_logic_vector(7 downto 0);
-			 out_2 : out std_logic_vector(7 downto 0);
-			 out_3 : out std_logic_vector(7 downto 0);
-			 out_4 : out std_logic_vector(7 downto 0);
-			 out_5 : out std_logic_vector(7 downto 0);
-			 out_6 : out std_logic_vector(7 downto 0));
+		port(
+			clk   : in  std_logic;
+			reset : in  std_logic;
+			in_1  : in  std_logic_vector(7 downto 0);
+			in_2  : in  std_logic_vector(7 downto 0);
+			in_3  : in  std_logic_vector(7 downto 0);
+			in_4  : in  std_logic_vector(7 downto 0);
+			in_5  : in  std_logic_vector(7 downto 0);
+			in_6  : in  std_logic_vector(7 downto 0);
+			out_1 : out std_logic_vector(13 downto 0);
+			out_2 : out std_logic_vector(13 downto 0);
+			out_3 : out std_logic_vector(13 downto 0);
+			out_4 : out std_logic_vector(13 downto 0);
+			out_5 : out std_logic_vector(13 downto 0);
+			out_6 : out std_logic_vector(13 downto 0);
+			avg   : in  std_logic
+		);
 	end component moving_avg_filter;
 
 	-- declaration of signals used to interconnect 
@@ -370,12 +375,12 @@ architecture structure of top_flightsim_controller_n is
 	signal kp              : std_logic_vector(3 downto 0);
 	signal start           : std_logic;
 	signal home_enable     : std_logic;
-	signal set_pos_1       : std_logic_vector(7 downto 0);
-	signal set_pos_2       : std_logic_vector(7 downto 0);
-	signal set_pos_3       : std_logic_vector(7 downto 0);
-	signal set_pos_4       : std_logic_vector(7 downto 0);
-	signal set_pos_5       : std_logic_vector(7 downto 0);
-	signal set_pos_6       : std_logic_vector(7 downto 0);
+	signal set_pos_1       : std_logic_vector(13 downto 0);
+	signal set_pos_2       : std_logic_vector(13 downto 0);
+	signal set_pos_3       : std_logic_vector(13 downto 0);
+	signal set_pos_4       : std_logic_vector(13 downto 0);
+	signal set_pos_5       : std_logic_vector(13 downto 0);
+	signal set_pos_6       : std_logic_vector(13 downto 0);
 	signal drv_mode        : std_logic;
 	signal drv_man_1       : std_logic_vector(10 downto 0);
 	signal drv_man_2       : std_logic_vector(10 downto 0);
@@ -441,12 +446,14 @@ architecture structure of top_flightsim_controller_n is
 	signal drv_log_5       : std_logic_vector(3 downto 0);
 	signal drv_log_6       : std_logic_vector(3 downto 0);
 	signal motorenable     : std_logic;
-	signal byte_avg_2      : std_logic_vector(7 downto 0);
-	signal byte_avg_3      : std_logic_vector(7 downto 0);
-	signal byte_avg_4      : std_logic_vector(7 downto 0);
-	signal byte_avg_5      : std_logic_vector(7 downto 0);
-	signal byte_avg_6      : std_logic_vector(7 downto 0);
-	signal byte_avg_7      : std_logic_vector(7 downto 0);
+	signal byte_avg_2      : std_logic_vector(13 downto 0);
+	signal byte_avg_3      : std_logic_vector(13 downto 0);
+	signal byte_avg_4      : std_logic_vector(13 downto 0);
+	signal byte_avg_5      : std_logic_vector(13 downto 0);
+	signal byte_avg_6      : std_logic_vector(13 downto 0);
+	signal byte_avg_7      : std_logic_vector(13 downto 0);
+	signal avg             : std_logic;
+	signal lcd_char0       : std_logic_vector(3 downto 0);
 
 begin
 	-- component instantiations statements
@@ -653,6 +660,8 @@ begin
 			start         => start,
 			home_enable   => home_enable,
 			kp            => kp,
+			avg           => avg,
+			lcd_char0     => lcd_char0,
 			set_pos_1     => set_pos_1,
 			set_pos_2     => set_pos_2,
 			set_pos_3     => set_pos_3,
@@ -911,12 +920,12 @@ begin
 			position_4      => position_4,
 			position_5      => position_5,
 			position_6      => position_6,
-			set_pos_1       => set_pos_1,
-			set_pos_2       => set_pos_2,
-			set_pos_3       => set_pos_3,
-			set_pos_4       => set_pos_4,
-			set_pos_5       => set_pos_5,
-			set_pos_6       => set_pos_6,
+			set_pos_1       => set_pos_1(13 downto 6),
+			set_pos_2       => set_pos_2(13 downto 6),
+			set_pos_3       => set_pos_3(13 downto 6),
+			set_pos_4       => set_pos_4(13 downto 6),
+			set_pos_5       => set_pos_5(13 downto 6),
+			set_pos_6       => set_pos_6(13 downto 6),
 			drv_log_1       => drv_log_1,
 			drv_log_2       => drv_log_2,
 			drv_log_3       => drv_log_3,
@@ -968,7 +977,7 @@ begin
 
 	A37 : moving_avg_filter
 		port map(
-			clk   => sync_20ms,
+			clk   => sync_2ms,
 			reset => reset,
 			in_1  => byte_2,
 			in_2  => byte_3,
@@ -981,11 +990,12 @@ begin
 			out_3 => byte_avg_4,
 			out_4 => byte_avg_5,
 			out_5 => byte_avg_6,
-			out_6 => byte_avg_7
+			out_6 => byte_avg_7,
+			avg   => avg
 		);
 
 	-- additional statements 
-	val_0        <= kp & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
+	val_0        <= lcd_char0 & "0000" & position_1 & position_2 & "0000" & position_3 & position_4 & "0000" & position_5 & position_6; --LCD line1 1.6mm
 	txd          <= '1';
 	motor_enable <= motorenable;
 

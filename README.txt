@@ -47,7 +47,7 @@ motor_enable: signal to roboteq motor controller, low will stop motor
 power_off: signal disables power to motor controllers   
 
 SW0,SW1 sets kp value 0..3 
-SW2 sets moving average: '0': 64 samples x 2ms (display 'A') '1': 128 samples x 2ms (display 'B')
+SW2 sets moving average: '0'= fast: 64 samples x 2ms (display 'A') '1' = slow : 128 samples x 2ms (display 'B')
 SW3 = '1' sets mode of operation (mode is displayed on LCD lower left corner digit):
 
 kp value / moving average setting is displayed alternately on LCD upper left corner digit

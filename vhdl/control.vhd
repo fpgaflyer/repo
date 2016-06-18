@@ -487,13 +487,13 @@ begin
 		avg <= sw2;
 
 		if cnt_20ms(5) = '1' then
-			if avg = '1' then
+			if sw2 = '1' then
 				lcd_char0 <= X"B";
 			else
 				lcd_char0 <= X"A";
 			end if;
 		else
-			lcd_char0 <= kp;
+			lcd_char0 <= '0' & '0' & sw1 & sw0;
 		end if;
 
 		case mde is
